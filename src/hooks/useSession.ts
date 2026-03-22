@@ -12,6 +12,8 @@ import {
 } from "@/lib/ipc";
 
 interface UseSessionOptions {
+  /** Project name this session belongs to. */
+  projectName?: string;
   /** Working directory for the PTY session. */
   cwd: string;
   /** Command to run. Defaults to powershell.exe. */
@@ -37,6 +39,7 @@ interface UseSessionReturn {
 
 /** Hook to manage a single PTY session lifecycle. */
 export function useSession({
+  projectName,
   cwd,
   command,
   onOutput,
@@ -69,7 +72,7 @@ export function useSession({
         }
 
         sessionIdRef.current = id;
-        addSession(id);
+        addSession(id, projectName);
         updateStatus(id, "running");
 
         // Listen for output

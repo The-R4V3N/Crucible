@@ -4,6 +4,8 @@ use std::sync::Mutex;
 use tauri::{AppHandle, Emitter, State};
 use uuid::Uuid;
 
+use crate::config::WarpConfig;
+use crate::git::GitStatus;
 use crate::pty::PtyManager;
 
 /// Shared PTY manager state, wrapped in a Mutex for thread safety.
@@ -85,6 +87,48 @@ struct PtyOutputPayload {
 struct PtyExitPayload {
     session_id: String,
     code: Option<u32>,
+}
+
+/// Load the WARP configuration from the given path, or the default location.
+#[tauri::command]
+pub fn config_load(path: Option<String>) -> Result<WarpConfig, String> {
+    let config_path = match path {
+        Some(p) => std::path::PathBuf::from(p),
+        None => {
+            let exe_dir = std::env::current_exe()
+                .map_err(|e| e.to_string())?
+                .parent()
+                .ok_or("cannot determine exe directory")?
+                .to_path_buf();
+            // In dev mode, look in the project root (two levels up from exe)
+            let candidates = [
+                exe_dir.join("warp_config.json"),
+                exe_dir.join("../../warp_config.json"),
+                exe_dir.join("../../../warp_config.json"),
+                std::path::PathBuf::from("warp_config.json"),
+            ];
+            candidates
+                .into_iter()
+                .find(|p| p.exists())
+                .ok_or_else(|| "warp_config.json not found".to_string())?
+        }
+    };
+    crate::config::schema::load_config(&config_path)
+}
+
+/// Save the WARP configuration to the given path.
+#[tauri::command]
+pub fn config_save(config: WarpConfig, path: Option<String>) -> Result<(), String> {
+    let config_path = path
+        .map(std::path::PathBuf::from)
+        .unwrap_or_else(|| std::path::PathBuf::from("warp_config.json"));
+    crate::config::schema::save_config(&config, &config_path)
+}
+
+/// Get git status for a repository at the given path.
+#[tauri::command]
+pub fn git_status(path: String) -> Result<GitStatus, String> {
+    crate::git::status::get_git_status(&path)
 }
 
 /// Read PTY output in a loop and emit events to the frontend.

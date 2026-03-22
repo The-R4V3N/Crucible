@@ -6,6 +6,7 @@ export type SessionStatus = "starting" | "running" | "stopped" | "error";
 /** A PTY session tracked in the frontend. */
 export interface Session {
   id: string;
+  projectName: string;
   status: SessionStatus;
 }
 
@@ -13,24 +14,30 @@ export interface Session {
 interface SessionState {
   sessions: Record<string, Session>;
   activeSessionId: string | null;
-  addSession: (id: string) => void;
+  addSession: (id: string, projectName?: string) => void;
   updateStatus: (id: string, status: SessionStatus) => void;
   removeSession: (id: string) => void;
   setActiveSession: (id: string | null) => void;
+  getSessionByProject: (projectName: string) => Session | undefined;
 }
 
-export const useSessionStore = create<SessionState>((set) => ({
+export const useSessionStore = create<SessionState>((set, get) => ({
   sessions: {},
   activeSessionId: null,
 
-  addSession: (id) =>
+  addSession: (id, projectName = "default") =>
     set((state) => ({
       sessions: {
         ...state.sessions,
-        [id]: { id, status: "starting" },
+        [id]: { id, projectName, status: "starting" },
       },
       activeSessionId: state.activeSessionId ?? id,
     })),
+
+  getSessionByProject: (projectName) => {
+    const sessions = get().sessions;
+    return Object.values(sessions).find((s) => s.projectName === projectName);
+  },
 
   updateStatus: (id, status) =>
     set((state) => {

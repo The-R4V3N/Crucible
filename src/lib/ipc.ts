@@ -60,3 +60,34 @@ export async function onPtyExit(
     callback(event.payload);
   });
 }
+
+// --- Config IPC ---
+
+import type { WarpConfig } from "@/stores/configStore";
+
+/** Load WARP configuration from disk. */
+export async function configLoad(path?: string): Promise<WarpConfig> {
+  return invoke<WarpConfig>("config_load", { path: path ?? null });
+}
+
+/** Save WARP configuration to disk. */
+export async function configSave(
+  config: WarpConfig,
+  path?: string,
+): Promise<void> {
+  return invoke("config_save", { config, path: path ?? null });
+}
+
+// --- Git IPC ---
+
+/** Git status for a project. */
+export interface GitStatusInfo {
+  branch: string;
+  dirty: boolean;
+  changed_files: number;
+}
+
+/** Get git status for a repository at the given path. */
+export async function gitStatus(path: string): Promise<GitStatusInfo> {
+  return invoke<GitStatusInfo>("git_status", { path });
+}
