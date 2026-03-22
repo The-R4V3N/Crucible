@@ -77,3 +77,17 @@ export async function configSave(
 ): Promise<void> {
   return invoke("config_save", { config, path: path ?? null });
 }
+
+// --- Git IPC ---
+
+/** Git status for a project. */
+export interface GitStatusInfo {
+  branch: string;
+  dirty: boolean;
+  changed_files: number;
+}
+
+/** Get git status for a repository at the given path. */
+export async function gitStatus(path: string): Promise<GitStatusInfo> {
+  return invoke<GitStatusInfo>("git_status", { path });
+}

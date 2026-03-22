@@ -3,6 +3,7 @@
 
 pub mod commands;
 pub mod config;
+pub mod git;
 pub mod pty;
 
 use commands::PtyState;
@@ -21,6 +22,7 @@ pub fn run() {
             commands::pty_kill,
             commands::config_load,
             commands::config_save,
+            commands::git_status,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

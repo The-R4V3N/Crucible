@@ -5,6 +5,7 @@ use tauri::{AppHandle, Emitter, State};
 use uuid::Uuid;
 
 use crate::config::WarpConfig;
+use crate::git::GitStatus;
 use crate::pty::PtyManager;
 
 /// Shared PTY manager state, wrapped in a Mutex for thread safety.
@@ -122,6 +123,12 @@ pub fn config_save(config: WarpConfig, path: Option<String>) -> Result<(), Strin
         .map(std::path::PathBuf::from)
         .unwrap_or_else(|| std::path::PathBuf::from("warp_config.json"));
     crate::config::schema::save_config(&config, &config_path)
+}
+
+/// Get git status for a repository at the given path.
+#[tauri::command]
+pub fn git_status(path: String) -> Result<GitStatus, String> {
+    crate::git::status::get_git_status(&path)
 }
 
 /// Read PTY output in a loop and emit events to the frontend.
