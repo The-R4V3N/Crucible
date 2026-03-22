@@ -1,0 +1,29 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --warp-bg: #1e1e1e;
+  --warp-sidebar: #252526;
+  --warp-border: #3e3e3e;
+  --warp-text: #cccccc;
+  --warp-text-dim: #808080;
+  --warp-accent: #00e5ff;
+  --warp-success: #4ec9b0;
+  --warp-warning: #e5c07b;
+  --warp-error: #f44747;
+  --warp-attention: #007acc;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  background-color: var(--warp-bg);
+  color: var(--warp-text);
+  font-family: "Cascadia Code", Consolas, monospace;
+}
