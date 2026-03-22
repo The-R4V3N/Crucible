@@ -20,6 +20,8 @@ interface UseSessionOptions {
   onOutput?: (data: string) => void;
   /** Callback when PTY process exits. */
   onExit?: (code: number | null) => void;
+  /** Callback when an error occurs. */
+  onError?: (error: string) => void;
 }
 
 interface UseSessionReturn {
@@ -39,6 +41,7 @@ export function useSession({
   command,
   onOutput,
   onExit,
+  onError,
 }: UseSessionOptions): UseSessionReturn {
   const sessionIdRef = useRef<string | null>(null);
   const { addSession, updateStatus, removeSession } = useSessionStore();
@@ -48,6 +51,8 @@ export function useSession({
   onOutputRef.current = onOutput;
   const onExitRef = useRef(onExit);
   onExitRef.current = onExit;
+  const onErrorRef = useRef(onError);
+  onErrorRef.current = onError;
 
   useEffect(() => {
     let cancelled = false;
@@ -81,7 +86,9 @@ export function useSession({
             onExitRef.current?.(payload.code);
           }
         });
-      } catch {
+      } catch (err) {
+        const message = err instanceof Error ? err.message : String(err);
+        onErrorRef.current?.(message);
         if (sessionIdRef.current) {
           updateStatus(sessionIdRef.current, "error");
         }

@@ -35,10 +35,12 @@ interface TerminalViewProps {
   cwd: string;
   /** Command to run. Defaults to powershell.exe. */
   command?: string;
+  /** Callback for errors during session setup. */
+  onError?: (error: string) => void;
 }
 
 /** Terminal component that renders xterm.js connected to a PTY session. */
-function TerminalView({ cwd, command }: TerminalViewProps) {
+function TerminalView({ cwd, command, onError }: TerminalViewProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const terminalRef = useRef<Terminal | null>(null);
   const fitAddonRef = useRef<FitAddon | null>(null);
@@ -51,6 +53,10 @@ function TerminalView({ cwd, command }: TerminalViewProps) {
     },
     onExit: (_code) => {
       terminalRef.current?.write("\r\n\x1b[90m[Process exited]\x1b[0m\r\n");
+    },
+    onError: (err) => {
+      onError?.(err);
+      terminalRef.current?.write(`\r\n\x1b[31m[Error: ${err}]\x1b[0m\r\n`);
     },
   });
 
