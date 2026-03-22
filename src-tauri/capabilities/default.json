@@ -1,0 +1,16 @@
+{
+  "identifier": "default",
+  "description": "Default capabilities for WARP",
+  "windows": ["main"],
+  "permissions": [
+    "core:default",
+    "core:event:default",
+    "core:event:allow-listen",
+    "core:event:allow-emit",
+    "shell:default",
+    {
+      "identifier": "shell:allow-open",
+      "allow": [{ "name": "*" }]
+    }
+  ]
+}
