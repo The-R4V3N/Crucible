@@ -1,13 +1,17 @@
 import { useUiStore } from "@/stores/uiStore";
 import ProjectList from "./ProjectList";
+import SourceControl from "./SourceControl";
+import Shortcuts from "./Shortcuts";
 import type { ProjectConfig } from "@/stores/configStore";
+import type { GitStatusInfo } from "@/lib/ipc";
 
 interface SidebarProps {
   projects: ProjectConfig[];
+  gitStatus?: GitStatusInfo | null;
 }
 
-/** Left sidebar showing project list and status. */
-function Sidebar({ projects }: SidebarProps) {
+/** Left sidebar showing project list, source control, and shortcuts. */
+function Sidebar({ projects, gitStatus }: SidebarProps) {
   const sidebarVisible = useUiStore((s) => s.sidebarVisible);
 
   if (!sidebarVisible) return null;
@@ -28,6 +32,12 @@ function Sidebar({ projects }: SidebarProps) {
       <div className="flex-1 overflow-y-auto">
         <ProjectList projects={projects} />
       </div>
+
+      {/* Source control */}
+      <SourceControl gitStatus={gitStatus ?? null} />
+
+      {/* Shortcuts reference */}
+      <Shortcuts />
     </aside>
   );
 }
