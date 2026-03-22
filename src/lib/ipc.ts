@@ -60,3 +60,20 @@ export async function onPtyExit(
     callback(event.payload);
   });
 }
+
+// --- Config IPC ---
+
+import type { WarpConfig } from "@/stores/configStore";
+
+/** Load WARP configuration from disk. */
+export async function configLoad(path?: string): Promise<WarpConfig> {
+  return invoke<WarpConfig>("config_load", { path: path ?? null });
+}
+
+/** Save WARP configuration to disk. */
+export async function configSave(
+  config: WarpConfig,
+  path?: string,
+): Promise<void> {
+  return invoke("config_save", { config, path: path ?? null });
+}
