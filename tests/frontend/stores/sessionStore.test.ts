@@ -17,9 +17,14 @@ describe("sessionStore", () => {
   });
 
   it("addSession adds a session with starting status", () => {
-    useSessionStore.getState().addSession("s1");
+    useSessionStore.getState().addSession("s1", "project-a");
     const state = useSessionStore.getState();
-    expect(state.sessions["s1"]).toEqual({ id: "s1", status: "starting" });
+    expect(state.sessions["s1"]).toEqual({ id: "s1", projectName: "project-a", status: "starting" });
+  });
+
+  it("addSession defaults projectName to 'default'", () => {
+    useSessionStore.getState().addSession("s1");
+    expect(useSessionStore.getState().sessions["s1"]?.projectName).toBe("default");
   });
 
   it("addSession sets first session as active", () => {
@@ -31,6 +36,18 @@ describe("sessionStore", () => {
     useSessionStore.getState().addSession("s1");
     useSessionStore.getState().addSession("s2");
     expect(useSessionStore.getState().activeSessionId).toBe("s1");
+  });
+
+  it("getSessionByProject finds session by project name", () => {
+    useSessionStore.getState().addSession("s1", "project-a");
+    useSessionStore.getState().addSession("s2", "project-b");
+    const session = useSessionStore.getState().getSessionByProject("project-b");
+    expect(session?.id).toBe("s2");
+  });
+
+  it("getSessionByProject returns undefined for unknown project", () => {
+    const session = useSessionStore.getState().getSessionByProject("nonexistent");
+    expect(session).toBeUndefined();
   });
 
   it("updateStatus changes session status", () => {
