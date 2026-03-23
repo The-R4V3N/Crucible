@@ -3,6 +3,7 @@
 
 pub mod commands;
 pub mod config;
+pub mod files;
 pub mod git;
 pub mod pty;
 

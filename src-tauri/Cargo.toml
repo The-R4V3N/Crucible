@@ -21,6 +21,7 @@ portable-pty = "0.8"
 thiserror = "2"
 uuid = { version = "1", features = ["v4"] }
 git2 = "0.19"
+notify = "7"
 
 [features]
 default = ["custom-protocol"]
