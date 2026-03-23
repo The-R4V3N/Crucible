@@ -7,8 +7,10 @@ import {
   ptyKill,
   onPtyOutput,
   onPtyExit,
+  onPtyAttention,
   type PtyOutputPayload,
   type PtyExitPayload,
+  type PtyAttentionPayload,
 } from "@/lib/ipc";
 
 interface UseSessionOptions {
@@ -47,7 +49,7 @@ export function useSession({
   onError,
 }: UseSessionOptions): UseSessionReturn {
   const sessionIdRef = useRef<string | null>(null);
-  const { addSession, updateStatus, removeSession } = useSessionStore();
+  const { addSession, updateStatus, removeSession, setAttention } = useSessionStore();
 
   // Store callbacks in refs to avoid effect re-runs
   const onOutputRef = useRef(onOutput);
@@ -61,6 +63,7 @@ export function useSession({
     let cancelled = false;
     let unlistenOutput: (() => void) | undefined;
     let unlistenExit: (() => void) | undefined;
+    let unlistenAttention: (() => void) | undefined;
 
     const setup = async () => {
       try {
@@ -89,6 +92,13 @@ export function useSession({
             onExitRef.current?.(payload.code);
           }
         });
+
+        // Listen for attention
+        unlistenAttention = await onPtyAttention((payload: PtyAttentionPayload) => {
+          if (payload.session_id === id) {
+            setAttention(id, payload.needs_attention);
+          }
+        });
       } catch (err) {
         const message = err instanceof Error ? err.message : String(err);
         onErrorRef.current?.(message);
@@ -104,6 +114,7 @@ export function useSession({
       cancelled = true;
       unlistenOutput?.();
       unlistenExit?.();
+      unlistenAttention?.();
       const id = sessionIdRef.current;
       if (id) {
         ptyKill(id).catch(() => {});

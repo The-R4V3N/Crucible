@@ -8,6 +8,7 @@ export interface Session {
   id: string;
   projectName: string;
   status: SessionStatus;
+  needsAttention: boolean;
 }
 
 /** Session store state and actions. */
@@ -18,6 +19,7 @@ interface SessionState {
   updateStatus: (id: string, status: SessionStatus) => void;
   removeSession: (id: string) => void;
   setActiveSession: (id: string | null) => void;
+  setAttention: (id: string, needsAttention: boolean) => void;
   getSessionByProject: (projectName: string) => Session | undefined;
 }
 
@@ -29,7 +31,7 @@ export const useSessionStore = create<SessionState>((set, get) => ({
     set((state) => ({
       sessions: {
         ...state.sessions,
-        [id]: { id, projectName, status: "starting" },
+        [id]: { id, projectName, status: "starting", needsAttention: false },
       },
       activeSessionId: state.activeSessionId ?? id,
     })),
@@ -60,5 +62,25 @@ export const useSessionStore = create<SessionState>((set, get) => ({
       };
     }),
 
-  setActiveSession: (id) => set({ activeSessionId: id }),
+  setActiveSession: (id) =>
+    set((state) => {
+      const sessions = { ...state.sessions };
+      // Clear attention on the session being activated
+      if (id && sessions[id]) {
+        sessions[id] = { ...sessions[id], needsAttention: false };
+      }
+      return { activeSessionId: id, sessions };
+    }),
+
+  setAttention: (id, needsAttention) =>
+    set((state) => {
+      const session = state.sessions[id];
+      if (!session) return state;
+      return {
+        sessions: {
+          ...state.sessions,
+          [id]: { ...session, needsAttention },
+        },
+      };
+    }),
 }));
