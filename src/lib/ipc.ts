@@ -85,6 +85,7 @@ export interface GitStatusInfo {
   branch: string;
   dirty: boolean;
   changed_files: number;
+  changed_file_paths: string[];
 }
 
 /** Get git status for a repository at the given path. */
