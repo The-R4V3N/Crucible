@@ -6,7 +6,7 @@ use uuid::Uuid;
 
 use crate::config::WarpConfig;
 use crate::files::{self, FileNode};
-use crate::git::GitStatus;
+use crate::git::{FileDiff, GitStatus};
 use crate::pty::PtyManager;
 
 /// Shared PTY manager state, wrapped in a Mutex for thread safety.
@@ -130,6 +130,12 @@ pub fn config_save(config: WarpConfig, path: Option<String>) -> Result<(), Strin
 #[tauri::command]
 pub fn git_status(path: String) -> Result<GitStatus, String> {
     crate::git::status::get_git_status(&path)
+}
+
+/// Get the diff for a specific file in the working directory.
+#[tauri::command]
+pub fn git_diff(repo_path: String, file_path: String) -> Result<FileDiff, String> {
+    crate::git::diff::get_file_diff(&repo_path, &file_path)
 }
 
 /// Get the file tree for a directory.

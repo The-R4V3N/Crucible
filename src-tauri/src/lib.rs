@@ -24,6 +24,7 @@ pub fn run() {
             commands::config_load,
             commands::config_save,
             commands::git_status,
+            commands::git_diff,
             commands::file_tree,
             commands::file_read,
             commands::file_write,

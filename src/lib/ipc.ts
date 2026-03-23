@@ -92,6 +92,21 @@ export async function gitStatus(path: string): Promise<GitStatusInfo> {
   return invoke<GitStatusInfo>("git_status", { path });
 }
 
+/** File diff result. */
+export interface FileDiffInfo {
+  path: string;
+  old_content: string;
+  new_content: string;
+}
+
+/** Get the diff for a file in the working directory vs HEAD. */
+export async function gitDiff(
+  repoPath: string,
+  filePath: string,
+): Promise<FileDiffInfo> {
+  return invoke<FileDiffInfo>("git_diff", { repoPath, filePath });
+}
+
 // --- File IPC ---
 
 /** A node in the file tree. */
