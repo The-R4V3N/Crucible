@@ -91,3 +91,51 @@ export interface GitStatusInfo {
 export async function gitStatus(path: string): Promise<GitStatusInfo> {
   return invoke<GitStatusInfo>("git_status", { path });
 }
+
+// --- File IPC ---
+
+/** A node in the file tree. */
+export interface FileNode {
+  name: string;
+  path: string;
+  is_dir: boolean;
+  children: FileNode[];
+}
+
+/** File change event payload. */
+export interface FileChangedPayload {
+  path: string;
+  kind: string;
+}
+
+/** Get the file tree for a directory. */
+export async function fileTree(
+  path: string,
+  maxDepth?: number,
+): Promise<FileNode> {
+  return invoke<FileNode>("file_tree", { path, maxDepth: maxDepth ?? null });
+}
+
+/** Read a file's contents. */
+export async function fileRead(path: string): Promise<string> {
+  return invoke<string>("file_read", { path });
+}
+
+/** Write content to a file. */
+export async function fileWrite(path: string, content: string): Promise<void> {
+  return invoke("file_write", { path, content });
+}
+
+/** Start watching a directory for file changes. */
+export async function fileWatchStart(path: string): Promise<void> {
+  return invoke("file_watch_start", { path });
+}
+
+/** Listen for file change events. Returns an unlisten function. */
+export async function onFileChanged(
+  callback: (payload: FileChangedPayload) => void,
+): Promise<UnlistenFn> {
+  return listen<FileChangedPayload>("file:changed", (event) => {
+    callback(event.payload);
+  });
+}

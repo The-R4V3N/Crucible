@@ -5,6 +5,7 @@ use tauri::{AppHandle, Emitter, State};
 use uuid::Uuid;
 
 use crate::config::WarpConfig;
+use crate::files::{self, FileNode};
 use crate::git::GitStatus;
 use crate::pty::PtyManager;
 
@@ -129,6 +130,38 @@ pub fn config_save(config: WarpConfig, path: Option<String>) -> Result<(), Strin
 #[tauri::command]
 pub fn git_status(path: String) -> Result<GitStatus, String> {
     crate::git::status::get_git_status(&path)
+}
+
+/// Get the file tree for a directory.
+#[tauri::command]
+pub fn file_tree(path: String, max_depth: Option<usize>) -> Result<FileNode, String> {
+    files::build_tree(
+        &std::path::PathBuf::from(&path),
+        max_depth.unwrap_or(5),
+    )
+}
+
+/// Read a file's contents.
+#[tauri::command]
+pub fn file_read(path: String) -> Result<String, String> {
+    files::read_file(&std::path::PathBuf::from(&path))
+}
+
+/// Write content to a file.
+#[tauri::command]
+pub fn file_write(path: String, content: String) -> Result<(), String> {
+    files::write_file(&std::path::PathBuf::from(&path), &content)
+}
+
+/// Start watching a directory for file changes.
+#[tauri::command]
+pub fn file_watch_start(app: AppHandle, path: String) -> Result<(), String> {
+    // Start the watcher — it runs in a background thread
+    // The watcher handle is intentionally leaked to keep it alive
+    let watcher = files::start_watcher(app, &path)?;
+    // Leak the watcher so it keeps running until the app exits
+    std::mem::forget(watcher);
+    Ok(())
 }
 
 /// Read PTY output in a loop and emit events to the frontend.
