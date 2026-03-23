@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
 import Sidebar from "@/components/sidebar/Sidebar";
-import TerminalManager from "@/components/terminal/TerminalManager";
 import TabBar from "@/components/layout/TabBar";
+import ViewRenderer from "@/components/layout/ViewRenderer";
+import SplitPane from "@/components/panels/SplitPane";
 import FileExplorer from "@/components/explorer/FileExplorer";
-import EditorView from "@/components/editor/EditorView";
-import DiffView from "@/components/diff/DiffView";
 import { useConfigStore } from "@/stores/configStore";
 import { useSessionStore } from "@/stores/sessionStore";
 import { useUiStore } from "@/stores/uiStore";
@@ -51,6 +50,8 @@ function App() {
 
   const activeView = useUiStore((s) => s.activeView);
   const explorerVisible = useUiStore((s) => s.explorerVisible);
+  const splitMode = useUiStore((s) => s.splitMode);
+  const splitViews = useUiStore((s) => s.splitViews);
   const activeFilePath = useFileStore((s) => s.activeFilePath);
 
   // Keyboard shortcuts
@@ -105,14 +106,30 @@ function App() {
       <main className="flex-1 min-w-0 flex flex-col">
         <TabBar />
         <div className="flex-1 min-h-0">
-          {activeView === "terminal" && (
-            <TerminalManager projects={projects} onError={setError} />
-          )}
-          {activeView === "editor" && <EditorView />}
-          {activeView === "diff" && (
-            <DiffView
+          {splitMode ? (
+            <SplitPane orientation={splitMode}>
+              <ViewRenderer
+                view={splitViews[0]}
+                projects={projects}
+                repoPath={activeProject?.path ?? "."}
+                diffFilePath={activeFilePath}
+                onError={setError}
+              />
+              <ViewRenderer
+                view={splitViews[1]}
+                projects={projects}
+                repoPath={activeProject?.path ?? "."}
+                diffFilePath={activeFilePath}
+                onError={setError}
+              />
+            </SplitPane>
+          ) : (
+            <ViewRenderer
+              view={activeView}
+              projects={projects}
               repoPath={activeProject?.path ?? "."}
-              filePath={activeFilePath}
+              diffFilePath={activeFilePath}
+              onError={setError}
             />
           )}
         </div>

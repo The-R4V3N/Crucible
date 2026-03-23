@@ -72,7 +72,7 @@ describe("App", () => {
   beforeEach(() => {
     useConfigStore.setState({ config: null, isLoaded: false });
     useSessionStore.setState({ sessions: {}, activeSessionId: null });
-    useUiStore.setState({ sidebarVisible: true, explorerVisible: false, activeView: "terminal" });
+    useUiStore.setState({ sidebarVisible: true, explorerVisible: false, activeView: "terminal", splitMode: null, splitViews: ["terminal", "terminal"] });
   });
 
   it("shows loading state initially", () => {
