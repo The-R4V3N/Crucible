@@ -170,9 +170,17 @@ pub fn file_watch_start(app: AppHandle, path: String) -> Result<(), String> {
     Ok(())
 }
 
+/// Payload for attention events sent to the frontend.
+#[derive(Clone, serde::Serialize)]
+struct PtyAttentionPayload {
+    session_id: String,
+    needs_attention: bool,
+}
+
 /// Read PTY output in a loop and emit events to the frontend.
 fn read_pty_output(mut reader: Box<dyn Read + Send>, session_id: &str, app: &AppHandle) {
     let mut buf = [0u8; 4096];
+    let mut attention = crate::pty::AttentionDetector::new();
     loop {
         match reader.read(&mut buf) {
             Ok(0) => {
@@ -193,9 +201,20 @@ fn read_pty_output(mut reader: Box<dyn Read + Send>, session_id: &str, app: &App
                     "pty:output",
                     PtyOutputPayload {
                         session_id: session_id.to_string(),
-                        data,
+                        data: data.clone(),
                     },
                 );
+
+                // Check for attention patterns
+                if attention.process_output(&data) {
+                    let _ = app.emit(
+                        "pty:attention",
+                        PtyAttentionPayload {
+                            session_id: session_id.to_string(),
+                            needs_attention: true,
+                        },
+                    );
+                }
             }
             Err(_) => {
                 let _ = app.emit(

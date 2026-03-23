@@ -52,6 +52,21 @@ export async function onPtyOutput(
   });
 }
 
+/** Payload emitted by the pty:attention event. */
+export interface PtyAttentionPayload {
+  session_id: string;
+  needs_attention: boolean;
+}
+
+/** Listen for PTY attention events. Returns an unlisten function. */
+export async function onPtyAttention(
+  callback: (payload: PtyAttentionPayload) => void,
+): Promise<UnlistenFn> {
+  return listen<PtyAttentionPayload>("pty:attention", (event) => {
+    callback(event.payload);
+  });
+}
+
 /** Listen for PTY exit events. Returns an unlisten function. */
 export async function onPtyExit(
   callback: (payload: PtyExitPayload) => void,
