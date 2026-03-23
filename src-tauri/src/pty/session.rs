@@ -5,6 +5,61 @@ use portable_pty::{native_pty_system, Child, CommandBuilder, MasterPty, PtySize}
 
 use super::error::PtyError;
 
+/// Read the user-level PATH from the Windows registry and merge it
+/// with the current process PATH to ensure user-installed tools are available.
+#[cfg(windows)]
+fn get_user_path_from_registry() -> String {
+    use std::process::Command;
+    // Query the user's PATH from the registry
+    let output = Command::new("reg")
+        .args([
+            "query",
+            "HKCU\\Environment",
+            "/v",
+            "Path",
+        ])
+        .output();
+
+    match output {
+        Ok(out) => {
+            let stdout = String::from_utf8_lossy(&out.stdout);
+            // Parse the REG_EXPAND_SZ or REG_SZ value from the output
+            // Format: "    Path    REG_EXPAND_SZ    value"
+            for line in stdout.lines() {
+                let trimmed = line.trim();
+                if trimmed.starts_with("Path") || trimmed.starts_with("PATH") {
+                    // Split by whitespace and take everything after REG_*_SZ
+                    let parts: Vec<&str> = trimmed.splitn(3, "    ").collect();
+                    if let Some(value) = parts.last() {
+                        return value.trim().to_string();
+                    }
+                }
+            }
+            String::new()
+        }
+        Err(_) => String::new(),
+    }
+}
+
+/// Merge user PATH entries into an existing PATH string, avoiding duplicates.
+#[cfg(windows)]
+fn merge_path(current: &str, user_path: &str) -> String {
+    let current_entries: std::collections::HashSet<String> = current
+        .split(';')
+        .map(|s| s.trim().to_lowercase())
+        .collect();
+
+    let mut result = current.to_string();
+    for entry in user_path.split(';') {
+        let entry = entry.trim();
+        if !entry.is_empty() && !current_entries.contains(&entry.to_lowercase()) {
+            result.push(';');
+            result.push_str(entry);
+        }
+    }
+    result
+}
+
 /// Represents the current state of a PTY session.
 #[derive(Debug, Clone, PartialEq, Eq, serde::Serialize)]
 #[serde(rename_all = "lowercase")]
@@ -71,6 +126,18 @@ impl PtySession {
 
         let mut cmd = CommandBuilder::new(command);
         cmd.cwd(cwd);
+
+        // On Windows, merge user-level PATH from registry so tools like
+        // claude, cargo, etc. are available in the PTY session
+        #[cfg(windows)]
+        {
+            let user_path = get_user_path_from_registry();
+            if !user_path.is_empty() {
+                let current_path = std::env::var("PATH").unwrap_or_default();
+                let merged = merge_path(&current_path, &user_path);
+                cmd.env("PATH", &merged);
+            }
+        }
 
         let child = pair
             .slave
@@ -272,5 +339,16 @@ mod tests {
         assert!(reader.is_ok(), "take_reader failed: {:?}", reader.err());
         // Clean up
         let _ = session.kill();
+    }
+
+    #[cfg(windows)]
+    #[test]
+    fn test_get_user_path_returns_entries() {
+        let user_path = get_user_path_from_registry();
+        // On a dev machine, user PATH should have at least one entry
+        assert!(
+            !user_path.is_empty(),
+            "user PATH from registry should not be empty"
+        );
     }
 }
