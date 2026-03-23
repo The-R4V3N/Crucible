@@ -11,6 +11,7 @@ interface UseKeyboardOptions {
 /** Global keyboard shortcut handler. */
 export function useKeyboard({ projects }: UseKeyboardOptions) {
   const toggleSidebar = useUiStore((s) => s.toggleSidebar);
+  const toggleExplorer = useUiStore((s) => s.toggleExplorer);
   const sessions = useSessionStore((s) => s.sessions);
   const setActiveSession = useSessionStore((s) => s.setActiveSession);
 
@@ -20,6 +21,13 @@ export function useKeyboard({ projects }: UseKeyboardOptions) {
       if (e.ctrlKey && e.key === "b") {
         e.preventDefault();
         toggleSidebar();
+        return;
+      }
+
+      // Ctrl+E — toggle file explorer
+      if (e.ctrlKey && e.key === "e") {
+        e.preventDefault();
+        toggleExplorer();
         return;
       }
 
@@ -42,5 +50,5 @@ export function useKeyboard({ projects }: UseKeyboardOptions) {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [projects, sessions, toggleSidebar, setActiveSession]);
+  }, [projects, sessions, toggleSidebar, toggleExplorer, setActiveSession]);
 }

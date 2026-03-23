@@ -3,6 +3,7 @@
 
 pub mod commands;
 pub mod config;
+pub mod files;
 pub mod git;
 pub mod pty;
 
@@ -23,6 +24,11 @@ pub fn run() {
             commands::config_load,
             commands::config_save,
             commands::git_status,
+            commands::git_diff,
+            commands::file_tree,
+            commands::file_read,
+            commands::file_write,
+            commands::file_watch_start,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

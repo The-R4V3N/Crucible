@@ -1,10 +1,17 @@
 import { useEffect, useState } from "react";
 import Sidebar from "@/components/sidebar/Sidebar";
 import TerminalManager from "@/components/terminal/TerminalManager";
+import TabBar from "@/components/layout/TabBar";
+import FileExplorer from "@/components/explorer/FileExplorer";
+import EditorView from "@/components/editor/EditorView";
+import DiffView from "@/components/diff/DiffView";
 import { useConfigStore } from "@/stores/configStore";
 import { useSessionStore } from "@/stores/sessionStore";
+import { useUiStore } from "@/stores/uiStore";
 import { useKeyboard } from "@/hooks/useKeyboard";
 import { useGit } from "@/hooks/useGit";
+import { useFileWatcher } from "@/hooks/useFileWatcher";
+import { useFileStore } from "@/stores/fileStore";
 import { configLoad } from "@/lib/ipc";
 
 function App() {
@@ -42,11 +49,21 @@ function App() {
       });
   }, [setConfig]);
 
+  const activeView = useUiStore((s) => s.activeView);
+  const explorerVisible = useUiStore((s) => s.explorerVisible);
+  const activeFilePath = useFileStore((s) => s.activeFilePath);
+
   // Keyboard shortcuts
   useKeyboard({ projects });
 
   // Git status for active project
   const { status: gitStatus } = useGit({
+    path: activeProject?.path ?? ".",
+    enabled: isLoaded,
+  });
+
+  // File watcher for active project
+  useFileWatcher({
     path: activeProject?.path ?? ".",
     enabled: isLoaded,
   });
@@ -77,9 +94,28 @@ function App() {
       {/* Sidebar */}
       <Sidebar projects={projects} gitStatus={gitStatus} />
 
-      {/* Terminal area */}
-      <main className="flex-1 min-w-0">
-        <TerminalManager projects={projects} onError={setError} />
+      {/* File explorer panel */}
+      {explorerVisible && (
+        <div className="w-60 flex-shrink-0 border-r border-warp-border">
+          <FileExplorer />
+        </div>
+      )}
+
+      {/* Main content area */}
+      <main className="flex-1 min-w-0 flex flex-col">
+        <TabBar />
+        <div className="flex-1 min-h-0">
+          {activeView === "terminal" && (
+            <TerminalManager projects={projects} onError={setError} />
+          )}
+          {activeView === "editor" && <EditorView />}
+          {activeView === "diff" && (
+            <DiffView
+              repoPath={activeProject?.path ?? "."}
+              filePath={activeFilePath}
+            />
+          )}
+        </div>
       </main>
     </div>
   );

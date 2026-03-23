@@ -53,6 +53,17 @@ vi.mock("@/lib/ipc", () => ({
   onPtyOutput: vi.fn().mockResolvedValue(vi.fn()),
   onPtyExit: vi.fn().mockResolvedValue(vi.fn()),
   gitStatus: vi.fn().mockResolvedValue({ branch: "main", dirty: false, changed_files: 0 }),
+  gitDiff: vi.fn().mockResolvedValue({ path: "", old_content: "", new_content: "" }),
+  fileTree: vi.fn().mockResolvedValue({ name: "root", path: "/tmp", is_dir: true, children: [] }),
+  fileRead: vi.fn().mockResolvedValue(""),
+  fileWrite: vi.fn().mockResolvedValue(undefined),
+  fileWatchStart: vi.fn().mockResolvedValue(undefined),
+  onFileChanged: vi.fn().mockResolvedValue(vi.fn()),
+}));
+
+vi.mock("@monaco-editor/react", () => ({
+  default: vi.fn(() => <div data-testid="monaco-editor" />),
+  DiffEditor: vi.fn(() => <div data-testid="monaco-diff-editor" />),
 }));
 
 import App from "@/App";
@@ -61,7 +72,7 @@ describe("App", () => {
   beforeEach(() => {
     useConfigStore.setState({ config: null, isLoaded: false });
     useSessionStore.setState({ sessions: {}, activeSessionId: null });
-    useUiStore.setState({ sidebarVisible: true });
+    useUiStore.setState({ sidebarVisible: true, explorerVisible: false, activeView: "terminal" });
   });
 
   it("shows loading state initially", () => {
