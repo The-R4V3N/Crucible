@@ -10,6 +10,8 @@ pub struct GitStatus {
     pub dirty: bool,
     /// Number of changed files.
     pub changed_files: usize,
+    /// Paths of changed files (relative to repo root).
+    pub changed_file_paths: Vec<String>,
 }
 
 /// Get the git status for a repository at the given path.
@@ -18,12 +20,13 @@ pub fn get_git_status(path: &str) -> Result<GitStatus, String> {
         .map_err(|e| format!("not a git repository: {e}"))?;
 
     let branch = get_branch_name(&repo);
-    let (dirty, changed_files) = get_dirty_status(&repo);
+    let (dirty, changed_files, changed_file_paths) = get_dirty_status(&repo);
 
     Ok(GitStatus {
         branch,
         dirty,
         changed_files,
+        changed_file_paths,
     })
 }
 
@@ -37,8 +40,8 @@ fn get_branch_name(repo: &Repository) -> String {
     "HEAD".to_string()
 }
 
-/// Check if the working directory is dirty and count changed files.
-fn get_dirty_status(repo: &Repository) -> (bool, usize) {
+/// Check if the working directory is dirty, count changed files, and collect paths.
+fn get_dirty_status(repo: &Repository) -> (bool, usize, Vec<String>) {
     let mut opts = git2::StatusOptions::new();
     opts.include_untracked(true)
         .recurse_untracked_dirs(false);
@@ -46,9 +49,13 @@ fn get_dirty_status(repo: &Repository) -> (bool, usize) {
     match repo.statuses(Some(&mut opts)) {
         Ok(statuses) => {
             let changed = statuses.len();
-            (changed > 0, changed)
+            let paths: Vec<String> = statuses
+                .iter()
+                .filter_map(|entry| entry.path().map(|p| p.to_string()))
+                .collect();
+            (changed > 0, changed, paths)
         }
-        Err(_) => (false, 0),
+        Err(_) => (false, 0, Vec::new()),
     }
 }
 
@@ -92,5 +99,16 @@ mod tests {
         assert!(result.changed_files >= 0);
         // dirty flag should match whether there are changes
         assert_eq!(result.dirty, result.changed_files > 0);
+    }
+
+    #[test]
+    fn test_git_status_returns_changed_file_paths() {
+        let result = get_git_status(".").unwrap();
+        // changed_file_paths length should match changed_files count
+        assert_eq!(result.changed_file_paths.len(), result.changed_files);
+        // Each path should be a non-empty string
+        for path in &result.changed_file_paths {
+            assert!(!path.is_empty(), "changed file path should not be empty");
+        }
     }
 }

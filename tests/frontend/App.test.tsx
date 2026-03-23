@@ -52,7 +52,7 @@ vi.mock("@/lib/ipc", () => ({
   ptyKill: vi.fn().mockResolvedValue(undefined),
   onPtyOutput: vi.fn().mockResolvedValue(vi.fn()),
   onPtyExit: vi.fn().mockResolvedValue(vi.fn()),
-  gitStatus: vi.fn().mockResolvedValue({ branch: "main", dirty: false, changed_files: 0 }),
+  gitStatus: vi.fn().mockResolvedValue({ branch: "main", dirty: false, changed_files: 0, changed_file_paths: [] }),
   gitDiff: vi.fn().mockResolvedValue({ path: "", old_content: "", new_content: "" }),
   fileTree: vi.fn().mockResolvedValue({ name: "root", path: "/tmp", is_dir: true, children: [] }),
   fileRead: vi.fn().mockResolvedValue(""),
