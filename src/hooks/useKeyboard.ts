@@ -12,6 +12,7 @@ interface UseKeyboardOptions {
 export function useKeyboard({ projects }: UseKeyboardOptions) {
   const toggleSidebar = useUiStore((s) => s.toggleSidebar);
   const toggleExplorer = useUiStore((s) => s.toggleExplorer);
+  const toggleBottomPanel = useUiStore((s) => s.toggleBottomPanel);
   const splitVertical = useUiStore((s) => s.splitVertical);
   const splitHorizontal = useUiStore((s) => s.splitHorizontal);
   const closeSplit = useUiStore((s) => s.closeSplit);
@@ -49,6 +50,13 @@ export function useKeyboard({ projects }: UseKeyboardOptions) {
         return;
       }
 
+      // Ctrl+` — toggle bottom panel
+      if (e.ctrlKey && e.key === "`") {
+        e.preventDefault();
+        toggleBottomPanel();
+        return;
+      }
+
       // Ctrl+W — close split (if active)
       if (e.ctrlKey && e.key === "w" && splitMode) {
         e.preventDefault();
@@ -75,5 +83,5 @@ export function useKeyboard({ projects }: UseKeyboardOptions) {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [projects, sessions, toggleSidebar, toggleExplorer, splitVertical, splitHorizontal, closeSplit, splitMode, setActiveSession]);
+  }, [projects, sessions, toggleSidebar, toggleExplorer, toggleBottomPanel, splitVertical, splitHorizontal, closeSplit, splitMode, setActiveSession]);
 }

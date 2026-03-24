@@ -10,12 +10,14 @@ export type SplitMode = "vertical" | "horizontal" | null;
 interface UiState {
   sidebarVisible: boolean;
   explorerVisible: boolean;
+  bottomPanelVisible: boolean;
   activeView: ViewType;
   splitMode: SplitMode;
   splitViews: [ViewType, ViewType];
   toggleSidebar: () => void;
   setSidebarVisible: (visible: boolean) => void;
   toggleExplorer: () => void;
+  toggleBottomPanel: () => void;
   setActiveView: (view: ViewType) => void;
   splitVertical: () => void;
   splitHorizontal: () => void;
@@ -26,6 +28,7 @@ interface UiState {
 export const useUiStore = create<UiState>((set) => ({
   sidebarVisible: true,
   explorerVisible: false,
+  bottomPanelVisible: false,
   activeView: "terminal",
   splitMode: null,
   splitViews: ["terminal", "terminal"] as [ViewType, ViewType],
@@ -37,6 +40,9 @@ export const useUiStore = create<UiState>((set) => ({
 
   toggleExplorer: () =>
     set((state) => ({ explorerVisible: !state.explorerVisible })),
+
+  toggleBottomPanel: () =>
+    set((state) => ({ bottomPanelVisible: !state.bottomPanelVisible })),
 
   setActiveView: (view) => set({ activeView: view }),
 
