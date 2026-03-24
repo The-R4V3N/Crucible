@@ -5,7 +5,7 @@ use tauri::{AppHandle, Emitter, State};
 use uuid::Uuid;
 
 use crate::config::WarpConfig;
-use crate::files::{self, FileNode};
+use crate::files::{self, FileNode, SearchMatch};
 use crate::git::{FileDiff, GitStatus};
 use crate::pty::PtyManager;
 
@@ -157,6 +157,20 @@ pub fn file_read(path: String) -> Result<String, String> {
 #[tauri::command]
 pub fn file_write(path: String, content: String) -> Result<(), String> {
     files::write_file(&std::path::PathBuf::from(&path), &content)
+}
+
+/// Search for a pattern in project files.
+#[tauri::command]
+pub fn file_search(
+    path: String,
+    query: String,
+    max_results: Option<usize>,
+) -> Result<Vec<SearchMatch>, String> {
+    files::search_files(
+        &std::path::PathBuf::from(&path),
+        &query,
+        max_results.unwrap_or(100),
+    )
 }
 
 /// Start watching a directory for file changes.

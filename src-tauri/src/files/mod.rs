@@ -1,6 +1,8 @@
+pub mod search;
 pub mod tree;
 pub mod watcher;
 
+pub use search::{search_files, SearchMatch};
 pub use tree::{build_tree, FileNode};
 pub use watcher::{start_watcher, FileChangedPayload};
 

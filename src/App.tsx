@@ -3,7 +3,9 @@ import Sidebar from "@/components/sidebar/Sidebar";
 import TabBar from "@/components/layout/TabBar";
 import ViewRenderer from "@/components/layout/ViewRenderer";
 import SplitPane from "@/components/panels/SplitPane";
+import BottomPanel from "@/components/panels/BottomPanel";
 import FileExplorer from "@/components/explorer/FileExplorer";
+import SearchPanel from "@/components/search/SearchPanel";
 import { useConfigStore } from "@/stores/configStore";
 import { useSessionStore } from "@/stores/sessionStore";
 import { useUiStore } from "@/stores/uiStore";
@@ -52,6 +54,8 @@ function App() {
   const explorerVisible = useUiStore((s) => s.explorerVisible);
   const splitMode = useUiStore((s) => s.splitMode);
   const splitViews = useUiStore((s) => s.splitViews);
+  const searchVisible = useUiStore((s) => s.searchVisible);
+  const toggleSearch = useUiStore((s) => s.toggleSearch);
   const activeFilePath = useFileStore((s) => s.activeFilePath);
 
   // Keyboard shortcuts
@@ -102,9 +106,22 @@ function App() {
         </div>
       )}
 
+      {/* Search panel */}
+      {searchVisible && (
+        <div className="w-72 flex-shrink-0 border-r border-warp-border">
+          <SearchPanel
+            projectPath={activeProject?.path ?? "."}
+            onResultClick={(filePath) => {
+              useFileStore.getState().openFile(filePath, filePath.split("/").pop() ?? filePath);
+              useUiStore.getState().setActiveView("editor");
+            }}
+          />
+        </div>
+      )}
+
       {/* Main content area */}
       <main className="flex-1 min-w-0 flex flex-col">
-        <TabBar />
+        <TabBar onSearchToggle={toggleSearch} />
         <div className="flex-1 min-h-0">
           {splitMode ? (
             <SplitPane orientation={splitMode}>
@@ -133,6 +150,14 @@ function App() {
             />
           )}
         </div>
+
+        {/* Bottom panel */}
+        <BottomPanel
+          changedFiles={gitStatus?.changed_file_paths ?? []}
+          onFileClick={(filePath) => {
+            useUiStore.getState().setActiveView("diff");
+          }}
+        />
       </main>
     </div>
   );

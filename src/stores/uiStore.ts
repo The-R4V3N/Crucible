@@ -11,14 +11,18 @@ interface UiState {
   sidebarVisible: boolean;
   explorerVisible: boolean;
   bottomPanelVisible: boolean;
+  searchVisible: boolean;
   activeView: ViewType;
+  tabOrder: ViewType[];
   splitMode: SplitMode;
   splitViews: [ViewType, ViewType];
   toggleSidebar: () => void;
   setSidebarVisible: (visible: boolean) => void;
   toggleExplorer: () => void;
   toggleBottomPanel: () => void;
+  toggleSearch: () => void;
   setActiveView: (view: ViewType) => void;
+  reorderTabs: (fromIndex: number, toIndex: number) => void;
   splitVertical: () => void;
   splitHorizontal: () => void;
   closeSplit: () => void;
@@ -29,7 +33,9 @@ export const useUiStore = create<UiState>((set) => ({
   sidebarVisible: true,
   explorerVisible: false,
   bottomPanelVisible: false,
+  searchVisible: false,
   activeView: "terminal",
+  tabOrder: ["terminal", "editor", "diff"] as ViewType[],
   splitMode: null,
   splitViews: ["terminal", "terminal"] as [ViewType, ViewType],
 
@@ -44,7 +50,20 @@ export const useUiStore = create<UiState>((set) => ({
   toggleBottomPanel: () =>
     set((state) => ({ bottomPanelVisible: !state.bottomPanelVisible })),
 
+  toggleSearch: () =>
+    set((state) => ({ searchVisible: !state.searchVisible })),
+
   setActiveView: (view) => set({ activeView: view }),
+
+  reorderTabs: (fromIndex, toIndex) =>
+    set((state) => {
+      const order = [...state.tabOrder];
+      const [moved] = order.splice(fromIndex, 1);
+      if (moved) {
+        order.splice(toIndex, 0, moved);
+      }
+      return { tabOrder: order };
+    }),
 
   splitVertical: () =>
     set({ splitMode: "vertical", splitViews: ["terminal", "editor"] }),

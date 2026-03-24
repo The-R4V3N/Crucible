@@ -162,6 +162,26 @@ export async function fileWatchStart(path: string): Promise<void> {
   return invoke("file_watch_start", { path });
 }
 
+/** A search result match. */
+export interface SearchMatchResult {
+  path: string;
+  line: number;
+  content: string;
+}
+
+/** Search for a pattern in project files. */
+export async function fileSearch(
+  path: string,
+  query: string,
+  maxResults?: number,
+): Promise<SearchMatchResult[]> {
+  return invoke<SearchMatchResult[]>("file_search", {
+    path,
+    query,
+    maxResults: maxResults ?? null,
+  });
+}
+
 /** Listen for file change events. Returns an unlisten function. */
 export async function onFileChanged(
   callback: (payload: FileChangedPayload) => void,
