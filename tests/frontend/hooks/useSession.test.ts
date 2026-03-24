@@ -10,6 +10,7 @@ vi.mock("@/lib/ipc", () => ({
   ptyKill: vi.fn(),
   onPtyOutput: vi.fn(),
   onPtyExit: vi.fn(),
+  onPtyAttention: vi.fn(),
 }));
 
 import {
@@ -19,6 +20,7 @@ import {
   ptyKill,
   onPtyOutput,
   onPtyExit,
+  onPtyAttention,
 } from "@/lib/ipc";
 import { useSession } from "@/hooks/useSession";
 
@@ -28,6 +30,7 @@ const mockPtyResize = vi.mocked(ptyResize);
 const mockPtyKill = vi.mocked(ptyKill);
 const mockOnPtyOutput = vi.mocked(onPtyOutput);
 const mockOnPtyExit = vi.mocked(onPtyExit);
+const mockOnPtyAttention = vi.mocked(onPtyAttention);
 
 describe("useSession", () => {
   beforeEach(() => {
@@ -36,12 +39,14 @@ describe("useSession", () => {
 
     const unlistenOutput = vi.fn();
     const unlistenExit = vi.fn();
+    const unlistenAttention = vi.fn();
     mockPtyCreate.mockResolvedValue("test-session-id");
     mockPtyWrite.mockResolvedValue(undefined);
     mockPtyResize.mockResolvedValue(undefined);
     mockPtyKill.mockResolvedValue(undefined);
     mockOnPtyOutput.mockResolvedValue(unlistenOutput);
     mockOnPtyExit.mockResolvedValue(unlistenExit);
+    mockOnPtyAttention.mockResolvedValue(unlistenAttention);
   });
 
   it("calls ptyCreate on mount", async () => {

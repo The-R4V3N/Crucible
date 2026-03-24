@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import { Terminal } from "@xterm/xterm";
 import { FitAddon } from "@xterm/addon-fit";
 import { useSession } from "@/hooks/useSession";
+import { useSessionStore } from "@/stores/sessionStore";
 import "@xterm/xterm/css/xterm.css";
 
 /** WARP terminal color theme. */
@@ -46,6 +47,12 @@ function TerminalView({ projectName, cwd, command, onError }: TerminalViewProps)
   const containerRef = useRef<HTMLDivElement>(null);
   const terminalRef = useRef<Terminal | null>(null);
   const fitAddonRef = useRef<FitAddon | null>(null);
+
+  const sessions = useSessionStore((s) => s.sessions);
+  const currentSession = projectName
+    ? Object.values(sessions).find((s) => s.projectName === projectName)
+    : null;
+  const needsAttention = currentSession?.needsAttention ?? false;
 
   const { write, resize } = useSession({
     projectName,
@@ -122,7 +129,11 @@ function TerminalView({ projectName, cwd, command, onError }: TerminalViewProps)
     <div
       ref={containerRef}
       data-testid="terminal-container"
-      className="h-full w-full bg-warp-bg"
+      className={`h-full w-full bg-warp-bg ${
+        needsAttention
+          ? "ring-2 ring-warp-accent ring-inset"
+          : ""
+      }`}
     />
   );
 }

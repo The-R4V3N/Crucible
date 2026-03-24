@@ -58,7 +58,11 @@ function ProjectList({ projects }: ProjectListProps) {
 
             {/* Status dot */}
             <div
-              className={`h-2 w-2 rounded-full ${statusColor(session?.status)}`}
+              className={`h-2 w-2 rounded-full ${
+                session?.needsAttention
+                  ? "bg-warp-attention animate-pulse"
+                  : statusColor(session?.status)
+              }`}
               data-testid={`status-dot-${project.name}`}
             />
 

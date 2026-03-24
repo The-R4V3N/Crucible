@@ -52,6 +52,21 @@ export async function onPtyOutput(
   });
 }
 
+/** Payload emitted by the pty:attention event. */
+export interface PtyAttentionPayload {
+  session_id: string;
+  needs_attention: boolean;
+}
+
+/** Listen for PTY attention events. Returns an unlisten function. */
+export async function onPtyAttention(
+  callback: (payload: PtyAttentionPayload) => void,
+): Promise<UnlistenFn> {
+  return listen<PtyAttentionPayload>("pty:attention", (event) => {
+    callback(event.payload);
+  });
+}
+
 /** Listen for PTY exit events. Returns an unlisten function. */
 export async function onPtyExit(
   callback: (payload: PtyExitPayload) => void,
@@ -145,6 +160,26 @@ export async function fileWrite(path: string, content: string): Promise<void> {
 /** Start watching a directory for file changes. */
 export async function fileWatchStart(path: string): Promise<void> {
   return invoke("file_watch_start", { path });
+}
+
+/** A search result match. */
+export interface SearchMatchResult {
+  path: string;
+  line: number;
+  content: string;
+}
+
+/** Search for a pattern in project files. */
+export async function fileSearch(
+  path: string,
+  query: string,
+  maxResults?: number,
+): Promise<SearchMatchResult[]> {
+  return invoke<SearchMatchResult[]>("file_search", {
+    path,
+    query,
+    maxResults: maxResults ?? null,
+  });
 }
 
 /** Listen for file change events. Returns an unlisten function. */

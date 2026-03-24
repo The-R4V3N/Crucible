@@ -5,7 +5,7 @@ use tauri::{AppHandle, Emitter, State};
 use uuid::Uuid;
 
 use crate::config::WarpConfig;
-use crate::files::{self, FileNode};
+use crate::files::{self, FileNode, SearchMatch};
 use crate::git::{FileDiff, GitStatus};
 use crate::pty::PtyManager;
 
@@ -159,6 +159,20 @@ pub fn file_write(path: String, content: String) -> Result<(), String> {
     files::write_file(&std::path::PathBuf::from(&path), &content)
 }
 
+/// Search for a pattern in project files.
+#[tauri::command]
+pub fn file_search(
+    path: String,
+    query: String,
+    max_results: Option<usize>,
+) -> Result<Vec<SearchMatch>, String> {
+    files::search_files(
+        &std::path::PathBuf::from(&path),
+        &query,
+        max_results.unwrap_or(100),
+    )
+}
+
 /// Start watching a directory for file changes.
 #[tauri::command]
 pub fn file_watch_start(app: AppHandle, path: String) -> Result<(), String> {
@@ -170,9 +184,17 @@ pub fn file_watch_start(app: AppHandle, path: String) -> Result<(), String> {
     Ok(())
 }
 
+/// Payload for attention events sent to the frontend.
+#[derive(Clone, serde::Serialize)]
+struct PtyAttentionPayload {
+    session_id: String,
+    needs_attention: bool,
+}
+
 /// Read PTY output in a loop and emit events to the frontend.
 fn read_pty_output(mut reader: Box<dyn Read + Send>, session_id: &str, app: &AppHandle) {
     let mut buf = [0u8; 4096];
+    let mut attention = crate::pty::AttentionDetector::new();
     loop {
         match reader.read(&mut buf) {
             Ok(0) => {
@@ -193,9 +215,20 @@ fn read_pty_output(mut reader: Box<dyn Read + Send>, session_id: &str, app: &App
                     "pty:output",
                     PtyOutputPayload {
                         session_id: session_id.to_string(),
-                        data,
+                        data: data.clone(),
                     },
                 );
+
+                // Check for attention patterns
+                if attention.process_output(&data) {
+                    let _ = app.emit(
+                        "pty:attention",
+                        PtyAttentionPayload {
+                            session_id: session_id.to_string(),
+                            needs_attention: true,
+                        },
+                    );
+                }
             }
             Err(_) => {
                 let _ = app.emit(
