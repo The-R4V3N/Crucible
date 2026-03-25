@@ -50,6 +50,9 @@ pub struct WarpConfig {
     /// Notification settings.
     #[serde(default)]
     pub notifications: NotificationConfig,
+    /// Last active project name (for session restore).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub active_project: Option<String>,
 }
 
 impl Default for NotificationConfig {
@@ -198,6 +201,7 @@ mod tests {
             font_size: 14,
             sidebar_width: 240,
             notifications: NotificationConfig::default(),
+            active_project: Some("roundtrip".to_string()),
         };
 
         let dir = std::env::temp_dir();
@@ -208,7 +212,31 @@ mod tests {
 
         assert_eq!(loaded.projects[0].name, "roundtrip");
         assert_eq!(loaded.theme, "dark");
+        assert_eq!(loaded.active_project, Some("roundtrip".to_string()));
 
         std::fs::remove_file(&path).unwrap();
+    }
+
+    #[test]
+    fn test_active_project_defaults_to_none() {
+        let json = r#"{ "projects": [] }"#;
+        let config: WarpConfig = serde_json::from_str(json).unwrap();
+        assert_eq!(config.active_project, None);
+    }
+
+    #[test]
+    fn test_active_project_omitted_from_json_when_none() {
+        let config = WarpConfig {
+            projects: vec![],
+            theme: "dark".to_string(),
+            accent_color: "#00E5FF".to_string(),
+            font_family: "Cascadia Code".to_string(),
+            font_size: 14,
+            sidebar_width: 240,
+            notifications: NotificationConfig::default(),
+            active_project: None,
+        };
+        let json = serde_json::to_string(&config).unwrap();
+        assert!(!json.contains("active_project"));
     }
 }

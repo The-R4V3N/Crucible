@@ -3,7 +3,16 @@
   "bundle": {
     "active": true,
     "targets": "all",
-    "icon": ["icons/icon.ico"]
+    "icon": ["icons/icon.ico"],
+    "category": "DeveloperTool",
+    "shortDescription": "AI agent IDE for Windows",
+    "longDescription": "WARP is a project-centric workspace combining terminal multiplexing, a code editor, git integration, and smart notifications.",
+    "copyright": "2026 WARP Contributors",
+    "windows": {
+      "nsis": {
+        "displayLanguageSelector": false
+      }
+    }
   },
   "productName": "WARP",
   "version": "0.1.0",
@@ -22,7 +31,7 @@
         "height": 800,
         "minWidth": 800,
         "minHeight": 600,
-        "decorations": true,
+        "decorations": false,
         "resizable": true,
         "backgroundColor": [30, 30, 30, 255]
       }

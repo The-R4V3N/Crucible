@@ -27,6 +27,14 @@ vi.mock("@xterm/addon-fit", () => {
 
 vi.mock("@xterm/xterm/css/xterm.css", () => ({}));
 
+vi.mock("@tauri-apps/api/window", () => ({
+  getCurrentWindow: () => ({
+    minimize: vi.fn(),
+    toggleMaximize: vi.fn(),
+    close: vi.fn(),
+  }),
+}));
+
 vi.mock("@/hooks/useSession", () => ({
   useSession: vi.fn().mockReturnValue({
     sessionId: null,
@@ -45,7 +53,9 @@ vi.mock("@/lib/ipc", () => ({
     font_size: 14,
     sidebar_width: 240,
     notifications: { visual: true, border_glow: true, sound: false },
+    active_project: null,
   }),
+  configSave: vi.fn().mockResolvedValue(undefined),
   ptyCreate: vi.fn().mockResolvedValue("mock-session"),
   ptyWrite: vi.fn().mockResolvedValue(undefined),
   ptyResize: vi.fn().mockResolvedValue(undefined),

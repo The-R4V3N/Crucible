@@ -23,6 +23,7 @@ export interface WarpConfig {
   font_size: number;
   sidebar_width: number;
   notifications: NotificationConfig;
+  active_project: string | null;
 }
 
 /** Config store state and actions. */
@@ -32,6 +33,7 @@ interface ConfigState {
   setConfig: (config: WarpConfig) => void;
   addProject: (name: string, path: string, command?: string) => void;
   removeProject: (name: string) => void;
+  setActiveProject: (name: string | null) => void;
 }
 
 const defaultConfig: WarpConfig = {
@@ -46,6 +48,7 @@ const defaultConfig: WarpConfig = {
     border_glow: true,
     sound: false,
   },
+  active_project: null,
 };
 
 export const useConfigStore = create<ConfigState>((set) => ({
@@ -78,6 +81,21 @@ export const useConfigStore = create<ConfigState>((set) => ({
         config: {
           ...state.config,
           projects: state.config.projects.filter((p) => p.name !== name),
+          active_project:
+            state.config.active_project === name
+              ? null
+              : state.config.active_project,
+        },
+      };
+    }),
+
+  setActiveProject: (name) =>
+    set((state) => {
+      if (!state.config) return state;
+      return {
+        config: {
+          ...state.config,
+          active_project: name,
         },
       };
     }),
