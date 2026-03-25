@@ -1,6 +1,8 @@
 import { useSessionStore } from "@/stores/sessionStore";
+import { useConfigStore } from "@/stores/configStore";
 import type { ProjectConfig } from "@/stores/configStore";
 import type { SessionStatus } from "@/stores/sessionStore";
+import { configSave } from "@/lib/ipc";
 
 interface ProjectListProps {
   projects: ProjectConfig[];
@@ -27,6 +29,17 @@ function ProjectList({ projects }: ProjectListProps) {
   const sessions = useSessionStore((s) => s.sessions);
   const activeSessionId = useSessionStore((s) => s.activeSessionId);
   const setActiveSession = useSessionStore((s) => s.setActiveSession);
+  const removeProject = useConfigStore((s) => s.removeProject);
+
+  const handleRemove = (e: React.MouseEvent, projectName: string) => {
+    e.stopPropagation();
+    removeProject(projectName);
+    // Defer save to avoid triggering re-renders during current update
+    setTimeout(() => {
+      const config = useConfigStore.getState().config;
+      if (config) configSave(config).catch(() => {});
+    }, 100);
+  };
 
   return (
     <div className="flex flex-col gap-0.5 px-1" data-testid="project-list">
@@ -75,6 +88,16 @@ function ProjectList({ projects }: ProjectListProps) {
                 F{index + 1}
               </span>
             )}
+
+            {/* Remove button */}
+            <span
+              data-testid={`remove-project-${project.name}`}
+              onClick={(e) => handleRemove(e, project.name)}
+              className="text-xs text-warp-text-dim opacity-0 group-hover:opacity-100 hover:text-warp-error cursor-pointer ml-1"
+              title="Remove project"
+            >
+              ×
+            </span>
           </button>
         );
       })}

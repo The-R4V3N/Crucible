@@ -48,11 +48,14 @@ function TerminalView({ projectName, cwd, command, onError }: TerminalViewProps)
   const terminalRef = useRef<Terminal | null>(null);
   const fitAddonRef = useRef<FitAddon | null>(null);
 
-  const sessions = useSessionStore((s) => s.sessions);
-  const currentSession = projectName
-    ? Object.values(sessions).find((s) => s.projectName === projectName)
-    : null;
-  const needsAttention = currentSession?.needsAttention ?? false;
+  // Targeted selector: only re-render when THIS project's needsAttention changes
+  const needsAttention = useSessionStore((s) => {
+    if (!projectName) return false;
+    const session = Object.values(s.sessions).find(
+      (sess) => sess.projectName === projectName,
+    );
+    return session?.needsAttention ?? false;
+  });
 
   const { write, resize } = useSession({
     projectName,
@@ -70,55 +73,81 @@ function TerminalView({ projectName, cwd, command, onError }: TerminalViewProps)
     },
   });
 
-  // Initialize xterm.js
+  // Initialize xterm.js — deferred until container is visible to avoid crashes
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
 
-    const terminal = new Terminal({
-      theme: WARP_THEME,
-      fontFamily: '"Cascadia Code", Consolas, monospace',
-      fontSize: 14,
-      cursorBlink: true,
-      cursorStyle: "bar",
-      allowProposedApi: true,
-    });
+    let terminal: Terminal | null = null;
+    let fitAddon: FitAddon | null = null;
+    let resizeObserver: ResizeObserver | null = null;
+    let opened = false;
 
-    const fitAddon = new FitAddon();
-    terminal.loadAddon(fitAddon);
+    const safeFit = () => {
+      try {
+        if (container.offsetWidth > 0 && container.offsetHeight > 0 && fitAddon) {
+          fitAddon.fit();
+        }
+      } catch {
+        // Ignore fit errors on zero-size containers
+      }
+    };
 
-    terminal.open(container);
-    fitAddon.fit();
+    const initTerminal = () => {
+      if (opened) return;
+      // Wait until container has real dimensions
+      if (container.offsetWidth === 0 || container.offsetHeight === 0) return;
 
-    terminalRef.current = terminal;
-    fitAddonRef.current = fitAddon;
+      opened = true;
+      terminal = new Terminal({
+        theme: WARP_THEME,
+        fontFamily: '"Cascadia Code", Consolas, monospace',
+        fontSize: 14,
+        cursorBlink: true,
+        cursorStyle: "bar",
+        allowProposedApi: true,
+      });
 
-    // Forward keyboard input to PTY
-    terminal.onData((data) => {
-      write(data);
-    });
+      fitAddon = new FitAddon();
+      terminal.loadAddon(fitAddon);
+      terminal.open(container);
+      safeFit();
 
-    // Forward resize events to PTY
-    terminal.onResize(({ rows, cols }) => {
-      resize(rows, cols);
-    });
+      terminalRef.current = terminal;
+      fitAddonRef.current = fitAddon;
+
+      // Forward keyboard input to PTY
+      terminal.onData((data) => {
+        write(data);
+      });
+
+      // Forward resize events to PTY
+      terminal.onResize(({ rows, cols }) => {
+        resize(rows, cols);
+      });
+    };
+
+    // Try immediately if visible
+    initTerminal();
 
     // Handle window resize
-    const handleResize = () => {
-      fitAddon.fit();
-    };
+    const handleResize = () => safeFit();
     window.addEventListener("resize", handleResize);
 
-    // Also observe container size changes
-    const resizeObserver = new ResizeObserver(() => {
-      fitAddon.fit();
+    // Observe container — init when it becomes visible, fit on size changes
+    resizeObserver = new ResizeObserver(() => {
+      if (!opened) {
+        initTerminal();
+      } else {
+        safeFit();
+      }
     });
     resizeObserver.observe(container);
 
     return () => {
       window.removeEventListener("resize", handleResize);
-      resizeObserver.disconnect();
-      terminal.dispose();
+      resizeObserver?.disconnect();
+      terminal?.dispose();
       terminalRef.current = null;
       fitAddonRef.current = null;
     };

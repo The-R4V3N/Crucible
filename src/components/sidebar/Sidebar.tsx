@@ -1,5 +1,6 @@
 import { useUiStore } from "@/stores/uiStore";
 import ProjectList from "./ProjectList";
+import AddProjectButton from "./AddProjectButton";
 import SourceControl from "./SourceControl";
 import Shortcuts from "./Shortcuts";
 import type { ProjectConfig } from "@/stores/configStore";
@@ -31,6 +32,7 @@ function Sidebar({ projects, gitStatus }: SidebarProps) {
       {/* Project list */}
       <div className="flex-1 overflow-y-auto">
         <ProjectList projects={projects} />
+        <AddProjectButton />
       </div>
 
       {/* Source control */}
