@@ -71,6 +71,14 @@ function TerminalView({ projectName, cwd, command, onError }: TerminalViewProps)
       onError?.(err);
       terminalRef.current?.write(`\r\n\x1b[31m[Error: ${err}]\x1b[0m\r\n`);
     },
+    onReady: () => {
+      // Sync xterm dimensions to the PTY now that the session is connected.
+      // The initial fit/resize may have fired before the session was ready.
+      const terminal = terminalRef.current;
+      if (terminal && terminal.rows > 0 && terminal.cols > 0) {
+        resize(terminal.rows, terminal.cols);
+      }
+    },
   });
 
   // Initialize xterm.js — deferred until container is visible to avoid crashes
