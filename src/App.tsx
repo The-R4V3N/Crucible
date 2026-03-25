@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Sidebar from "@/components/sidebar/Sidebar";
+import TitleBar from "@/components/layout/TitleBar";
+import ErrorBoundary from "@/components/layout/ErrorBoundary";
 import TabBar from "@/components/layout/TabBar";
 import ViewRenderer from "@/components/layout/ViewRenderer";
 import SplitPane from "@/components/panels/SplitPane";
@@ -13,7 +15,7 @@ import { useKeyboard } from "@/hooks/useKeyboard";
 import { useGit } from "@/hooks/useGit";
 import { useFileWatcher } from "@/hooks/useFileWatcher";
 import { useFileStore } from "@/stores/fileStore";
-import { configLoad } from "@/lib/ipc";
+import { configLoad, configSave } from "@/lib/ipc";
 
 function App() {
   const [error, setError] = useState<string | null>(null);
@@ -46,6 +48,7 @@ function App() {
           font_size: 14,
           sidebar_width: 240,
           notifications: { visual: true, border_glow: true, sound: false },
+          active_project: null,
         });
       });
   }, [setConfig]);
@@ -57,6 +60,37 @@ function App() {
   const searchVisible = useUiStore((s) => s.searchVisible);
   const toggleSearch = useUiStore((s) => s.toggleSearch);
   const activeFilePath = useFileStore((s) => s.activeFilePath);
+
+  // Persist active project to config when it changes
+  const setActiveProject = useConfigStore((s) => s.setActiveProject);
+  useEffect(() => {
+    const projectName = activeSession?.projectName ?? null;
+    if (config && config.active_project !== projectName) {
+      setActiveProject(projectName);
+      const updatedConfig = useConfigStore.getState().config;
+      if (updatedConfig) {
+        configSave(updatedConfig).catch(() => {});
+      }
+    }
+  }, [activeSession?.projectName]);
+
+  // Restore active project from config on startup
+  useEffect(() => {
+    if (!config?.active_project) return;
+    const targetProject = config.active_project;
+    // Wait for sessions to be created, then activate the right one
+    const unsubscribe = useSessionStore.subscribe((state) => {
+      const session = Object.values(state.sessions).find(
+        (s) => s.projectName === targetProject,
+      );
+      if (session && state.activeSessionId !== session.id) {
+        useSessionStore.getState().setActiveSession(session.id);
+        unsubscribe();
+      }
+    });
+    // Clean up if component unmounts before restore completes
+    return unsubscribe;
+  }, [isLoaded]);
 
   // Keyboard shortcuts
   useKeyboard({ projects });
@@ -82,7 +116,10 @@ function App() {
   }
 
   return (
-    <div className="flex h-screen w-screen bg-warp-bg text-warp-text font-mono overflow-hidden">
+    <div className="flex flex-col h-screen w-screen bg-warp-bg text-warp-text font-mono overflow-hidden">
+      <TitleBar />
+      <ErrorBoundary>
+      <div className="flex flex-1 min-h-0">
       {/* Error banner */}
       {error && (
         <div className="absolute top-0 left-0 right-0 bg-warp-error/90 text-white p-2 text-sm z-50">
@@ -156,6 +193,8 @@ function App() {
           }}
         />
       </main>
+      </div>
+      </ErrorBoundary>
     </div>
   );
 }

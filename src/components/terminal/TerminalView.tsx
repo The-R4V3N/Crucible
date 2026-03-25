@@ -71,6 +71,14 @@ function TerminalView({ projectName, cwd, command, onError }: TerminalViewProps)
       onError?.(err);
       terminalRef.current?.write(`\r\n\x1b[31m[Error: ${err}]\x1b[0m\r\n`);
     },
+    onReady: () => {
+      // Sync xterm dimensions to the PTY now that the session is connected.
+      // The initial fit/resize may have fired before the session was ready.
+      const terminal = terminalRef.current;
+      if (terminal && terminal.rows > 0 && terminal.cols > 0) {
+        resize(terminal.rows, terminal.cols);
+      }
+    },
   });
 
   // Initialize xterm.js — deferred until container is visible to avoid crashes
@@ -115,6 +123,15 @@ function TerminalView({ projectName, cwd, command, onError }: TerminalViewProps)
 
       terminalRef.current = terminal;
       fitAddonRef.current = fitAddon;
+
+      // Let F-keys and global shortcuts pass through to the window handler
+      terminal.attachCustomKeyEventHandler((e) => {
+        // F1-F12: project switching
+        if (/^F\d+$/.test(e.key)) return false;
+        // Ctrl+B, Ctrl+E, Ctrl+D, Ctrl+Shift+D, Ctrl+Shift+F, Ctrl+1/2/3, Ctrl+`, Ctrl+W
+        if (e.ctrlKey && ["b", "e", "d", "D", "F", "1", "2", "3", "`", "w"].includes(e.key)) return false;
+        return true;
+      });
 
       // Forward keyboard input to PTY
       terminal.onData((data) => {

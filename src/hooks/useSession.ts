@@ -26,6 +26,8 @@ interface UseSessionOptions {
   onExit?: (code: number | null) => void;
   /** Callback when an error occurs. */
   onError?: (error: string) => void;
+  /** Callback when PTY session is ready (connected and listeners attached). */
+  onReady?: () => void;
 }
 
 interface UseSessionReturn {
@@ -47,6 +49,7 @@ export function useSession({
   onOutput,
   onExit,
   onError,
+  onReady,
 }: UseSessionOptions): UseSessionReturn {
   const sessionIdRef = useRef<string | null>(null);
   const { addSession, updateStatus, removeSession, setAttention } = useSessionStore();
@@ -58,6 +61,8 @@ export function useSession({
   onExitRef.current = onExit;
   const onErrorRef = useRef(onError);
   onErrorRef.current = onError;
+  const onReadyRef = useRef(onReady);
+  onReadyRef.current = onReady;
 
   useEffect(() => {
     let cancelled = false;
@@ -99,6 +104,9 @@ export function useSession({
             setAttention(id, payload.needs_attention);
           }
         });
+
+        // Notify that the session is fully ready
+        onReadyRef.current?.();
       } catch (err) {
         const message = err instanceof Error ? err.message : String(err);
         onErrorRef.current?.(message);

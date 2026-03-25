@@ -10,6 +10,7 @@ vi.mock("@xterm/xterm", () => {
     onResize: vi.fn(),
     loadAddon: vi.fn(),
     dispose: vi.fn(),
+    attachCustomKeyEventHandler: vi.fn(),
   }));
   return { Terminal };
 });
