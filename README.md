@@ -1,21 +1,80 @@
+<div align="center">
+
 # WARP
 
-AI agent IDE for Windows — a project-centric workspace combining terminal multiplexing, a code editor, git integration, and smart notifications.
+**An AI agent IDE for Windows — project-centric workspace combining terminal multiplexing, a code editor, git integration, and smart notifications.**
 
-Built with [Tauri v2](https://v2.tauri.app) (Rust backend) + React (frontend) + xterm.js (terminal) + Monaco (editor).
+[![Built with Tauri](https://img.shields.io/badge/built%20with-Tauri%20v2-FFC131?style=for-the-badge&logo=tauri&logoColor=white)](https://v2.tauri.app)
+[![React](https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react&logoColor=white)](https://react.dev)
+[![Rust](https://img.shields.io/badge/Rust-backend-DEA584?style=for-the-badge&logo=rust&logoColor=white)](https://www.rust-lang.org/)
+[![License MIT](https://img.shields.io/badge/license-MIT-blue?style=for-the-badge)](LICENSE)
+
+[![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178c6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![xterm.js](https://img.shields.io/badge/terminal-xterm.js-000000?logo=windowsterminal&logoColor=white)](#tech-stack)
+[![Monaco](https://img.shields.io/badge/editor-Monaco-007ACC?logo=visualstudiocode&logoColor=white)](#tech-stack)
+[![last commit](https://img.shields.io/github/last-commit/The-R4V3N/WARP)](https://github.com/The-R4V3N/WARP/commits/master)
+
+<br/>
+
+[Features](#features) · [Quick Start](#quick-start) · [Architecture](#architecture) · [Tech Stack](#tech-stack) · [Configuration](#configuration) · [Contributing](#contributing)
+
+</div>
+
+---
+
+WARP is a desktop IDE built for developers who live in the terminal. It wraps multiple PTY sessions, a Monaco code editor, git tooling, and smart notifications into a single Tauri-powered window — native performance, no Electron, no browser tab.
+
+> **One workspace. Every project. Zero context switching.**
+
+---
 
 ## Features
 
-- **Multi-project terminals** — Run multiple PTY sessions side-by-side, one per project
-- **Project management** — Add/remove projects via folder picker, persisted to config
+<table>
+<tr>
+<td width="50%" valign="top">
+
+### Terminal
+
+- **Multi-project terminals** — Run multiple PTY sessions side-by-side
+- **Split panes** — Vertical and horizontal split views (`Ctrl+\`)
 - **Session persistence** — Active project restored on restart
-- **Code editor** — Monaco editor with syntax highlighting and file tabs
-- **Git integration** — Branch status, changed files, inline diffs
-- **Smart notifications** — Attention detection with sidebar indicators and border glow
-- **Split panes** — Vertical and horizontal split views
-- **Project search** — Search across all project files
+- **ConPTY native** — Real Windows terminal, not a wrapper
+
+</td>
+<td width="50%" valign="top">
+
+### Editor & Files
+
+- **Monaco editor** — Syntax highlighting, file tabs, full editing
 - **File explorer** — Browse and open files from the sidebar
-- **Keyboard-driven** — F-key project switching, Ctrl+\ splits, Ctrl+K search
+- **Project search** — Search across all project files (`Ctrl+K`)
+
+</td>
+</tr>
+<tr>
+<td width="50%" valign="top">
+
+### Git
+
+- **Branch status** — Current branch always visible
+- **Changed files** — See what's modified at a glance
+- **Inline diffs** — Review changes without leaving the IDE
+
+</td>
+<td width="50%" valign="top">
+
+### Workflow
+
+- **Project management** — Add/remove projects via folder picker
+- **Smart notifications** — Attention detection with sidebar indicators and border glow
+- **Keyboard-driven** — F-key project switching, full keybinding support
+
+</td>
+</tr>
+</table>
+
+---
 
 ## Quick Start
 
@@ -28,6 +87,8 @@ Built with [Tauri v2](https://v2.tauri.app) (Rust backend) + React (frontend) + 
 ### Install & Run
 
 ```bash
+git clone https://github.com/The-R4V3N/WARP.git
+cd WARP
 npm install
 npm run dev
 ```
@@ -37,8 +98,8 @@ This starts both the Vite dev server and the Tauri/Rust backend.
 ### Run Tests
 
 ```bash
-npm run test          # Frontend tests (Vitest)
-cd src-tauri && cargo test   # Rust tests
+npm run test                    # Frontend tests (Vitest)
+cd src-tauri && cargo test      # Rust tests
 ```
 
 ### Build for Production
@@ -47,11 +108,78 @@ cd src-tauri && cargo test   # Rust tests
 npm run build
 ```
 
-Produces a Windows installer (.msi/.exe) in `src-tauri/target/release/bundle/`.
+Produces a Windows installer (`.msi`/`.exe`) in `src-tauri/target/release/bundle/`.
+
+---
+
+## Architecture
+
+```text
+warp/
+├── src-tauri/               Rust backend (Tauri v2)
+│   └── src/
+│       ├── main.rs          Tauri entry point
+│       ├── pty/             PTY session management (ConPTY)
+│       ├── git/             Git integration (git2)
+│       ├── files/           File system ops + watcher (notify)
+│       ├── config/          Config loading + validation
+│       └── commands.rs      IPC command handlers
+│
+├── src/                     React frontend
+│   ├── components/          UI — sidebar, terminal, editor, diff, panels, layout
+│   ├── hooks/               useSession, useGit, useFileWatcher, useKeyboard
+│   ├── stores/              State management (Zustand)
+│   ├── lib/                 Utilities — ipc, keybindings, theme
+│   └── styles/              Tailwind + custom CSS
+│
+└── tests/
+    ├── rust/                Rust integration tests
+    └── frontend/            React component + hook tests
+```
+
+<details>
+<summary><strong>IPC Contract (Rust ↔ React)</strong></summary>
+
+Commands defined in `src-tauri/src/commands.rs`, called via `@tauri-apps/api`:
+
+| Command | Description |
+|---------|-------------|
+| `pty_create(path, command)` | Spawn a new PTY session → returns `session_id` |
+| `pty_write(session_id, data)` | Write input to a PTY session |
+| `pty_resize(session_id, rows, cols)` | Resize the terminal |
+| `pty_kill(session_id)` | Kill a PTY session |
+| `git_status(path)` | Get git status for a project |
+| `git_diff(path)` | Get git diff output |
+| `file_tree(path)` | List directory tree |
+| `file_read(path)` | Read file contents |
+| `file_write(path, content)` | Write file contents |
+
+**Events:** `pty:output` · `pty:exit` · `file:changed`
+
+</details>
+
+---
+
+## Tech Stack
+
+| Layer | Technology | Purpose |
+|-------|-----------|---------|
+| **Backend** | Rust (Tauri v2) | Native performance, system access |
+| **PTY** | portable-pty (ConPTY) | Real terminal sessions on Windows |
+| **Git** | git2 crate | Branch, status, diff operations |
+| **File Watch** | notify crate | Real-time file change detection |
+| **Frontend** | React 19 + TypeScript | UI components and state |
+| **Styling** | Tailwind CSS | Utility-first styling |
+| **State** | Zustand | Lightweight state management |
+| **Terminal** | xterm.js | Terminal emulation in the browser view |
+| **Editor** | Monaco Editor | Code editing with syntax highlighting |
+| **Build** | Vite | Fast frontend bundling |
+
+---
 
 ## Configuration
 
-WARP stores its config in `warp_config.json` at the project root:
+WARP stores its config in `warp_config.json` (auto-created on first run):
 
 ```json
 {
@@ -66,20 +194,36 @@ WARP stores its config in `warp_config.json` at the project root:
 }
 ```
 
-## Architecture
+---
 
-See [ARCHITECTURE.md](ARCHITECTURE.md) for the full blueprint: layout, IPC API, milestones, and project structure.
+## Milestones
 
-## Tech Stack
+| Milestone | Focus | Status |
+|-----------|-------|--------|
+| **M1** | Core Terminal — Tauri + xterm.js + PTY | Done |
+| **M2** | Multi-session + Sidebar | Done |
+| **M3** | File Editor + Explorer | Done |
+| **M4** | Smart Features — notifications, splits | Done |
+| **M5** | Polish + Release | Done |
 
-| Layer | Technology |
-|-------|-----------|
-| Backend | Rust (Tauri v2), portable-pty (ConPTY), git2, notify |
-| Frontend | React 19, TypeScript, Tailwind CSS, Zustand |
-| Terminal | xterm.js |
-| Editor | Monaco Editor |
-| Build | Vite, Turbopack |
+---
 
-## License
+## Contributing
 
-MIT
+PRs welcome. See [ARCHITECTURE.md](ARCHITECTURE.md) for the full blueprint.
+
+**Development follows strict TDD** — every feature starts with a failing test. See [CLAUDE.md](CLAUDE.md) for coding conventions and commit guidelines.
+
+---
+
+<div align="center">
+
+### Brand
+
+**Accent:** `#00E5FF` Neon Cyan · **Theme:** Dark · **Font:** Cascadia Code
+
+---
+
+*built with Rust, driven by agents*
+
+</div>
