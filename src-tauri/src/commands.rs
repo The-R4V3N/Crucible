@@ -91,6 +91,7 @@ struct PtyExitPayload {
 }
 
 /// Resolve the default config file path by searching known locations.
+/// If no file exists, returns the preferred write path (project root in dev).
 fn resolve_config_path() -> Result<std::path::PathBuf, String> {
     let exe_dir = std::env::current_exe()
         .map_err(|e| e.to_string())?
@@ -105,19 +106,37 @@ fn resolve_config_path() -> Result<std::path::PathBuf, String> {
         exe_dir.join("warp_config.json"),
         std::path::PathBuf::from("warp_config.json"),
     ];
-    candidates
-        .into_iter()
-        .find(|p| p.exists())
-        .ok_or_else(|| "warp_config.json not found".to_string())
+    // Return existing file if found
+    if let Some(path) = candidates.iter().find(|p| p.exists()) {
+        return Ok(path.clone());
+    }
+    // No file exists — return the preferred write location (first candidate)
+    Ok(candidates[0].clone())
 }
 
 /// Load the WARP configuration from the given path, or the default location.
+/// Creates a default config file if none exists.
 #[tauri::command]
 pub fn config_load(path: Option<String>) -> Result<WarpConfig, String> {
     let config_path = match path {
         Some(p) => std::path::PathBuf::from(p),
         None => resolve_config_path()?,
     };
+    if !config_path.exists() {
+        // Create a default config so first-run works out of the box
+        let default_config = WarpConfig {
+            projects: vec![],
+            theme: "dark".to_string(),
+            accent_color: "#00E5FF".to_string(),
+            font_family: "Cascadia Code".to_string(),
+            font_size: 14,
+            sidebar_width: 240,
+            notifications: crate::config::schema::NotificationConfig::default(),
+            active_project: None,
+        };
+        crate::config::schema::save_config(&default_config, &config_path)?;
+        return Ok(default_config);
+    }
     crate::config::schema::load_config(&config_path)
 }
 
