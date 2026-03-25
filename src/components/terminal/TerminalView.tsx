@@ -124,6 +124,15 @@ function TerminalView({ projectName, cwd, command, onError }: TerminalViewProps)
       terminalRef.current = terminal;
       fitAddonRef.current = fitAddon;
 
+      // Let F-keys and global shortcuts pass through to the window handler
+      terminal.attachCustomKeyEventHandler((e) => {
+        // F1-F12: project switching
+        if (/^F\d+$/.test(e.key)) return false;
+        // Ctrl+B, Ctrl+E, Ctrl+D, Ctrl+Shift+D, Ctrl+Shift+F, Ctrl+1/2/3, Ctrl+`, Ctrl+W
+        if (e.ctrlKey && ["b", "e", "d", "D", "F", "1", "2", "3", "`", "w"].includes(e.key)) return false;
+        return true;
+      });
+
       // Forward keyboard input to PTY
       terminal.onData((data) => {
         write(data);
