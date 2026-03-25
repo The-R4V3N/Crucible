@@ -1,42 +1,66 @@
+import { memo } from "react";
 import { useSessionStore } from "@/stores/sessionStore";
-import type { ProjectConfig } from "@/stores/configStore";
+import { useConfigStore, type ProjectConfig } from "@/stores/configStore";
 import TerminalView from "./TerminalView";
 
 interface TerminalManagerProps {
-  projects: ProjectConfig[];
   onError?: (error: string) => void;
 }
 
-/** Manages multiple terminal instances, showing only the active one. */
-function TerminalManager({ projects, onError }: TerminalManagerProps) {
-  const activeSessionId = useSessionStore((s) => s.activeSessionId);
-  const sessions = useSessionStore((s) => s.sessions);
+/** A single terminal pane — subscribes to its own active state to avoid parent re-renders. */
+const TerminalPane = memo(function TerminalPane({
+  projectName,
+  cwd,
+  command,
+  onError,
+}: {
+  projectName: string;
+  cwd: string;
+  command: string;
+  onError?: (error: string) => void;
+}) {
+  // Each pane subscribes to its own isActive — no cascading re-renders from parent
+  const isActive = useSessionStore((s) => {
+    const session = Object.values(s.sessions).find(
+      (sess) => sess.projectName === projectName,
+    );
+    return session?.id === s.activeSessionId;
+  });
 
   return (
-    <div className="relative h-full w-full" data-testid="terminal-manager">
-      {projects.map((project) => {
-        const session = Object.values(sessions).find(
-          (s) => s.projectName === project.name,
-        );
-        const isActive = session?.id === activeSessionId;
+    <div
+      className={`absolute inset-0 bg-warp-bg ${isActive ? "visible" : "invisible"}`}
+      style={{ contain: "strict" }}
+      data-testid={`terminal-pane-${projectName}`}
+    >
+      <TerminalView
+        projectName={projectName}
+        cwd={cwd}
+        command={command}
+        onError={onError}
+      />
+    </div>
+  );
+});
 
-        return (
-          <div
-            key={project.name}
-            className={`absolute inset-0 ${isActive ? "visible" : "invisible"}`}
-            data-testid={`terminal-pane-${project.name}`}
-          >
-            <TerminalView
-              projectName={project.name}
-              cwd={project.path}
-              command={project.command}
-              onError={onError}
-            />
-          </div>
-        );
-      })}
+/** Manages multiple terminal instances, showing only the active one. */
+function TerminalManager({ onError }: TerminalManagerProps) {
+  // Subscribe directly to config store — no props chain from App → ViewRenderer
+  const projects = useConfigStore((s) => s.config?.projects ?? []);
+
+  return (
+    <div className="relative h-full w-full bg-warp-bg" data-testid="terminal-manager">
+      {projects.map((project) => (
+        <TerminalPane
+          key={project.name}
+          projectName={project.name}
+          cwd={project.path}
+          command={project.command}
+          onError={onError}
+        />
+      ))}
     </div>
   );
 }
 
-export default TerminalManager;
+export default memo(TerminalManager);

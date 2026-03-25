@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Sidebar from "@/components/sidebar/Sidebar";
 import TabBar from "@/components/layout/TabBar";
 import ViewRenderer from "@/components/layout/ViewRenderer";
@@ -21,7 +21,7 @@ function App() {
   const isLoaded = useConfigStore((s) => s.isLoaded);
   const setConfig = useConfigStore((s) => s.setConfig);
 
-  const projects = config?.projects ?? [];
+  const projects = useMemo(() => config?.projects ?? [], [config?.projects]);
   const activeSessionId = useSessionStore((s) => s.activeSessionId);
   const sessions = useSessionStore((s) => s.sessions);
 
@@ -120,21 +120,19 @@ function App() {
       )}
 
       {/* Main content area */}
-      <main className="flex-1 min-w-0 flex flex-col">
+      <main className="flex-1 min-w-0 flex flex-col bg-warp-bg">
         <TabBar onSearchToggle={toggleSearch} />
         <div className="flex-1 min-h-0">
           {splitMode ? (
             <SplitPane orientation={splitMode}>
               <ViewRenderer
                 view={splitViews[0]}
-                projects={projects}
                 repoPath={activeProject?.path ?? "."}
                 diffFilePath={activeFilePath}
                 onError={setError}
               />
               <ViewRenderer
                 view={splitViews[1]}
-                projects={projects}
                 repoPath={activeProject?.path ?? "."}
                 diffFilePath={activeFilePath}
                 onError={setError}
@@ -143,7 +141,6 @@ function App() {
           ) : (
             <ViewRenderer
               view={activeView}
-              projects={projects}
               repoPath={activeProject?.path ?? "."}
               diffFilePath={activeFilePath}
               onError={setError}

@@ -11,6 +11,8 @@
     {
       "identifier": "shell:allow-open",
       "allow": [{ "name": "*" }]
-    }
+    },
+    "dialog:default",
+    "dialog:allow-open"
   ]
 }

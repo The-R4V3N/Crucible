@@ -15,6 +15,7 @@ use std::sync::Mutex;
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_shell::init())
+        .plugin(tauri_plugin_dialog::init())
         .manage(PtyState(Mutex::new(PtyManager::new())))
         .invoke_handler(tauri::generate_handler![
             commands::pty_create,

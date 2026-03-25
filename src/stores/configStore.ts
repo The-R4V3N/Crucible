@@ -30,6 +30,8 @@ interface ConfigState {
   config: WarpConfig | null;
   isLoaded: boolean;
   setConfig: (config: WarpConfig) => void;
+  addProject: (name: string, path: string, command?: string) => void;
+  removeProject: (name: string) => void;
 }
 
 const defaultConfig: WarpConfig = {
@@ -54,5 +56,29 @@ export const useConfigStore = create<ConfigState>((set) => ({
     set({
       config: { ...defaultConfig, ...config },
       isLoaded: true,
+    }),
+
+  addProject: (name, path, command = "powershell.exe") =>
+    set((state) => {
+      if (!state.config) return state;
+      // Don't add duplicate project names
+      if (state.config.projects.some((p) => p.name === name)) return state;
+      return {
+        config: {
+          ...state.config,
+          projects: [...state.config.projects, { name, path, command }],
+        },
+      };
+    }),
+
+  removeProject: (name) =>
+    set((state) => {
+      if (!state.config) return state;
+      return {
+        config: {
+          ...state.config,
+          projects: state.config.projects.filter((p) => p.name !== name),
+        },
+      };
     }),
 }));

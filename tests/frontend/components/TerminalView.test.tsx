@@ -42,6 +42,15 @@ const MockTerminal = vi.mocked(Terminal);
 describe("TerminalView", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    // Mock offsetWidth/offsetHeight so the deferred init triggers
+    Object.defineProperty(HTMLDivElement.prototype, "offsetWidth", {
+      configurable: true,
+      get: () => 800,
+    });
+    Object.defineProperty(HTMLDivElement.prototype, "offsetHeight", {
+      configurable: true,
+      get: () => 600,
+    });
   });
 
   it("renders terminal container", () => {

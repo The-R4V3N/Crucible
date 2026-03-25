@@ -90,39 +90,44 @@ struct PtyExitPayload {
     code: Option<u32>,
 }
 
+/// Resolve the default config file path by searching known locations.
+fn resolve_config_path() -> Result<std::path::PathBuf, String> {
+    let exe_dir = std::env::current_exe()
+        .map_err(|e| e.to_string())?
+        .parent()
+        .ok_or("cannot determine exe directory")?
+        .to_path_buf();
+    // In dev mode, exe is at src-tauri/target/debug/warp.exe
+    // Prefer the project root (3 levels up) to avoid writing inside src-tauri/
+    // which triggers the tauri dev watcher and restarts the app.
+    let candidates = [
+        exe_dir.join("../../../warp_config.json"),
+        exe_dir.join("warp_config.json"),
+        std::path::PathBuf::from("warp_config.json"),
+    ];
+    candidates
+        .into_iter()
+        .find(|p| p.exists())
+        .ok_or_else(|| "warp_config.json not found".to_string())
+}
+
 /// Load the WARP configuration from the given path, or the default location.
 #[tauri::command]
 pub fn config_load(path: Option<String>) -> Result<WarpConfig, String> {
     let config_path = match path {
         Some(p) => std::path::PathBuf::from(p),
-        None => {
-            let exe_dir = std::env::current_exe()
-                .map_err(|e| e.to_string())?
-                .parent()
-                .ok_or("cannot determine exe directory")?
-                .to_path_buf();
-            // In dev mode, look in the project root (two levels up from exe)
-            let candidates = [
-                exe_dir.join("warp_config.json"),
-                exe_dir.join("../../warp_config.json"),
-                exe_dir.join("../../../warp_config.json"),
-                std::path::PathBuf::from("warp_config.json"),
-            ];
-            candidates
-                .into_iter()
-                .find(|p| p.exists())
-                .ok_or_else(|| "warp_config.json not found".to_string())?
-        }
+        None => resolve_config_path()?,
     };
     crate::config::schema::load_config(&config_path)
 }
 
-/// Save the WARP configuration to the given path.
+/// Save the WARP configuration to the given path, or the resolved default.
 #[tauri::command]
 pub fn config_save(config: WarpConfig, path: Option<String>) -> Result<(), String> {
-    let config_path = path
-        .map(std::path::PathBuf::from)
-        .unwrap_or_else(|| std::path::PathBuf::from("warp_config.json"));
+    let config_path = match path {
+        Some(p) => std::path::PathBuf::from(p),
+        None => resolve_config_path()?,
+    };
     crate::config::schema::save_config(&config, &config_path)
 }
 
