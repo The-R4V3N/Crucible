@@ -153,7 +153,7 @@ function TabBar({ onSearchToggle }: TabBarProps) {
             }
           }}
           className="flex items-center px-3 text-warp-text-dim hover:text-warp-accent transition-colors"
-          title="Split Editor (Ctrl+D)"
+          title="Split Editor (Ctrl+\)"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
