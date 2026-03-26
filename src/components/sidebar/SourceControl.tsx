@@ -1,12 +1,28 @@
 import type { GitStatusInfo } from "@/lib/ipc";
+import { useFileStore } from "@/stores/fileStore";
+import { useUiStore } from "@/stores/uiStore";
 
 interface SourceControlProps {
   /** Git status for the active project. */
   gitStatus: GitStatusInfo | null;
+  /** Callback when a changed file is clicked. Defaults to opening in editor. */
+  onFileClick?: (filePath: string) => void;
 }
 
 /** Source control panel showing git branch and changed files. */
-function SourceControl({ gitStatus }: SourceControlProps) {
+function SourceControl({ gitStatus, onFileClick }: SourceControlProps) {
+  const openFile = useFileStore((s) => s.openFile);
+  const setActiveView = useUiStore((s) => s.setActiveView);
+
+  const handleFileClick = (filePath: string) => {
+    if (onFileClick) {
+      onFileClick(filePath);
+    } else {
+      const name = filePath.split("/").pop() ?? filePath;
+      openFile(filePath, name);
+      setActiveView("editor");
+    }
+  };
   if (!gitStatus) return null;
 
   return (
@@ -46,13 +62,14 @@ function SourceControl({ gitStatus }: SourceControlProps) {
           data-testid="changed-files-list"
         >
           {gitStatus.changed_file_paths.map((filePath) => (
-            <div
+            <button
               key={filePath}
-              className="truncate text-xs text-warp-text-dim hover:text-warp-text cursor-pointer"
+              onClick={() => handleFileClick(filePath)}
+              className="truncate text-xs text-warp-text-dim hover:text-warp-text cursor-pointer text-left w-full"
               title={filePath}
             >
               {filePath}
-            </div>
+            </button>
           ))}
         </div>
       )}
