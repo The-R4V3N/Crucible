@@ -139,28 +139,61 @@ function TabBar({ onSearchToggle }: TabBarProps) {
         })}
       </div>
 
-      {/* Search icon */}
-      <button
-        data-testid="search-toggle"
-        onClick={onSearchToggle}
-        className="flex items-center px-3 text-warp-text-dim hover:text-warp-accent transition-colors"
-        title="Search (Ctrl+Shift+F)"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
+      {/* Action icons */}
+      <div className="flex items-center">
+        {/* Split editor icon */}
+        <button
+          data-testid="split-toggle"
+          onClick={() => {
+            const store = useUiStore.getState();
+            if (store.splitMode) {
+              store.closeSplit();
+            } else {
+              store.splitVertical();
+            }
+          }}
+          className="flex items-center px-3 text-warp-text-dim hover:text-warp-accent transition-colors"
+          title="Split Editor (Ctrl+D)"
         >
-          <circle cx="11" cy="11" r="8" />
-          <path d="m21 21-4.3-4.3" />
-        </svg>
-      </button>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <rect x="2" y="3" width="20" height="18" rx="2" />
+            <line x1="12" y1="3" x2="12" y2="21" />
+          </svg>
+        </button>
+
+        {/* Search icon */}
+        <button
+          data-testid="search-toggle"
+          onClick={onSearchToggle}
+          className="flex items-center px-3 text-warp-text-dim hover:text-warp-accent transition-colors"
+          title="Search (Ctrl+Shift+F)"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <circle cx="11" cy="11" r="8" />
+            <path d="m21 21-4.3-4.3" />
+          </svg>
+        </button>
+      </div>
     </div>
   );
 }
