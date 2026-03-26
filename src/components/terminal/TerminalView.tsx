@@ -57,6 +57,22 @@ function TerminalView({ projectName, cwd, command, onError }: TerminalViewProps)
     return session?.needsAttention ?? false;
   });
 
+  // Targeted selector: is this terminal the active one?
+  const isActive = useSessionStore((s) => {
+    if (!projectName) return false;
+    const session = Object.values(s.sessions).find(
+      (sess) => sess.projectName === projectName,
+    );
+    return session?.id === s.activeSessionId;
+  });
+
+  // Auto-focus terminal when it becomes active
+  useEffect(() => {
+    if (isActive && terminalRef.current) {
+      terminalRef.current.focus();
+    }
+  }, [isActive]);
+
   const { write, resize } = useSession({
     projectName,
     cwd,
