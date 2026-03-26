@@ -1,5 +1,5 @@
-import { describe, it, expect } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { describe, it, expect, vi } from "vitest";
+import { render, screen, fireEvent } from "@testing-library/react";
 import SourceControl from "@/components/sidebar/SourceControl";
 
 describe("SourceControl", () => {
@@ -76,8 +76,26 @@ describe("SourceControl", () => {
     render(
       <SourceControl
         gitStatus={{ branch: "main", dirty: false, changed_files: 0, changed_file_paths: [] }}
+        onFileClick={vi.fn()}
       />,
     );
     expect(screen.queryByTestId("changed-files-list")).not.toBeInTheDocument();
+  });
+
+  it("calls onFileClick when a changed file is clicked", () => {
+    const onFileClick = vi.fn();
+    render(
+      <SourceControl
+        gitStatus={{
+          branch: "main",
+          dirty: true,
+          changed_files: 2,
+          changed_file_paths: ["src/App.tsx", "src/lib/ipc.ts"],
+        }}
+        onFileClick={onFileClick}
+      />,
+    );
+    fireEvent.click(screen.getByText("src/App.tsx"));
+    expect(onFileClick).toHaveBeenCalledWith("src/App.tsx");
   });
 });
