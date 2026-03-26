@@ -43,10 +43,10 @@ WARP is an AI agent IDE for Windows — a project-centric workspace that combine
 │  WARP  │┌───────────────────────────────────────────┐│
 │  logo  ││                                           ││
 │        ││                                           ││
-│ ▌elena ││         Active tab content                ││
-│  nexus ││     (xterm.js / Monaco / Diff view)       ││
-│  crucix││                                           ││
-│  ai_mon││                                           ││
+│ ▌proj1 ││         Active tab content                ││
+│  proj2 ││     (xterm.js / Monaco / Diff view)       ││
+│  proj3 ││                                           ││
+│  proj4 ││                                           ││
 │  warp  ││                                           ││
 │        │├───────────────────────────────────────────┤│
 │ ────── ││  Bottom Panel (collapsible)               ││
@@ -347,8 +347,8 @@ starting → running → idle → needs_attention
 {
   "projects": [
     {
-      "name": "elena-valore",
-      "path": "D:/Development/Elena_Valore_Store",
+      "name": "my-project",
+      "path": "D:/Development/MyProject",
       "command": "claude"
     }
   ],
