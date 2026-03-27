@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Editor from "@monaco-editor/react";
 import type * as Monaco from "monaco-editor";
 import { useFileStore } from "@/stores/fileStore";
@@ -38,9 +38,39 @@ function EditorView() {
   const [loading, setLoading] = useState(false);
   const [editorInstance, setEditorInstance] =
     useState<Monaco.editor.IStandaloneCodeEditor | null>(null);
+  // Ref to the editor container div — used by the ResizeObserver below.
+  const editorContainerRef = useRef<HTMLDivElement>(null);
 
   // Sync cursor position to editorStore via the hook
   useEditorCursor(editorInstance);
+
+  // Dispose Monaco editor when the instance changes or EditorView unmounts.
+  useEffect(() => {
+    return () => {
+      editorInstance?.dispose();
+    };
+  }, [editorInstance]);
+
+  // Manual layout management via ResizeObserver.
+  // We use automaticLayout: false on the Editor (below) so Monaco does NOT create
+  // its own ResizeObserver. Monaco's internal observer fires asynchronously after
+  // the editor's DOM element is removed, accessing already-torn-down internals and
+  // crashing with "Cannot read properties of undefined (reading '_isDisposed')".
+  // By controlling the observer ourselves we can disconnect it in the effect cleanup
+  // before the editor is disposed or the component unmounts.
+  useEffect(() => {
+    if (!editorInstance || !editorContainerRef.current) return;
+    if (typeof ResizeObserver === "undefined") return;
+
+    const observer = new ResizeObserver(() => {
+      editorInstance.layout();
+    });
+    observer.observe(editorContainerRef.current);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [editorInstance]);
 
   // Load file content and sync language when active file changes
   useEffect(() => {
@@ -84,7 +114,7 @@ function EditorView() {
   return (
     <div className="flex h-full flex-col" data-testid="editor-view">
       <EditorTabs />
-      <div className="flex-1">
+      <div ref={editorContainerRef} className="flex-1">
         {loading ? (
           <div className="flex h-full items-center justify-center text-warp-text-dim">
             Loading...
@@ -107,7 +137,7 @@ function EditorView() {
               fontSize: 14,
               minimap: { enabled: false },
               scrollBeyondLastLine: false,
-              automaticLayout: true,
+              automaticLayout: false,
               lineNumbers: "on",
               renderWhitespace: "selection",
               tabSize: 2,

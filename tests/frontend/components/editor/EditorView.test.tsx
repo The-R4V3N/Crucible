@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, act as reactAct } from "react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, waitFor, act } from "@testing-library/react";
 import { useFileStore } from "@/stores/fileStore";
@@ -12,6 +12,7 @@ function makeFakeEditor() {
 
   return {
     getPosition: () => ({ lineNumber: 1, column: 1 }),
+    dispose: vi.fn(),
     onDidChangeCursorPosition: vi.fn(
       (
         cb: (e: {
@@ -74,6 +75,7 @@ vi.mock("@/lib/ipc", () => ({
 import { fileRead } from "@/lib/ipc";
 const mockFileRead = vi.mocked(fileRead);
 
+import Editor from "@monaco-editor/react";
 import EditorView from "@/components/editor/EditorView";
 
 describe("EditorView", () => {
@@ -136,6 +138,59 @@ describe("EditorView", () => {
       expect(lastFakeEditor).not.toBeNull();
       expect(lastFakeEditor!.onDidChangeCursorPosition).toHaveBeenCalledOnce();
     });
+  });
+
+  it("calls editor.dispose() on unmount (prevents automaticLayout crash on split view toggle)", async () => {
+    useFileStore.getState().openFile("/tmp/test.ts", "test.ts");
+    const { unmount } = render(<EditorView />);
+    // Wait for the full mount cycle: file loaded, Monaco remounted, cursor hook active
+    await waitFor(() => {
+      expect(lastFakeEditor).not.toBeNull();
+      expect(lastFakeEditor!.onDidChangeCursorPosition).toHaveBeenCalledOnce();
+    });
+    const editorToDispose = lastFakeEditor!;
+    unmount();
+    expect(editorToDispose.dispose).toHaveBeenCalled();
+  });
+
+  it("disables Monaco automaticLayout to prevent internal ResizeObserver from crashing on unmount", async () => {
+    useFileStore.getState().openFile("/tmp/test.ts", "test.ts");
+    render(<EditorView />);
+    await screen.findByTestId("monaco-editor");
+
+    const MonacoMock = vi.mocked(Editor);
+    // automaticLayout: true causes Monaco's internal ResizeObserver to fire into a
+    // removed DOM element after unmount. We must set it to false and handle layout
+    // ourselves so we control when the observer is disconnected.
+    const wasCalledWithAutoLayoutFalse = MonacoMock.mock.calls.some(
+      (call) =>
+        (call[0] as Record<string, unknown>)?.options !== undefined &&
+        ((call[0] as Record<string, unknown>).options as Record<string, unknown>)
+          ?.automaticLayout === false,
+    );
+    expect(wasCalledWithAutoLayoutFalse).toBe(true);
+  });
+
+  it("disposes Monaco synchronously when last file is closed (prevents ResizeObserver crash)", async () => {
+    useFileStore.getState().openFile("/tmp/test.ts", "test.ts");
+    render(<EditorView />);
+
+    await waitFor(() => {
+      expect(lastFakeEditor).not.toBeNull();
+      expect(lastFakeEditor!.onDidChangeCursorPosition).toHaveBeenCalledOnce();
+    });
+
+    const editorToDispose = lastFakeEditor!;
+    editorToDispose.dispose.mockClear();
+
+    // Synchronous reactAct flushes useLayoutEffect but NOT passive useEffect.
+    // With the current useEffect disposal: dispose is NOT yet called here.
+    // With useLayoutEffect disposal: dispose IS called synchronously before DOM update.
+    reactAct(() => {
+      useFileStore.getState().closeFile("/tmp/test.ts");
+    });
+
+    expect(editorToDispose.dispose).toHaveBeenCalled();
   });
 
   it("does not update cursor store when stale editor fires during file switch", async () => {
