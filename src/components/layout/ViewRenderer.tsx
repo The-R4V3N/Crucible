@@ -11,7 +11,11 @@ interface ViewRendererProps {
   onError?: (error: string) => void;
 }
 
-/** Renders all views, showing only the active one. Keeps components mounted to prevent flicker. */
+/** Renders all views, showing only the active one.
+ *  Terminal and Editor stay mounted (visibility toggle) to prevent flicker.
+ *  DiffView uses display:none because Monaco DiffEditor's canvas can bleed
+ *  through visibility:hidden in some WebView2 contexts, and it causes
+ *  model disposal errors when receiving file path updates while invisible. */
 const ViewRenderer = memo(function ViewRenderer({ view, repoPath, diffFilePath, onError }: ViewRendererProps) {
   return (
     <div className="relative h-full w-full bg-warp-bg">
@@ -21,8 +25,8 @@ const ViewRenderer = memo(function ViewRenderer({ view, repoPath, diffFilePath, 
       <div className={`absolute inset-0 bg-warp-bg ${view === "editor" ? "visible" : "invisible"}`}>
         <EditorView />
       </div>
-      <div className={`absolute inset-0 bg-warp-bg ${view === "diff" ? "visible" : "invisible"}`}>
-        <DiffView repoPath={repoPath} filePath={diffFilePath} />
+      <div className={`absolute inset-0 bg-warp-bg ${view === "diff" ? "block" : "hidden"}`}>
+        <DiffView repoPath={repoPath} filePath={view === "diff" ? diffFilePath : null} />
       </div>
     </div>
   );

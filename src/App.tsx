@@ -134,7 +134,7 @@ function App() {
       )}
 
       {/* Sidebar */}
-      <Sidebar projects={projects} gitStatus={gitStatus} />
+      <Sidebar projects={projects} gitStatus={gitStatus} projectPath={activeProject?.path} />
 
       {/* File explorer panel */}
       {explorerVisible && (
@@ -192,8 +192,14 @@ function App() {
         <BottomPanel
           changedFiles={gitStatus?.changed_file_paths ?? []}
           onFileClick={(filePath) => {
+            const projectBase = activeProject?.path;
+            let fullPath = filePath;
+            if (projectBase) {
+              const base = projectBase.endsWith("/") ? projectBase.slice(0, -1) : projectBase;
+              fullPath = `${base}/${filePath}`;
+            }
             const name = filePath.split("/").pop() ?? filePath;
-            useFileStore.getState().openFile(filePath, name);
+            useFileStore.getState().openFile(fullPath, name);
             if (useUiStore.getState().splitMode) {
               useUiStore.getState().closeSplit();
             }

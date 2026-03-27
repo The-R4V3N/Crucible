@@ -9,10 +9,11 @@ import type { GitStatusInfo } from "@/lib/ipc";
 interface SidebarProps {
   projects: ProjectConfig[];
   gitStatus?: GitStatusInfo | null;
+  projectPath?: string;
 }
 
 /** Left sidebar showing project list, source control, and shortcuts. */
-function Sidebar({ projects, gitStatus }: SidebarProps) {
+function Sidebar({ projects, gitStatus, projectPath }: SidebarProps) {
   const sidebarVisible = useUiStore((s) => s.sidebarVisible);
 
   if (!sidebarVisible) return null;
@@ -36,7 +37,7 @@ function Sidebar({ projects, gitStatus }: SidebarProps) {
       </div>
 
       {/* Source control */}
-      <SourceControl gitStatus={gitStatus ?? null} />
+      <SourceControl gitStatus={gitStatus ?? null} projectPath={projectPath} />
 
       {/* Shortcuts reference */}
       <Shortcuts />

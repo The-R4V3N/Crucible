@@ -7,10 +7,12 @@ interface SourceControlProps {
   gitStatus: GitStatusInfo | null;
   /** Callback when a changed file is clicked. Defaults to opening in editor. */
   onFileClick?: (filePath: string) => void;
+  /** Project root path, prepended to git-relative file paths. */
+  projectPath?: string;
 }
 
 /** Source control panel showing git branch and changed files. */
-function SourceControl({ gitStatus, onFileClick }: SourceControlProps) {
+function SourceControl({ gitStatus, onFileClick, projectPath }: SourceControlProps) {
   const openFile = useFileStore((s) => s.openFile);
   const setActiveView = useUiStore((s) => s.setActiveView);
 
@@ -18,8 +20,14 @@ function SourceControl({ gitStatus, onFileClick }: SourceControlProps) {
     if (onFileClick) {
       onFileClick(filePath);
     } else {
+      // Build absolute path from project root + git-relative path
+      let fullPath = filePath;
+      if (projectPath) {
+        const base = projectPath.endsWith("/") ? projectPath.slice(0, -1) : projectPath;
+        fullPath = `${base}/${filePath}`;
+      }
       const name = filePath.split("/").pop() ?? filePath;
-      openFile(filePath, name);
+      openFile(fullPath, name);
       // Close split mode so the editor shows as a single view
       if (useUiStore.getState().splitMode) {
         useUiStore.getState().closeSplit();
