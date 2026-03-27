@@ -1,5 +1,6 @@
+import { useEffect } from "react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import { useFileStore } from "@/stores/fileStore";
 import { useEditorStore } from "@/stores/editorStore";
 
@@ -11,7 +12,10 @@ function makeFakeEditor() {
   };
 }
 
-// Mock Monaco editor — calls onMount with a fake editor instance
+// Capture the last fake editor passed to onMount so tests can inspect it
+let lastFakeEditor: ReturnType<typeof makeFakeEditor> | null = null;
+
+// Mock Monaco editor — calls onMount after mount (mirrors real Monaco behaviour)
 vi.mock("@monaco-editor/react", () => ({
   default: vi.fn(
     ({
@@ -23,9 +27,13 @@ vi.mock("@monaco-editor/react", () => ({
       language: string;
       onMount?: (editor: ReturnType<typeof makeFakeEditor>) => void;
     }) => {
-      if (onMount) {
-        onMount(makeFakeEditor());
-      }
+      useEffect(() => {
+        if (onMount) {
+          const fakeEditor = makeFakeEditor();
+          lastFakeEditor = fakeEditor;
+          onMount(fakeEditor);
+        }
+      }, []);
       return (
         <div data-testid="monaco-editor" data-language={language}>
           {value}
@@ -46,6 +54,7 @@ import EditorView from "@/components/editor/EditorView";
 describe("EditorView", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    lastFakeEditor = null;
     useFileStore.setState({
       tree: null,
       openFiles: [],
@@ -97,9 +106,10 @@ describe("EditorView", () => {
     useFileStore.getState().openFile("/tmp/test.ts", "test.ts");
     render(<EditorView />);
     await screen.findByTestId("monaco-editor");
-    // The fake editor's onDidChangeCursorPosition should have been called once
-    // (indirectly via useEditorCursor hook inside EditorView)
-    // We verify the store language was set, confirming onMount fired
-    expect(useEditorStore.getState().language).toBe("typescript");
+    // Wait for onMount effect + useEditorCursor effect to both flush
+    await waitFor(() => {
+      expect(lastFakeEditor).not.toBeNull();
+      expect(lastFakeEditor!.onDidChangeCursorPosition).toHaveBeenCalledOnce();
+    });
   });
 });
