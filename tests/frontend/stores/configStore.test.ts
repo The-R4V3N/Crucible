@@ -22,6 +22,7 @@ describe("configStore", () => {
       font_size: 14,
       sidebar_width: 240,
       notifications: { visual: true, border_glow: true, sound: false },
+      active_project: null,
     };
     useConfigStore.getState().setConfig(config);
     const state = useConfigStore.getState();

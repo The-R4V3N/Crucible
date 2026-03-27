@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { useFileStore } from "@/stores/fileStore";
 import FileTree from "@/components/explorer/FileTree";
@@ -9,10 +9,25 @@ const mockTree: FileNode = {
   path: "/tmp/project",
   is_dir: true,
   children: [
-    { name: "src", path: "/tmp/project/src", is_dir: true, children: [
-      { name: "main.ts", path: "/tmp/project/src/main.ts", is_dir: false, children: [] },
-    ]},
-    { name: "README.md", path: "/tmp/project/README.md", is_dir: false, children: [] },
+    {
+      name: "src",
+      path: "/tmp/project/src",
+      is_dir: true,
+      children: [
+        {
+          name: "main.ts",
+          path: "/tmp/project/src/main.ts",
+          is_dir: false,
+          children: [],
+        },
+      ],
+    },
+    {
+      name: "README.md",
+      path: "/tmp/project/README.md",
+      is_dir: false,
+      children: [],
+    },
   ],
 };
 
@@ -40,13 +55,17 @@ describe("FileTree", () => {
   it("clicking a directory toggles expansion", () => {
     render(<FileTree tree={mockTree} />);
     fireEvent.click(screen.getByText("src"));
-    expect(useFileStore.getState().expandedDirs.has("/tmp/project/src")).toBe(true);
+    expect(useFileStore.getState().expandedDirs.has("/tmp/project/src")).toBe(
+      true,
+    );
   });
 
   it("clicking a file calls openFile", () => {
     render(<FileTree tree={mockTree} />);
     fireEvent.click(screen.getByText("README.md"));
-    expect(useFileStore.getState().activeFilePath).toBe("/tmp/project/README.md");
+    expect(useFileStore.getState().activeFilePath).toBe(
+      "/tmp/project/README.md",
+    );
   });
 
   it("shows children when directory is expanded", () => {

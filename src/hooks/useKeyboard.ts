@@ -88,7 +88,7 @@ export function useKeyboard({ projects }: UseKeyboardOptions) {
       // F1-F12 — switch to project 1-12
       const fKeyMatch = e.key.match(/^F(\d+)$/);
       if (fKeyMatch && !e.ctrlKey && !e.altKey && !e.metaKey) {
-        const index = parseInt(fKeyMatch[1], 10) - 1;
+        const index = parseInt(fKeyMatch[1]!, 10) - 1;
         const project = projects[index];
         if (project) {
           e.preventDefault();
@@ -104,5 +104,19 @@ export function useKeyboard({ projects }: UseKeyboardOptions) {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [projects, sessions, toggleSidebar, toggleExplorer, toggleBottomPanel, toggleSearch, tabOrder, setActiveView, splitVertical, splitHorizontal, closeSplit, splitMode, setActiveSession]);
+  }, [
+    projects,
+    sessions,
+    toggleSidebar,
+    toggleExplorer,
+    toggleBottomPanel,
+    toggleSearch,
+    tabOrder,
+    setActiveView,
+    splitVertical,
+    splitHorizontal,
+    closeSplit,
+    splitMode,
+    setActiveSession,
+  ]);
 }

@@ -4,17 +4,28 @@ import { useEditorCursor } from "@/hooks/useEditorCursor";
 import { useEditorStore } from "@/stores/editorStore";
 
 /** Minimal fake Monaco editor for testing. */
-function makeFakeEditor(overrides?: Partial<{
-  getPosition: () => { lineNumber: number; column: number } | null;
-}>) {
-  const listeners: Array<(e: { position: { lineNumber: number; column: number } | null }) => void> = [];
+function makeFakeEditor(
+  overrides?: Partial<{
+    getPosition: () => { lineNumber: number; column: number } | null;
+  }>,
+) {
+  const listeners: Array<
+    (e: { position: { lineNumber: number; column: number } | null }) => void
+  > = [];
 
   const editor = {
-    getPosition: overrides?.getPosition ?? (() => ({ lineNumber: 1, column: 1 })),
-    onDidChangeCursorPosition: vi.fn((cb: (e: { position: { lineNumber: number; column: number } | null }) => void) => {
-      listeners.push(cb);
-      return { dispose: vi.fn() };
-    }),
+    getPosition:
+      overrides?.getPosition ?? (() => ({ lineNumber: 1, column: 1 })),
+    onDidChangeCursorPosition: vi.fn(
+      (
+        cb: (e: {
+          position: { lineNumber: number; column: number } | null;
+        }) => void,
+      ) => {
+        listeners.push(cb);
+        return { dispose: vi.fn() };
+      },
+    ),
     _firePositionChange(lineNumber: number, column: number) {
       listeners.forEach((cb) => cb({ position: { lineNumber, column } }));
     },
@@ -25,7 +36,11 @@ function makeFakeEditor(overrides?: Partial<{
 
 describe("useEditorCursor", () => {
   beforeEach(() => {
-    useEditorStore.setState({ cursorLine: 1, cursorCol: 1, language: "plaintext" });
+    useEditorStore.setState({
+      cursorLine: 1,
+      cursorCol: 1,
+      language: "plaintext",
+    });
   });
 
   it("registers onDidChangeCursorPosition on mount", () => {
@@ -79,10 +94,17 @@ describe("useEditorCursor", () => {
     renderHook(() => useEditorCursor(editor as never));
 
     // Manually fire with null position (Monaco can emit this)
-    const listeners: Array<(e: { position: { lineNumber: number; column: number } | null }) => void> = [];
-    (editor.onDidChangeCursorPosition as ReturnType<typeof vi.fn>).mock.calls.forEach(
-      ([cb]: [typeof listeners[0]]) => listeners.push(cb)
-    );
+    const listeners: Array<
+      (e: { position: { lineNumber: number; column: number } | null }) => void
+    > = [];
+    (
+      editor.onDidChangeCursorPosition as ReturnType<typeof vi.fn>
+    ).mock.calls.forEach((call: unknown[]) => {
+      const cb = call[0] as (e: {
+        position: { lineNumber: number; column: number } | null;
+      }) => void;
+      listeners.push(cb);
+    });
     listeners.forEach((cb) => cb({ position: null }));
 
     // Store should remain at initial values

@@ -20,7 +20,7 @@ interface FileState {
   toggleDir: (path: string) => void;
 }
 
-export const useFileStore = create<FileState>((set, get) => ({
+export const useFileStore = create<FileState>((set) => ({
   tree: null,
   openFiles: [],
   activeFilePath: null,
@@ -45,7 +45,8 @@ export const useFileStore = create<FileState>((set, get) => ({
       const remaining = state.openFiles.filter((f) => f.path !== path);
       let activeFilePath = state.activeFilePath;
       if (activeFilePath === path) {
-        activeFilePath = remaining.length > 0 ? remaining[remaining.length - 1]!.path : null;
+        activeFilePath =
+          remaining.length > 0 ? remaining[remaining.length - 1]!.path : null;
       }
       return { openFiles: remaining, activeFilePath };
     }),

@@ -1,6 +1,6 @@
 import { memo } from "react";
 import { useSessionStore } from "@/stores/sessionStore";
-import { useConfigStore, type ProjectConfig } from "@/stores/configStore";
+import { useConfigStore } from "@/stores/configStore";
 import TerminalView from "./TerminalView";
 
 interface TerminalManagerProps {
@@ -49,7 +49,10 @@ function TerminalManager({ onError }: TerminalManagerProps) {
   const projects = useConfigStore((s) => s.config?.projects ?? []);
 
   return (
-    <div className="relative h-full w-full bg-warp-bg" data-testid="terminal-manager">
+    <div
+      className="relative h-full w-full bg-warp-bg"
+      data-testid="terminal-manager"
+    >
       {projects.map((project) => (
         <TerminalPane
           key={project.name}
