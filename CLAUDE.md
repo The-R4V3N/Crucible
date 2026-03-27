@@ -35,6 +35,27 @@ See `ARCHITECTURE.md` for the full blueprint: layout, IPC API, milestones, and p
 - Run tests before every commit. Broken tests block commits.
 - Test names describe behavior: `test_session_starts_in_starting_state`, not `test1`.
 
+## AI Workflow (Non-negotiable)
+
+These rules govern how Claude approaches every task in this project.
+
+### Feature workflow
+
+1. **Plan** — Enter planning mode first. Identify every file to create/modify, define data structures, list all test cases, and flag gotchas. Get confirmation before writing anything.
+2. **Red** — Write all failing tests for the feature. Run them to confirm they fail for the right reason.
+3. **Green** — Write the minimum implementation to make the tests pass.
+4. **Refactor** — Clean up without breaking tests.
+
+Never skip the planning step, even for "small" changes. Planning surfaces design issues before code is written.
+
+### Debugging workflow
+
+1. **Reproduce** — Write a failing test that isolates and reproduces the bug. If a test already exists, confirm it fails.
+2. **Fix** — Write the minimum code to make the failing test pass.
+3. **Verify** — Run the full test suite to confirm nothing regressed.
+
+Never patch code without a test that proves the bug existed and is now gone.
+
 ## Build & Run Commands
 
 ```bash
