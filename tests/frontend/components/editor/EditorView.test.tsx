@@ -1,14 +1,36 @@
 import { useEffect } from "react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, act } from "@testing-library/react";
 import { useFileStore } from "@/stores/fileStore";
 import { useEditorStore } from "@/stores/editorStore";
 
-/** Fake Monaco editor passed to onMount — supports cursor listener. */
+/** Fake Monaco editor — implements real dispose semantics so cursor tests work. */
 function makeFakeEditor() {
+  const listeners: Array<
+    (e: { position: { lineNumber: number; column: number } | null }) => void
+  > = [];
+
   return {
     getPosition: () => ({ lineNumber: 1, column: 1 }),
-    onDidChangeCursorPosition: vi.fn(() => ({ dispose: vi.fn() })),
+    onDidChangeCursorPosition: vi.fn(
+      (
+        cb: (e: {
+          position: { lineNumber: number; column: number } | null;
+        }) => void,
+      ) => {
+        listeners.push(cb);
+        return {
+          dispose: vi.fn(() => {
+            const idx = listeners.indexOf(cb);
+            if (idx >= 0) listeners.splice(idx, 1);
+          }),
+        };
+      },
+    ),
+    /** Simulates Monaco firing a cursor event — respects dispose. */
+    _firePositionChange(lineNumber: number, column: number) {
+      listeners.forEach((cb) => cb({ position: { lineNumber, column } }));
+    },
   };
 }
 
@@ -48,6 +70,9 @@ vi.mock("@/lib/ipc", () => ({
   fileRead: vi.fn().mockResolvedValue("file content here"),
   fileWrite: vi.fn().mockResolvedValue(undefined),
 }));
+
+import { fileRead } from "@/lib/ipc";
+const mockFileRead = vi.mocked(fileRead);
 
 import EditorView from "@/components/editor/EditorView";
 
@@ -111,5 +136,40 @@ describe("EditorView", () => {
       expect(lastFakeEditor).not.toBeNull();
       expect(lastFakeEditor!.onDidChangeCursorPosition).toHaveBeenCalledOnce();
     });
+  });
+
+  it("does not update cursor store when stale editor fires during file switch", async () => {
+    // file2 never resolves — keeps editor in loading state after switch
+    mockFileRead
+      .mockResolvedValueOnce("content of file 1")
+      .mockReturnValue(new Promise(() => {}));
+
+    useFileStore.getState().openFile("/tmp/a.ts", "a.ts");
+    render(<EditorView />);
+
+    // Wait for file1 editor to mount and cursor hook to be active
+    await waitFor(() => {
+      expect(lastFakeEditor).not.toBeNull();
+      expect(lastFakeEditor!.onDidChangeCursorPosition).toHaveBeenCalledOnce();
+    });
+
+    const staleEditor = lastFakeEditor!;
+
+    // Switch to file2 — starts loading, Monaco unmounts
+    await act(async () => {
+      useFileStore.setState({ activeFilePath: "/tmp/b.ts" });
+    });
+
+    // Reset cursor store to a known state
+    useEditorStore.setState({ cursorLine: 1, cursorCol: 1 });
+
+    // Simulate Monaco firing a cursor event on the now-stale editor.
+    // With the fix, dispose() was called so no listeners remain — store stays at 1,1.
+    // Without the fix, the listener is still active — store would update to 99,42.
+    staleEditor._firePositionChange(99, 42);
+
+    // Store must NOT have been updated by the stale editor
+    expect(useEditorStore.getState().cursorLine).toBe(1);
+    expect(useEditorStore.getState().cursorCol).toBe(1);
   });
 });

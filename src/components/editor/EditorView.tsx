@@ -45,10 +45,14 @@ function EditorView() {
   // Load file content and sync language when active file changes
   useEffect(() => {
     if (!activeFilePath) {
+      setEditorInstance(null);
       setContent("");
       return;
     }
 
+    // Clear stale editor ref before loading so useEditorCursor doesn't hold
+    // a reference to a disposed Monaco instance during the loading phase.
+    setEditorInstance(null);
     useEditorStore.getState().setLanguage(detectLanguage(activeFilePath));
 
     setLoading(true);
