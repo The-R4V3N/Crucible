@@ -150,6 +150,9 @@ function App() {
             projectPath={activeProject?.path ?? "."}
             onResultClick={(filePath) => {
               useFileStore.getState().openFile(filePath, filePath.split("/").pop() ?? filePath);
+              if (useUiStore.getState().splitMode) {
+                useUiStore.getState().closeSplit();
+              }
               useUiStore.getState().setActiveView("editor");
             }}
           />
@@ -189,7 +192,12 @@ function App() {
         <BottomPanel
           changedFiles={gitStatus?.changed_file_paths ?? []}
           onFileClick={(filePath) => {
-            useUiStore.getState().setActiveView("diff");
+            const name = filePath.split("/").pop() ?? filePath;
+            useFileStore.getState().openFile(filePath, name);
+            if (useUiStore.getState().splitMode) {
+              useUiStore.getState().closeSplit();
+            }
+            useUiStore.getState().setActiveView("editor");
           }}
         />
       </main>

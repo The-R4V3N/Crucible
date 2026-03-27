@@ -20,6 +20,10 @@ function SourceControl({ gitStatus, onFileClick }: SourceControlProps) {
     } else {
       const name = filePath.split("/").pop() ?? filePath;
       openFile(filePath, name);
+      // Close split mode so the editor shows as a single view
+      if (useUiStore.getState().splitMode) {
+        useUiStore.getState().closeSplit();
+      }
       setActiveView("editor");
     }
   };

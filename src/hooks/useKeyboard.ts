@@ -39,15 +39,15 @@ export function useKeyboard({ projects }: UseKeyboardOptions) {
         return;
       }
 
-      // Ctrl+D — split vertical
-      if (e.ctrlKey && !e.shiftKey && e.key === "d") {
+      // Ctrl+\ — split vertical
+      if (e.ctrlKey && !e.shiftKey && e.key === "\\") {
         e.preventDefault();
         splitVertical();
         return;
       }
 
-      // Ctrl+Shift+D — split horizontal
-      if (e.ctrlKey && e.shiftKey && e.key === "D") {
+      // Ctrl+Shift+\ — split horizontal
+      if (e.ctrlKey && e.shiftKey && e.key === "|") {
         e.preventDefault();
         splitHorizontal();
         return;

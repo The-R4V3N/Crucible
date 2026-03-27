@@ -140,12 +140,15 @@ function TerminalView({ projectName, cwd, command, onError }: TerminalViewProps)
       terminalRef.current = terminal;
       fitAddonRef.current = fitAddon;
 
-      // Let F-keys and global shortcuts pass through to the window handler
-      terminal.attachCustomKeyEventHandler((e) => {
+      // Let F-keys and global shortcuts pass through to the window handler.
+      // NOTE: Ctrl+D is NOT passed through — it must reach the shell as EOF.
+      terminal.attachCustomKeyEventHandler((e: KeyboardEvent) => {
         // F1-F12: project switching
         if (/^F\d+$/.test(e.key)) return false;
-        // Ctrl+B, Ctrl+E, Ctrl+D, Ctrl+Shift+D, Ctrl+Shift+F, Ctrl+1/2/3, Ctrl+`, Ctrl+W
-        if (e.ctrlKey && ["b", "e", "d", "D", "F", "1", "2", "3", "`", "w"].includes(e.key)) return false;
+        // Ctrl+B, Ctrl+E, Ctrl+Shift+D, Ctrl+Shift+F, Ctrl+1/2/3, Ctrl+`, Ctrl+W
+        // Ctrl+D is intentionally NOT here — it must reach the shell as EOF
+        if (e.ctrlKey && e.shiftKey && ["D", "F"].includes(e.key)) return false;
+        if (e.ctrlKey && !e.shiftKey && ["b", "e", "1", "2", "3", "`", "w", "\\"].includes(e.key)) return false;
         return true;
       });
 
