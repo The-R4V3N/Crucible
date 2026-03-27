@@ -16,6 +16,7 @@ import { useGit } from "@/hooks/useGit";
 import { useFileWatcher } from "@/hooks/useFileWatcher";
 import { useFileStore } from "@/stores/fileStore";
 import { configLoad, configSave } from "@/lib/ipc";
+import StatusBar from "@/components/layout/StatusBar";
 
 function App() {
   const [error, setError] = useState<string | null>(null);
@@ -206,6 +207,7 @@ function App() {
             useUiStore.getState().setActiveView("editor");
           }}
         />
+        <StatusBar gitStatus={gitStatus} />
       </main>
       </div>
       </ErrorBoundary>
