@@ -4,7 +4,7 @@ import type * as Monaco from "monaco-editor";
 import { useFileStore } from "@/stores/fileStore";
 import { useEditorStore } from "@/stores/editorStore";
 import { useEditorCursor } from "@/hooks/useEditorCursor";
-import { fileRead, fileWrite } from "@/lib/ipc";
+import { fileRead } from "@/lib/ipc";
 import EditorTabs from "./EditorTabs";
 
 /** Detect language from file extension. */
@@ -36,7 +36,8 @@ function EditorView() {
   const openFiles = useFileStore((s) => s.openFiles);
   const [content, setContent] = useState<string>("");
   const [loading, setLoading] = useState(false);
-  const [editorInstance, setEditorInstance] = useState<Monaco.editor.IStandaloneCodeEditor | null>(null);
+  const [editorInstance, setEditorInstance] =
+    useState<Monaco.editor.IStandaloneCodeEditor | null>(null);
 
   // Sync cursor position to editorStore via the hook
   useEditorCursor(editorInstance);

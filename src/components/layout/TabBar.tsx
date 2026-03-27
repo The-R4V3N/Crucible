@@ -24,84 +24,57 @@ function TabBar({ onSearchToggle }: TabBarProps) {
   const dragStartX = useRef(0);
   const didDrag = useRef(false);
 
-  const handleMouseDown = useCallback((e: React.MouseEvent, index: number) => {
-    dragStartX.current = e.clientX;
-    didDrag.current = false;
-
-    const handleMouseMove = (moveEvent: MouseEvent) => {
-      if (Math.abs(moveEvent.clientX - dragStartX.current) > 5) {
-        didDrag.current = true;
-        setDragIndex(index);
-
-        // Find which tab we're hovering over
-        const tabs = document.querySelectorAll("[data-tab-index]");
-        for (const tab of tabs) {
-          const rect = tab.getBoundingClientRect();
-          if (moveEvent.clientX >= rect.left && moveEvent.clientX <= rect.right) {
-            const tabIdx = parseInt(tab.getAttribute("data-tab-index") ?? "-1", 10);
-            setHoverIndex(tabIdx);
-            break;
-          }
-        }
-      }
-    };
-
-    const handleMouseUp = () => {
-      if (didDrag.current && dragIndex !== null && hoverIndex !== null && dragIndex !== hoverIndex) {
-        reorderTabs(dragIndex, hoverIndex);
-      }
-      setDragIndex(null);
-      setHoverIndex(null);
-      document.removeEventListener("mousemove", handleMouseMove);
-      document.removeEventListener("mouseup", handleMouseUp);
-    };
-
-    document.addEventListener("mousemove", handleMouseMove);
-    document.addEventListener("mouseup", handleMouseUp);
-  }, [dragIndex, hoverIndex, reorderTabs]);
-
   // Use refs for the mouseup handler to get latest state
   const dragIndexRef = useRef(dragIndex);
   dragIndexRef.current = dragIndex;
   const hoverIndexRef = useRef(hoverIndex);
   hoverIndexRef.current = hoverIndex;
 
-  const handleMouseDownStable = useCallback((e: React.MouseEvent, index: number) => {
-    dragStartX.current = e.clientX;
-    didDrag.current = false;
+  const handleMouseDownStable = useCallback(
+    (e: React.MouseEvent, index: number) => {
+      dragStartX.current = e.clientX;
+      didDrag.current = false;
 
-    const handleMouseMove = (moveEvent: MouseEvent) => {
-      if (Math.abs(moveEvent.clientX - dragStartX.current) > 5) {
-        didDrag.current = true;
-        setDragIndex(index);
+      const handleMouseMove = (moveEvent: MouseEvent) => {
+        if (Math.abs(moveEvent.clientX - dragStartX.current) > 5) {
+          didDrag.current = true;
+          setDragIndex(index);
 
-        const tabs = document.querySelectorAll("[data-tab-index]");
-        for (const tab of tabs) {
-          const rect = tab.getBoundingClientRect();
-          if (moveEvent.clientX >= rect.left && moveEvent.clientX <= rect.right) {
-            const tabIdx = parseInt(tab.getAttribute("data-tab-index") ?? "-1", 10);
-            setHoverIndex(tabIdx);
-            break;
+          const tabs = document.querySelectorAll("[data-tab-index]");
+          for (const tab of tabs) {
+            const rect = tab.getBoundingClientRect();
+            if (
+              moveEvent.clientX >= rect.left &&
+              moveEvent.clientX <= rect.right
+            ) {
+              const tabIdx = parseInt(
+                tab.getAttribute("data-tab-index") ?? "-1",
+                10,
+              );
+              setHoverIndex(tabIdx);
+              break;
+            }
           }
         }
-      }
-    };
+      };
 
-    const handleMouseUp = () => {
-      const from = dragIndexRef.current;
-      const to = hoverIndexRef.current;
-      if (didDrag.current && from !== null && to !== null && from !== to) {
-        reorderTabs(from, to);
-      }
-      setDragIndex(null);
-      setHoverIndex(null);
-      document.removeEventListener("mousemove", handleMouseMove);
-      document.removeEventListener("mouseup", handleMouseUp);
-    };
+      const handleMouseUp = () => {
+        const from = dragIndexRef.current;
+        const to = hoverIndexRef.current;
+        if (didDrag.current && from !== null && to !== null && from !== to) {
+          reorderTabs(from, to);
+        }
+        setDragIndex(null);
+        setHoverIndex(null);
+        document.removeEventListener("mousemove", handleMouseMove);
+        document.removeEventListener("mouseup", handleMouseUp);
+      };
 
-    document.addEventListener("mousemove", handleMouseMove);
-    document.addEventListener("mouseup", handleMouseUp);
-  }, [reorderTabs]);
+      document.addEventListener("mousemove", handleMouseMove);
+      document.addEventListener("mouseup", handleMouseUp);
+    },
+    [reorderTabs],
+  );
 
   return (
     <div
@@ -113,7 +86,8 @@ function TabBar({ onSearchToggle }: TabBarProps) {
         {tabOrder.map((viewId, index) => {
           const isActive = viewId === activeView;
           const isDragging = dragIndex === index;
-          const isDropTarget = hoverIndex === index && dragIndex !== null && dragIndex !== index;
+          const isDropTarget =
+            hoverIndex === index && dragIndex !== null && dragIndex !== index;
           return (
             <div
               key={viewId}

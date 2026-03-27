@@ -28,7 +28,12 @@ describe("ProjectList", () => {
   it("highlights active project", () => {
     useSessionStore.setState({
       sessions: {
-        s1: { id: "s1", projectName: "alpha", status: "running" },
+        s1: {
+          id: "s1",
+          projectName: "alpha",
+          status: "running",
+          needsAttention: false,
+        },
       },
       activeSessionId: "s1",
     });
@@ -40,8 +45,18 @@ describe("ProjectList", () => {
   it("clicking project switches active session", () => {
     useSessionStore.setState({
       sessions: {
-        s1: { id: "s1", projectName: "alpha", status: "running" },
-        s2: { id: "s2", projectName: "beta", status: "running" },
+        s1: {
+          id: "s1",
+          projectName: "alpha",
+          status: "running",
+          needsAttention: false,
+        },
+        s2: {
+          id: "s2",
+          projectName: "beta",
+          status: "running",
+          needsAttention: false,
+        },
       },
       activeSessionId: "s1",
     });
@@ -53,7 +68,12 @@ describe("ProjectList", () => {
   it("shows green dot for running session", () => {
     useSessionStore.setState({
       sessions: {
-        s1: { id: "s1", projectName: "alpha", status: "running" },
+        s1: {
+          id: "s1",
+          projectName: "alpha",
+          status: "running",
+          needsAttention: false,
+        },
       },
       activeSessionId: "s1",
     });
@@ -65,7 +85,12 @@ describe("ProjectList", () => {
   it("shows red dot for stopped session", () => {
     useSessionStore.setState({
       sessions: {
-        s1: { id: "s1", projectName: "alpha", status: "stopped" },
+        s1: {
+          id: "s1",
+          projectName: "alpha",
+          status: "stopped",
+          needsAttention: false,
+        },
       },
       activeSessionId: "s1",
     });

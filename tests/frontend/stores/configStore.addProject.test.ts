@@ -2,13 +2,16 @@ import { describe, it, expect, beforeEach } from "vitest";
 import { useConfigStore, type WarpConfig } from "@/stores/configStore";
 
 const baseConfig: WarpConfig = {
-  projects: [{ name: "existing", path: "/tmp/existing", command: "powershell.exe" }],
+  projects: [
+    { name: "existing", path: "/tmp/existing", command: "powershell.exe" },
+  ],
   theme: "dark",
   accent_color: "#00E5FF",
   font_family: "Cascadia Code",
   font_size: 14,
   sidebar_width: 240,
   notifications: { visual: true, border_glow: true, sound: false },
+  active_project: null,
 };
 
 describe("configStore addProject", () => {

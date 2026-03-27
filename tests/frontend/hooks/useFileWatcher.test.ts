@@ -5,11 +5,14 @@ vi.mock("@/lib/ipc", () => ({
   fileWatchStart: vi.fn().mockResolvedValue(undefined),
   onFileChanged: vi.fn().mockResolvedValue(vi.fn()),
   fileTree: vi.fn().mockResolvedValue({
-    name: "root", path: "/tmp", is_dir: true, children: [],
+    name: "root",
+    path: "/tmp",
+    is_dir: true,
+    children: [],
   }),
 }));
 
-import { fileWatchStart, onFileChanged, fileTree } from "@/lib/ipc";
+import { fileWatchStart, onFileChanged } from "@/lib/ipc";
 import { useFileWatcher } from "@/hooks/useFileWatcher";
 
 const mockFileWatchStart = vi.mocked(fileWatchStart);

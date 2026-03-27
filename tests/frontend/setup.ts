@@ -1,11 +1,8 @@
 import "@testing-library/jest-dom/vitest";
 
 // Polyfill ResizeObserver for jsdom
-global.ResizeObserver = class ResizeObserver {
-  private callback: ResizeObserverCallback;
-  constructor(callback: ResizeObserverCallback) {
-    this.callback = callback;
-  }
+window.ResizeObserver = class ResizeObserver {
+  constructor(_callback: ResizeObserverCallback) {}
   observe() {}
   unobserve() {}
   disconnect() {}

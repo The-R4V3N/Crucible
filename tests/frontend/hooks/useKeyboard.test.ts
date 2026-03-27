@@ -14,8 +14,8 @@ describe("useKeyboard", () => {
     useUiStore.setState({ sidebarVisible: true });
     useSessionStore.setState({
       sessions: {
-        s1: { id: "s1", projectName: "alpha", status: "running" },
-        s2: { id: "s2", projectName: "beta", status: "running" },
+        s1: { id: "s1", projectName: "alpha", status: "running", needsAttention: false },
+        s2: { id: "s2", projectName: "beta", status: "running", needsAttention: false },
       },
       activeSessionId: "s1",
     });
