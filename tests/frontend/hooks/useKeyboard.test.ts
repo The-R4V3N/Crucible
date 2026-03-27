@@ -1,9 +1,16 @@
-import { describe, it, expect, beforeEach } from "vitest";
-import { renderHook } from "@testing-library/react";
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { renderHook, act } from "@testing-library/react";
 import { useUiStore } from "@/stores/uiStore";
 import { useSessionStore } from "@/stores/sessionStore";
 import { usePaletteStore } from "@/stores/paletteStore";
 import { useKeyboard } from "@/hooks/useKeyboard";
+
+vi.mock("@tauri-apps/api/event", () => ({
+  listen: vi.fn().mockResolvedValue(vi.fn()),
+}));
+
+import { listen } from "@tauri-apps/api/event";
+const mockListen = vi.mocked(listen);
 
 const mockProjects = [
   { name: "alpha", path: "/tmp/alpha", command: "bash" },
@@ -107,5 +114,59 @@ describe("useKeyboard", () => {
       new KeyboardEvent("keydown", { key: "b", ctrlKey: true }),
     );
     expect(useUiStore.getState().sidebarVisible).toBe(true);
+  });
+
+  it("subscribes to palette:open-command Tauri event on mount", () => {
+    renderHook(() => useKeyboard({ projects: mockProjects }));
+    expect(mockListen).toHaveBeenCalledWith(
+      "palette:open-command",
+      expect.any(Function),
+    );
+  });
+
+  it("subscribes to palette:open-file Tauri event on mount", () => {
+    renderHook(() => useKeyboard({ projects: mockProjects }));
+    expect(mockListen).toHaveBeenCalledWith(
+      "palette:open-file",
+      expect.any(Function),
+    );
+  });
+
+  it("palette:open-command event opens command palette", async () => {
+    renderHook(() => useKeyboard({ projects: mockProjects }));
+    const calls = mockListen.mock.calls;
+    const commandCall = calls.find((c) => c[0] === "palette:open-command");
+    expect(commandCall).toBeDefined();
+    const handler = commandCall![1] as () => void;
+    await act(async () => {
+      handler();
+    });
+    const s = usePaletteStore.getState();
+    expect(s.open).toBe(true);
+    expect(s.mode).toBe("command");
+  });
+
+  it("palette:open-file event opens file palette", async () => {
+    renderHook(() => useKeyboard({ projects: mockProjects }));
+    const calls = mockListen.mock.calls;
+    const fileCall = calls.find((c) => c[0] === "palette:open-file");
+    expect(fileCall).toBeDefined();
+    const handler = fileCall![1] as () => void;
+    await act(async () => {
+      handler();
+    });
+    const s = usePaletteStore.getState();
+    expect(s.open).toBe(true);
+    expect(s.mode).toBe("file");
+  });
+
+  it("unlistens Tauri events on unmount", async () => {
+    const unlisten = vi.fn();
+    mockListen.mockResolvedValue(unlisten);
+    const { unmount } = renderHook(() => useKeyboard({ projects: mockProjects }));
+    // Wait for async listen to resolve
+    await act(async () => {});
+    unmount();
+    expect(unlisten).toHaveBeenCalled();
   });
 });

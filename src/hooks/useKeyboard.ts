@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { listen } from "@tauri-apps/api/event";
 import { useUiStore } from "@/stores/uiStore";
 import { useSessionStore } from "@/stores/sessionStore";
 import { usePaletteStore } from "@/stores/paletteStore";
@@ -137,4 +138,19 @@ export function useKeyboard({ projects }: UseKeyboardOptions) {
     splitMode,
     setActiveSession,
   ]);
+
+  // Tauri global shortcuts bypass WebView2's Ctrl+P/Ctrl+Shift+P interception on Windows.
+  useEffect(() => {
+    const unlistenFns: Array<() => void> = [];
+
+    listen("palette:open-command", () => {
+      usePaletteStore.getState().openCommandPalette();
+    }).then((fn) => unlistenFns.push(fn));
+
+    listen("palette:open-file", () => {
+      usePaletteStore.getState().openFilePalette();
+    }).then((fn) => unlistenFns.push(fn));
+
+    return () => unlistenFns.forEach((fn) => fn());
+  }, []);
 }

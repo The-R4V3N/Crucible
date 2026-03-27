@@ -35,6 +35,10 @@ vi.mock("@tauri-apps/api/window", () => ({
   }),
 }));
 
+vi.mock("@tauri-apps/api/event", () => ({
+  listen: vi.fn().mockResolvedValue(vi.fn()),
+}));
+
 vi.mock("@/hooks/useSession", () => ({
   useSession: vi.fn().mockReturnValue({
     sessionId: null,
