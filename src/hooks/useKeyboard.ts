@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useUiStore } from "@/stores/uiStore";
 import { useSessionStore } from "@/stores/sessionStore";
+import { usePaletteStore } from "@/stores/paletteStore";
 import type { ProjectConfig } from "@/stores/configStore";
 
 interface UseKeyboardOptions {
@@ -25,6 +26,23 @@ export function useKeyboard({ projects }: UseKeyboardOptions) {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      // Ctrl+Shift+P — open command palette
+      if (e.ctrlKey && e.shiftKey && e.key === "P") {
+        e.preventDefault();
+        usePaletteStore.getState().openCommandPalette();
+        return;
+      }
+
+      // Ctrl+P — open file palette
+      if (e.ctrlKey && !e.shiftKey && e.key === "p") {
+        e.preventDefault();
+        usePaletteStore.getState().openFilePalette();
+        return;
+      }
+
+      // Suppress all other shortcuts when palette is open
+      if (usePaletteStore.getState().open) return;
+
       // Ctrl+B — toggle sidebar
       if (e.ctrlKey && e.key === "b") {
         e.preventDefault();
