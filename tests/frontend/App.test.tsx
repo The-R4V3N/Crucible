@@ -97,4 +97,11 @@ describe("App", () => {
     });
     expect(screen.getByTestId("terminal-manager")).toBeInTheDocument();
   });
+
+  it("renders status bar after config loads", async () => {
+    render(<App />);
+    await waitFor(() => {
+      expect(screen.getByTestId("status-bar")).toBeInTheDocument();
+    });
+  });
 });

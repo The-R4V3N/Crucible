@@ -1,6 +1,9 @@
 import { useState, useEffect } from "react";
 import Editor from "@monaco-editor/react";
+import type * as Monaco from "monaco-editor";
 import { useFileStore } from "@/stores/fileStore";
+import { useEditorStore } from "@/stores/editorStore";
+import { useEditorCursor } from "@/hooks/useEditorCursor";
 import { fileRead, fileWrite } from "@/lib/ipc";
 import EditorTabs from "./EditorTabs";
 
@@ -33,13 +36,19 @@ function EditorView() {
   const openFiles = useFileStore((s) => s.openFiles);
   const [content, setContent] = useState<string>("");
   const [loading, setLoading] = useState(false);
+  const [editorInstance, setEditorInstance] = useState<Monaco.editor.IStandaloneCodeEditor | null>(null);
 
-  // Load file content when active file changes
+  // Sync cursor position to editorStore via the hook
+  useEditorCursor(editorInstance);
+
+  // Load file content and sync language when active file changes
   useEffect(() => {
     if (!activeFilePath) {
       setContent("");
       return;
     }
+
+    useEditorStore.getState().setLanguage(detectLanguage(activeFilePath));
 
     setLoading(true);
     fileRead(activeFilePath)
@@ -80,6 +89,9 @@ function EditorView() {
             value={content}
             language={language}
             theme="vs-dark"
+            onMount={(editor) => {
+              setEditorInstance(editor);
+            }}
             onChange={(value) => {
               if (value !== undefined) {
                 setContent(value);
