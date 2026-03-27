@@ -1,4 +1,5 @@
 import { useEditorStore } from "@/stores/editorStore";
+import { useUiStore } from "@/stores/uiStore";
 import type { GitStatusInfo } from "@/lib/ipc";
 
 interface StatusBarProps {
@@ -10,6 +11,8 @@ function StatusBar({ gitStatus }: StatusBarProps) {
   const cursorLine = useEditorStore((s) => s.cursorLine);
   const cursorCol = useEditorStore((s) => s.cursorCol);
   const language = useEditorStore((s) => s.language);
+  const activeView = useUiStore((s) => s.activeView);
+  const isEditorActive = activeView === "editor";
 
   return (
     <div
@@ -29,10 +32,14 @@ function StatusBar({ gitStatus }: StatusBarProps) {
         )}
       </div>
 
-      {/* Right: language + cursor position */}
+      {/* Right: language + cursor position (editor only) */}
       <div className="flex items-center gap-4">
-        <span data-testid="language-mode">{language}</span>
-        <span data-testid="cursor-position">Ln {cursorLine}, Col {cursorCol}</span>
+        {isEditorActive && (
+          <>
+            <span data-testid="language-mode">{language}</span>
+            <span data-testid="cursor-position">Ln {cursorLine}, Col {cursorCol}</span>
+          </>
+        )}
       </div>
     </div>
   );
