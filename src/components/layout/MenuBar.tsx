@@ -17,7 +17,7 @@ type OpenMenu = "file" | "help" | null;
 function useMenuRef(
   isOpen: boolean,
   onClose: () => void,
-): React.RefObject<HTMLDivElement> {
+): React.RefObject<HTMLDivElement | null> {
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (!isOpen) return;
@@ -91,10 +91,6 @@ function MenuBar() {
     if (!activeFilePath) return;
     const path = await dialogSave({ title: "Save As" });
     if (!path || typeof path !== "string") return;
-    const currentContent = useFileStore.getState().openFiles.find(
-      (f) => f.path === activeFilePath,
-    );
-    // Write current content to new path and open it
     await fileWrite(path, "");
     const name = path.replace(/\\/g, "/").split("/").pop() ?? path;
     openFile(path, name);

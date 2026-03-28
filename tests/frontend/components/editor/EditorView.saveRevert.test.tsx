@@ -1,4 +1,4 @@
-import { useEffect, act as reactAct } from "react";
+import { useEffect } from "react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, act, waitFor } from "@testing-library/react";
 import { useFileStore } from "@/stores/fileStore";
