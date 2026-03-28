@@ -32,8 +32,13 @@ jobs:
         run: npm ci
 
       # ── Frontend checks ───────────────────────────────────────────────────
-      - name: Lint (ESLint + Prettier)
-        run: npm run lint
+      # Use npx directly — Windows runners can't always resolve node_modules/.bin
+      # through npm run scripts on cmd.exe.
+      - name: Lint (ESLint)
+        run: npx eslint src/ --ext .ts,.tsx
+
+      - name: Format check (Prettier)
+        run: npx prettier --check src/
 
       - name: Frontend tests (Vitest)
         run: npm run test
