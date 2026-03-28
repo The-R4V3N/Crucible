@@ -1,6 +1,7 @@
 import { memo, useState, useCallback, useEffect, useRef } from "react";
 import { useSessionStore } from "@/stores/sessionStore";
 import { useConfigStore } from "@/stores/configStore";
+import { useUiStore } from "@/stores/uiStore";
 import TerminalView from "./TerminalView";
 import TerminalTabBar, { type TerminalTab } from "./TerminalTabBar";
 
@@ -83,6 +84,22 @@ function TerminalManager({ onError }: TerminalManagerProps) {
     // Switching active session is handled automatically when TerminalPane unmounts
     // and removeSession is called by useSession cleanup.
   }, []);
+
+  const handleCloseActiveTab = useCallback(() => {
+    const { activeSessionId, sessions } = useSessionStore.getState();
+    if (!activeSessionId) return;
+    const session = sessions[activeSessionId];
+    if (!session) return;
+    const projectTabs = tabs.filter((t) => t.projectName === session.projectName);
+    if (projectTabs.length <= 1) return; // don't close last tab
+    handleCloseTab(session.tabKey);
+  }, [tabs, handleCloseTab]);
+
+  // Register terminal actions into uiStore so MenuBar can trigger them
+  const setTerminalActions = useUiStore((s) => s.setTerminalActions);
+  useEffect(() => {
+    setTerminalActions({ addTab: handleAddTab, closeActiveTab: handleCloseActiveTab });
+  }, [setTerminalActions, handleAddTab, handleCloseActiveTab]);
 
   return (
     <div className="flex flex-col h-full w-full bg-warp-bg" data-testid="terminal-manager">

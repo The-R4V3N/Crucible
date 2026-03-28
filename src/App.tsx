@@ -73,7 +73,7 @@ function App() {
         configSave(updatedConfig).catch(() => {});
       }
     }
-  }, [activeSession?.projectName]);
+  }, [activeSession?.projectName, config, setActiveProject]);
 
   // Restore active project from config on startup
   useEffect(() => {
@@ -89,7 +89,7 @@ function App() {
     });
     // Clean up if component unmounts before restore completes
     return unsubscribe;
-  }, [isLoaded]);
+  }, [isLoaded, config?.active_project]);
 
   // Keyboard shortcuts
   useKeyboard({ projects });

@@ -5,7 +5,7 @@ import { useFileStore } from "@/stores/fileStore";
 import { useEditorStore } from "@/stores/editorStore";
 import { useEditorCursor } from "@/hooks/useEditorCursor";
 import { useGitDecorations } from "@/hooks/useGitDecorations";
-import { fileRead } from "@/lib/ipc";
+import { fileRead, fileWrite } from "@/lib/ipc";
 import EditorTabs from "./EditorTabs";
 
 /** Detect language from file extension. */
@@ -56,6 +56,41 @@ function EditorView({ repoPath = null }: EditorViewProps) {
 
   // Git gutter decorations — show added/modified/deleted lines vs HEAD
   useGitDecorations({ editor: editorInstance, filePath: activeFilePath ?? null, repoPath });
+
+  const saveRequest = useFileStore((s) => s.saveRequest);
+  const revertRequest = useFileStore((s) => s.revertRequest);
+  const markClean = useFileStore((s) => s.markClean);
+
+  // Refs so the save/revert effects can read the latest values without
+  // those values appearing in the dependency array (which would cause
+  // spurious saves on every keystroke or file switch).
+  const activeFilePathRef = useRef(activeFilePath);
+  const contentRef = useRef(content);
+  useEffect(() => {
+    activeFilePathRef.current = activeFilePath;
+  });
+  useEffect(() => {
+    contentRef.current = content;
+  });
+
+  // Save: write current editor content to disk when triggerSave() fires
+  useEffect(() => {
+    const path = activeFilePathRef.current;
+    if (!saveRequest || !path) return;
+    fileWrite(path, contentRef.current).then(() => {
+      markClean(path);
+    });
+  }, [saveRequest, markClean]);
+
+  // Revert: reload file from disk when triggerRevert() fires
+  useEffect(() => {
+    const path = activeFilePathRef.current;
+    if (!revertRequest || !path) return;
+    fileRead(path).then((text) => {
+      setContent(text);
+      markClean(path);
+    });
+  }, [revertRequest, markClean]);
 
   // Synchronously dispose the Monaco editor when the active file changes or the
   // component unmounts. useLayoutEffect cleanup fires before React applies DOM

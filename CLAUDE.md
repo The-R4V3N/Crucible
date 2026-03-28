@@ -33,6 +33,11 @@ See `ARCHITECTURE.md` for the full blueprint: layout, IPC API, milestones, and p
 - Rust tests go in `src-tauri/src/` (unit) and `tests/rust/` (integration).
 - Frontend tests go in `tests/frontend/` using Vitest + React Testing Library.
 - Run tests before every commit. Broken tests block commits.
+- **Run the full local CI check before every push.** A push is only allowed when all of the following pass locally:
+  1. `npx tsc --noEmit` — zero TypeScript errors
+  2. `npx prettier --check src/` — zero formatting issues (run `npx prettier --write src/` to fix)
+  3. `npm run lint` — zero ESLint warnings or errors
+  4. `npm run test` — all tests green
 - Test names describe behavior: `test_session_starts_in_starting_state`, not `test1`.
 
 ## AI Workflow (Non-negotiable)
