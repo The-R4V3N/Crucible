@@ -84,13 +84,41 @@ export async function configSave(config: WarpConfig, path?: string): Promise<voi
 export interface GitStatusInfo {
   branch: string;
   dirty: boolean;
+  /** Total number of changed files (staged + unstaged + untracked). */
   changed_files: number;
+  /** All changed file paths (union of staged, unstaged, untracked). */
   changed_file_paths: string[];
+  /** Files staged in the index (ready to commit). */
+  staged_files: string[];
+  /** Tracked files with working-tree changes not yet staged. */
+  unstaged_files: string[];
+  /** New files not yet tracked by git. */
+  untracked_files: string[];
 }
 
 /** Get git status for a repository at the given path. */
 export async function gitStatus(path: string): Promise<GitStatusInfo> {
   return invoke<GitStatusInfo>("git_status", { path });
+}
+
+/** Stage a file (add to the git index). */
+export async function gitStage(repoPath: string, filePath: string): Promise<void> {
+  return invoke("git_stage_file", { repoPath, filePath });
+}
+
+/** Unstage a file (restore index entry to HEAD state). */
+export async function gitUnstage(repoPath: string, filePath: string): Promise<void> {
+  return invoke("git_unstage_file", { repoPath, filePath });
+}
+
+/** Discard working-tree changes to a file (restore from HEAD). */
+export async function gitDiscard(repoPath: string, filePath: string): Promise<void> {
+  return invoke("git_discard_file", { repoPath, filePath });
+}
+
+/** Create a commit with all currently staged changes. */
+export async function gitCommit(repoPath: string, message: string): Promise<void> {
+  return invoke("git_commit_changes", { repoPath, message });
 }
 
 /** File diff result. */

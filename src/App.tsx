@@ -15,7 +15,7 @@ import { useKeyboard } from "@/hooks/useKeyboard";
 import { useGit } from "@/hooks/useGit";
 import { useFileWatcher } from "@/hooks/useFileWatcher";
 import { useFileStore } from "@/stores/fileStore";
-import { configLoad, configSave } from "@/lib/ipc";
+import { configLoad, configSave, gitStage, gitUnstage, gitDiscard, gitCommit } from "@/lib/ipc";
 import StatusBar from "@/components/layout/StatusBar";
 import CommandPalette from "@/components/palette/CommandPalette";
 
@@ -94,10 +94,41 @@ function App() {
   useKeyboard({ projects });
 
   // Git status for active project
-  const { status: gitStatus } = useGit({
+  const { status: gitStatus, refresh: refreshGit } = useGit({
     path: activeProject?.path ?? ".",
     enabled: isLoaded,
   });
+
+  const repoPath = activeProject?.path ?? ".";
+
+  const handleStage = async (filePath: string) => {
+    await gitStage(repoPath, filePath);
+    await refreshGit();
+  };
+  const handleUnstage = async (filePath: string) => {
+    await gitUnstage(repoPath, filePath);
+    await refreshGit();
+  };
+  const handleDiscard = async (filePath: string) => {
+    await gitDiscard(repoPath, filePath);
+    await refreshGit();
+  };
+  const handleCommit = async (message: string) => {
+    await gitCommit(repoPath, message);
+    await refreshGit();
+  };
+  const handleStageAll = async () => {
+    const files = [
+      ...(gitStatus?.unstaged_files ?? []),
+      ...(gitStatus?.untracked_files ?? []),
+    ];
+    for (const f of files) await gitStage(repoPath, f);
+    await refreshGit();
+  };
+  const handleUnstageAll = async () => {
+    for (const f of gitStatus?.staged_files ?? []) await gitUnstage(repoPath, f);
+    await refreshGit();
+  };
 
   // File watcher for active project
   useFileWatcher({
@@ -132,7 +163,17 @@ function App() {
           )}
 
           {/* Sidebar */}
-          <Sidebar projects={projects} gitStatus={gitStatus} projectPath={activeProject?.path} />
+          <Sidebar
+            projects={projects}
+            gitStatus={gitStatus}
+            projectPath={activeProject?.path}
+            onStage={handleStage}
+            onUnstage={handleUnstage}
+            onDiscard={handleDiscard}
+            onCommit={handleCommit}
+            onStageAll={handleStageAll}
+            onUnstageAll={handleUnstageAll}
+          />
 
           {/* File explorer panel */}
           {explorerVisible && (
