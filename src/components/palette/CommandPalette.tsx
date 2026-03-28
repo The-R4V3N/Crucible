@@ -31,9 +31,7 @@ export default function CommandPalette() {
     mode === "command"
       ? getCommands()
           .filter((cmd) => fuzzyMatch(query, cmd.label))
-          .sort(
-            (a, b) => fuzzyScore(query, b.label) - fuzzyScore(query, a.label),
-          )
+          .sort((a, b) => fuzzyScore(query, b.label) - fuzzyScore(query, a.label))
           .map((cmd) => ({
             id: cmd.id,
             label: cmd.label,
@@ -93,9 +91,7 @@ export default function CommandPalette() {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder={
-            mode === "command" ? "Type a command…" : "Search open files…"
-          }
+          placeholder={mode === "command" ? "Type a command…" : "Search open files…"}
           className="w-full bg-transparent px-4 py-3 text-sm text-warp-text placeholder-warp-text-dim outline-none border-b border-warp-border"
         />
         {items.length === 0 ? (
@@ -106,11 +102,7 @@ export default function CommandPalette() {
             No results
           </div>
         ) : (
-          <ul
-            data-testid="palette-list"
-            role="listbox"
-            className="overflow-y-auto"
-          >
+          <ul data-testid="palette-list" role="listbox" className="overflow-y-auto">
             {items.map((item, i) => (
               <CommandPaletteItem
                 key={item.id}

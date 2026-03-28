@@ -20,18 +20,12 @@ function BottomPanel({ changedFiles, onFileClick }: BottomPanelProps) {
       style={{ height: "200px" }}
     >
       <div className="flex items-center justify-between px-4 py-2">
-        <span className="text-xs uppercase tracking-wider text-warp-text-dim">
-          Changed Files
-        </span>
-        <span className="text-xs text-warp-text-dim">
-          {changedFiles.length}
-        </span>
+        <span className="text-xs uppercase tracking-wider text-warp-text-dim">Changed Files</span>
+        <span className="text-xs text-warp-text-dim">{changedFiles.length}</span>
       </div>
       <div className="overflow-y-auto px-2" style={{ maxHeight: "168px" }}>
         {changedFiles.length === 0 ? (
-          <div className="px-2 py-1 text-xs text-warp-text-dim">
-            No changed files
-          </div>
+          <div className="px-2 py-1 text-xs text-warp-text-dim">No changed files</div>
         ) : (
           changedFiles.map((filePath) => (
             <button

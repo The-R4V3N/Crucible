@@ -20,11 +20,7 @@ interface UseGitReturn {
 }
 
 /** Hook to poll git status for a project. */
-export function useGit({
-  path,
-  interval = 5000,
-  enabled = true,
-}: UseGitOptions): UseGitReturn {
+export function useGit({ path, interval = 5000, enabled = true }: UseGitOptions): UseGitReturn {
   const [status, setStatus] = useState<GitStatusInfo | null>(null);
   const [loading, setLoading] = useState(false);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);

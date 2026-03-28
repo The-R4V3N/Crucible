@@ -12,9 +12,7 @@ function TitleBar() {
         data-tauri-drag-region
         data-testid="titlebar-drag-region"
       >
-        <span className="text-warp-accent text-sm font-bold tracking-wider">
-          WARP
-        </span>
+        <span className="text-warp-accent text-sm font-bold tracking-wider">WARP</span>
       </div>
 
       {/* Window controls */}
@@ -33,7 +31,14 @@ function TitleBar() {
           className="w-12 h-full flex items-center justify-center text-warp-muted hover:bg-warp-hover transition-colors"
           onClick={() => appWindow.toggleMaximize()}
         >
-          <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="1">
+          <svg
+            width="10"
+            height="10"
+            viewBox="0 0 10 10"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1"
+          >
             <rect x="0.5" y="0.5" width="9" height="9" />
           </svg>
         </button>
@@ -42,7 +47,14 @@ function TitleBar() {
           className="w-12 h-full flex items-center justify-center text-warp-muted hover:bg-red-600 hover:text-white transition-colors"
           onClick={() => appWindow.close()}
         >
-          <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="1.2">
+          <svg
+            width="10"
+            height="10"
+            viewBox="0 0 10 10"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.2"
+          >
             <line x1="0" y1="0" x2="10" y2="10" />
             <line x1="10" y1="0" x2="0" y2="10" />
           </svg>

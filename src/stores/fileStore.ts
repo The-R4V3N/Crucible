@@ -48,8 +48,7 @@ export const useFileStore = create<FileState>((set) => ({
       const remaining = state.openFiles.filter((f) => f.path !== path);
       let activeFilePath = state.activeFilePath;
       if (activeFilePath === path) {
-        activeFilePath =
-          remaining.length > 0 ? remaining[remaining.length - 1]!.path : null;
+        activeFilePath = remaining.length > 0 ? remaining[remaining.length - 1]!.path : null;
       }
       return { openFiles: remaining, activeFilePath };
     }),
@@ -69,15 +68,11 @@ export const useFileStore = create<FileState>((set) => ({
 
   markDirty: (path) =>
     set((state) => ({
-      openFiles: state.openFiles.map((f) =>
-        f.path === path ? { ...f, isDirty: true } : f,
-      ),
+      openFiles: state.openFiles.map((f) => (f.path === path ? { ...f, isDirty: true } : f)),
     })),
 
   markClean: (path) =>
     set((state) => ({
-      openFiles: state.openFiles.map((f) =>
-        f.path === path ? { ...f, isDirty: false } : f,
-      ),
+      openFiles: state.openFiles.map((f) => (f.path === path ? { ...f, isDirty: false } : f)),
     })),
 }));

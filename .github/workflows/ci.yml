@@ -28,7 +28,13 @@ jobs:
         run: npm ci
 
       - name: Type check
-        run: npm run lint
+        run: tsc --noEmit
+
+      - name: Lint
+        run: npx eslint src/
+
+      - name: Format check
+        run: npx prettier --check src/
 
       - name: Tests
         run: npm run test

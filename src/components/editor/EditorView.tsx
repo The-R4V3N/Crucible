@@ -37,8 +37,9 @@ function EditorView() {
   const markDirty = useFileStore((s) => s.markDirty);
   const [content, setContent] = useState<string>("");
   const [loading, setLoading] = useState(false);
-  const [editorInstance, setEditorInstance] =
-    useState<Monaco.editor.IStandaloneCodeEditor | null>(null);
+  const [editorInstance, setEditorInstance] = useState<Monaco.editor.IStandaloneCodeEditor | null>(
+    null,
+  );
   // Ref to the editor container div — used by the ResizeObserver below.
   const editorContainerRef = useRef<HTMLDivElement>(null);
   // Ref tracks the live editor for synchronous disposal in useLayoutEffect.
@@ -62,7 +63,6 @@ function EditorView() {
       }
     };
   }, [activeFilePath]);
-
 
   // Manual layout management via ResizeObserver.
   // We use automaticLayout: false on the Editor (below) so Monaco does NOT create

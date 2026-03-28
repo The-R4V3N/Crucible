@@ -20,11 +20,9 @@ export const usePaletteStore = create<PaletteState>((set) => ({
   query: "",
   activeIndex: 0,
 
-  openCommandPalette: () =>
-    set({ open: true, mode: "command", query: "", activeIndex: 0 }),
+  openCommandPalette: () => set({ open: true, mode: "command", query: "", activeIndex: 0 }),
 
-  openFilePalette: () =>
-    set({ open: true, mode: "file", query: "", activeIndex: 0 }),
+  openFilePalette: () => set({ open: true, mode: "file", query: "", activeIndex: 0 }),
 
   close: () => set({ open: false, query: "", activeIndex: 0 }),
 

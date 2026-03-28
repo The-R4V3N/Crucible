@@ -51,18 +51,14 @@ function TerminalView({ projectName, cwd, command, onError }: TerminalViewProps)
   // Targeted selector: only re-render when THIS project's needsAttention changes
   const needsAttention = useSessionStore((s) => {
     if (!projectName) return false;
-    const session = Object.values(s.sessions).find(
-      (sess) => sess.projectName === projectName,
-    );
+    const session = Object.values(s.sessions).find((sess) => sess.projectName === projectName);
     return session?.needsAttention ?? false;
   });
 
   // Targeted selector: is this terminal the active one?
   const isActive = useSessionStore((s) => {
     if (!projectName) return false;
-    const session = Object.values(s.sessions).find(
-      (sess) => sess.projectName === projectName,
-    );
+    const session = Object.values(s.sessions).find((sess) => sess.projectName === projectName);
     return session?.id === s.activeSessionId;
   });
 
@@ -148,7 +144,8 @@ function TerminalView({ projectName, cwd, command, onError }: TerminalViewProps)
         // Ctrl+B, Ctrl+E, Ctrl+Shift+D, Ctrl+Shift+F, Ctrl+1/2/3, Ctrl+`, Ctrl+W
         // Ctrl+D is intentionally NOT here — it must reach the shell as EOF
         if (e.ctrlKey && e.shiftKey && ["D", "F"].includes(e.key)) return false;
-        if (e.ctrlKey && !e.shiftKey && ["b", "e", "1", "2", "3", "`", "w", "\\"].includes(e.key)) return false;
+        if (e.ctrlKey && !e.shiftKey && ["b", "e", "1", "2", "3", "`", "w", "\\"].includes(e.key))
+          return false;
         return true;
       });
 
@@ -195,9 +192,7 @@ function TerminalView({ projectName, cwd, command, onError }: TerminalViewProps)
       ref={containerRef}
       data-testid="terminal-container"
       className={`h-full w-full bg-warp-bg ${
-        needsAttention
-          ? "ring-2 ring-warp-accent ring-inset"
-          : ""
+        needsAttention ? "ring-2 ring-warp-accent ring-inset" : ""
       }`}
     />
   );

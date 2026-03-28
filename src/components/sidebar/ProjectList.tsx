@@ -44,9 +44,7 @@ function ProjectList({ projects }: ProjectListProps) {
   return (
     <div className="flex flex-col gap-0.5 px-1" data-testid="project-list">
       {projects.map((project, index) => {
-        const session = Object.values(sessions).find(
-          (s) => s.projectName === project.name,
-        );
+        const session = Object.values(sessions).find((s) => s.projectName === project.name);
         const isActive = session?.id === activeSessionId;
 
         return (

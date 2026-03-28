@@ -27,10 +27,7 @@ function EditorTabs() {
           >
             <span>{file.name}</span>
             {file.isDirty && (
-              <span
-                data-testid={`dirty-${file.path}`}
-                className="text-warp-accent text-xs"
-              >
+              <span data-testid={`dirty-${file.path}`} className="text-warp-accent text-xs">
                 •
               </span>
             )}

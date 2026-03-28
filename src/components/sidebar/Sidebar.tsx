@@ -25,9 +25,7 @@ function Sidebar({ projects, gitStatus, projectPath }: SidebarProps) {
     >
       {/* Logo */}
       <div className="flex items-center px-4 py-3">
-        <span className="text-warp-accent text-sm font-bold tracking-wider">
-          WARP
-        </span>
+        <span className="text-warp-accent text-sm font-bold tracking-wider">WARP</span>
       </div>
 
       {/* Project list */}

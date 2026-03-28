@@ -25,9 +25,7 @@ function StatusBar({ gitStatus }: StatusBarProps) {
           <span data-testid="git-branch" className="flex items-center gap-1">
             <span>⎇</span>
             <span>{gitStatus.branch}</span>
-            {gitStatus.dirty && (
-              <span data-testid="git-dirty">•</span>
-            )}
+            {gitStatus.dirty && <span data-testid="git-dirty">•</span>}
           </span>
         )}
       </div>
@@ -37,7 +35,9 @@ function StatusBar({ gitStatus }: StatusBarProps) {
         {isEditorActive && (
           <>
             <span data-testid="language-mode">{language}</span>
-            <span data-testid="cursor-position">Ln {cursorLine}, Col {cursorCol}</span>
+            <span data-testid="cursor-position">
+              Ln {cursorLine}, Col {cursorCol}
+            </span>
           </>
         )}
       </div>

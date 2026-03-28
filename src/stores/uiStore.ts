@@ -39,19 +39,15 @@ export const useUiStore = create<UiState>((set) => ({
   splitMode: null,
   splitViews: ["terminal", "terminal"] as [ViewType, ViewType],
 
-  toggleSidebar: () =>
-    set((state) => ({ sidebarVisible: !state.sidebarVisible })),
+  toggleSidebar: () => set((state) => ({ sidebarVisible: !state.sidebarVisible })),
 
   setSidebarVisible: (visible) => set({ sidebarVisible: visible }),
 
-  toggleExplorer: () =>
-    set((state) => ({ explorerVisible: !state.explorerVisible })),
+  toggleExplorer: () => set((state) => ({ explorerVisible: !state.explorerVisible })),
 
-  toggleBottomPanel: () =>
-    set((state) => ({ bottomPanelVisible: !state.bottomPanelVisible })),
+  toggleBottomPanel: () => set((state) => ({ bottomPanelVisible: !state.bottomPanelVisible })),
 
-  toggleSearch: () =>
-    set((state) => ({ searchVisible: !state.searchVisible })),
+  toggleSearch: () => set((state) => ({ searchVisible: !state.searchVisible })),
 
   setActiveView: (view) => set({ activeView: view }),
 
@@ -65,11 +61,9 @@ export const useUiStore = create<UiState>((set) => ({
       return { tabOrder: order };
     }),
 
-  splitVertical: () =>
-    set({ splitMode: "vertical", splitViews: ["terminal", "editor"] }),
+  splitVertical: () => set({ splitMode: "vertical", splitViews: ["terminal", "editor"] }),
 
-  splitHorizontal: () =>
-    set({ splitMode: "horizontal", splitViews: ["terminal", "editor"] }),
+  splitHorizontal: () => set({ splitMode: "horizontal", splitViews: ["terminal", "editor"] }),
 
   closeSplit: () => set({ splitMode: null }),
 
