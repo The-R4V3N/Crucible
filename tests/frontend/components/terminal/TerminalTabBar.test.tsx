@@ -109,4 +109,30 @@ describe("TerminalTabBar", () => {
     render(<TerminalTabBar tabs={singleTab} onAdd={vi.fn()} onClose={vi.fn()} />);
     expect(screen.queryByTestId("tab-close-solo-1")).not.toBeInTheDocument();
   });
+
+  // ── active-tab close: session switching ───────────────────────────────────
+
+  it("switches to another session before closing the active tab", () => {
+    const onClose = vi.fn();
+    const setActiveSpy = vi.spyOn(useSessionStore.getState(), "setActiveSession");
+    render(<TerminalTabBar tabs={TABS} onAdd={vi.fn()} onClose={onClose} />);
+
+    // Close the ACTIVE tab (proj-a-1 → sess-1)
+    fireEvent.click(screen.getByTestId("tab-close-proj-a-1"));
+
+    // Must switch to the sibling session first
+    expect(setActiveSpy).toHaveBeenCalledWith("sess-2");
+    // Then notify parent to remove the tab
+    expect(onClose).toHaveBeenCalledWith("proj-a-1");
+  });
+
+  it("does not switch session when closing an inactive tab", () => {
+    const setActiveSpy = vi.spyOn(useSessionStore.getState(), "setActiveSession");
+    render(<TerminalTabBar tabs={TABS} onAdd={vi.fn()} onClose={vi.fn()} />);
+
+    // Close the INACTIVE tab (proj-a-2 → sess-2)
+    fireEvent.click(screen.getByTestId("tab-close-proj-a-2"));
+
+    expect(setActiveSpy).not.toHaveBeenCalled();
+  });
 });

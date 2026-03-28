@@ -54,6 +54,14 @@ function TerminalTabBar({ tabs, onAdd, onClose }: TerminalTabBarProps) {
                 className="ml-1 opacity-0 group-hover:opacity-100 hover:text-warp-error transition-opacity"
                 onClick={(e) => {
                   e.stopPropagation();
+                  // If closing the active tab, switch to a sibling first so the
+                  // terminal panel doesn't go blank when activeSessionId → null.
+                  if (session?.id === activeSessionId) {
+                    const sibling = Object.values(sessions).find(
+                      (s) => s.projectName === session.projectName && s.tabKey !== tab.tabKey,
+                    );
+                    if (sibling) setActiveSession(sibling.id);
+                  }
                   onClose(tab.tabKey);
                 }}
                 aria-label={`Close ${label}`}
