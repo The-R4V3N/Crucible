@@ -4,6 +4,7 @@ import type * as Monaco from "monaco-editor";
 import { useFileStore } from "@/stores/fileStore";
 import { useEditorStore } from "@/stores/editorStore";
 import { useEditorCursor } from "@/hooks/useEditorCursor";
+import { useGitDecorations } from "@/hooks/useGitDecorations";
 import { fileRead } from "@/lib/ipc";
 import EditorTabs from "./EditorTabs";
 
@@ -30,8 +31,12 @@ function detectLanguage(path: string): string {
   return langMap[ext ?? ""] ?? "plaintext";
 }
 
+interface EditorViewProps {
+  repoPath?: string | null;
+}
+
 /** Monaco editor view with tabs and file content. */
-function EditorView() {
+function EditorView({ repoPath = null }: EditorViewProps) {
   const activeFilePath = useFileStore((s) => s.activeFilePath);
   const openFiles = useFileStore((s) => s.openFiles);
   const markDirty = useFileStore((s) => s.markDirty);
@@ -48,6 +53,9 @@ function EditorView() {
 
   // Sync cursor position to editorStore via the hook
   useEditorCursor(editorInstance);
+
+  // Git gutter decorations — show added/modified/deleted lines vs HEAD
+  useGitDecorations({ editor: editorInstance, filePath: activeFilePath ?? null, repoPath });
 
   // Synchronously dispose the Monaco editor when the active file changes or the
   // component unmounts. useLayoutEffect cleanup fires before React applies DOM
