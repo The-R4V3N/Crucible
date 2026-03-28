@@ -96,7 +96,7 @@ mod tests {
     fn test_git_status_detects_changes() {
         let result = get_git_status(".").unwrap();
         // changed_files should be a non-negative number
-        assert!(result.changed_files >= 0);
+        // changed_files is usize so always non-negative — just verify it compiles
         // dirty flag should match whether there are changes
         assert_eq!(result.dirty, result.changed_files > 0);
     }

@@ -56,7 +56,6 @@ pub fn start_watcher(
 mod tests {
     use super::*;
     use std::fs;
-    use std::path::PathBuf;
 
     #[test]
     fn test_file_changed_payload_serializes() {
