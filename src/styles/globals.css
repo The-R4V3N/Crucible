@@ -2,6 +2,25 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Git gutter decorations (Monaco line decorations) */
+.gutter-added {
+  background-color: #4ec9b0;
+  width: 3px !important;
+  margin-left: 3px;
+}
+
+.gutter-modified {
+  background-color: #007acc;
+  width: 3px !important;
+  margin-left: 3px;
+}
+
+.gutter-deleted {
+  background-color: #f44747;
+  width: 3px !important;
+  margin-left: 3px;
+}
+
 :root {
   --warp-bg: #1e1e1e;
   --warp-sidebar: #252526;

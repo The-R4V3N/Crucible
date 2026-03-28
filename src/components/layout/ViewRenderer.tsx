@@ -30,7 +30,7 @@ const ViewRenderer = memo(function ViewRenderer({
         <TerminalManager onError={onError} />
       </div>
       <div className={`absolute inset-0 bg-warp-bg ${view === "editor" ? "visible" : "invisible"}`}>
-        <EditorView />
+        <EditorView repoPath={repoPath} />
       </div>
       <div className={`absolute inset-0 bg-warp-bg ${view === "diff" ? "block" : "hidden"}`}>
         <DiffView repoPath={repoPath} filePath={view === "diff" ? diffFilePath : null} />
