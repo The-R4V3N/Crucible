@@ -18,6 +18,14 @@ export function useEditorCursor(editor: MonacoEditor | null) {
       useEditorStore.getState().setCursor(e.position.lineNumber, e.position.column);
     });
 
-    return dispose;
+    return () => {
+      try {
+        dispose();
+      } catch {
+        // Monaco's IDisposable accesses internals that are already torn down
+        // when editor.dispose() ran before this passive-effect cleanup fires.
+        // The listener is already gone — safe to ignore.
+      }
+    };
   }, [editor]);
 }

@@ -10,9 +10,15 @@ function makeFakeEditor() {
     (e: { position: { lineNumber: number; column: number } | null }) => void
   > = [];
 
+  // _disposeImpl is the underlying spy. Production code wraps editor.dispose with
+  // an idempotency guard (replacing the property), so tests must assert on
+  // _disposeImpl (the real implementation) rather than editor.dispose (the wrapper).
+  const disposeImpl = vi.fn();
+
   return {
     getPosition: () => ({ lineNumber: 1, column: 1 }),
-    dispose: vi.fn(),
+    dispose: disposeImpl,
+    _disposeImpl: disposeImpl,
     onDidChangeCursorPosition: vi.fn(
       (
         cb: (e: {
@@ -150,7 +156,7 @@ describe("EditorView", () => {
     });
     const editorToDispose = lastFakeEditor!;
     unmount();
-    expect(editorToDispose.dispose).toHaveBeenCalled();
+    expect(editorToDispose._disposeImpl).toHaveBeenCalled();
   });
 
   it("disables Monaco automaticLayout to prevent internal ResizeObserver from crashing on unmount", async () => {
@@ -181,16 +187,69 @@ describe("EditorView", () => {
     });
 
     const editorToDispose = lastFakeEditor!;
-    editorToDispose.dispose.mockClear();
+    editorToDispose._disposeImpl.mockClear();
 
     // Synchronous reactAct flushes useLayoutEffect but NOT passive useEffect.
-    // With the current useEffect disposal: dispose is NOT yet called here.
-    // With useLayoutEffect disposal: dispose IS called synchronously before DOM update.
+    // useLayoutEffect disposal: dispose IS called synchronously before DOM update.
     reactAct(() => {
       useFileStore.getState().closeFile("/tmp/test.ts");
     });
 
-    expect(editorToDispose.dispose).toHaveBeenCalled();
+    expect(editorToDispose._disposeImpl).toHaveBeenCalled();
+  });
+
+  it("disposes Monaco synchronously when switching to another file (prevents cursor blink timer crash)", async () => {
+    // The crash "Cannot read properties of undefined (reading '_isDisposed')" happens
+    // because Monaco's cursor blink setInterval fires after its DOM container is removed
+    // but before editor.dispose() cancels the timer. useLayoutEffect cleanup runs
+    // synchronously before DOM mutations, closing this window.
+    useFileStore.getState().openFile("/tmp/a.ts", "a.ts");
+    render(<EditorView />);
+
+    await waitFor(() => {
+      expect(lastFakeEditor).not.toBeNull();
+      expect(lastFakeEditor!.onDidChangeCursorPosition).toHaveBeenCalledOnce();
+    });
+
+    const firstEditor = lastFakeEditor!;
+    firstEditor._disposeImpl.mockClear();
+
+    // Synchronous reactAct flushes ALL effects (including passive useEffect) in jsdom,
+    // so this test passes regardless. It exists as a regression guard: if disposal is
+    // ever removed entirely, this test catches it. The real fix is useLayoutEffect in
+    // EditorView — jsdom cannot model the browser's async useEffect timing.
+    reactAct(() => {
+      useFileStore.setState({ activeFilePath: "/tmp/b.ts" });
+    });
+
+    expect(firstEditor._disposeImpl).toHaveBeenCalled();
+  });
+
+  it("onMount wraps dispose to be idempotent — _disposeImpl called once even when dispose() fires multiple times", async () => {
+    // Monaco's dispose() is not idempotent: calling it twice crashes with
+    // "_isDisposed" on already-torn-down internals. Our useLayoutEffect fires
+    // first (synchronous), then @monaco-editor/react fires its own useEffect
+    // cleanup — both call editor.dispose(). The idempotent wrapper ensures the
+    // underlying teardown (_disposeImpl) runs exactly once regardless.
+    useFileStore.getState().openFile("/tmp/test.ts", "test.ts");
+    render(<EditorView />);
+
+    await waitFor(() => {
+      expect(lastFakeEditor).not.toBeNull();
+      expect(lastFakeEditor!.onDidChangeCursorPosition).toHaveBeenCalledOnce();
+    });
+
+    const editor = lastFakeEditor!;
+    editor._disposeImpl.mockClear();
+
+    // Simulate multiple callers invoking dispose() — as happens in the browser
+    // when useLayoutEffect, @monaco-editor/react cleanup, and useEffect all fire.
+    editor.dispose();
+    editor.dispose();
+    editor.dispose();
+
+    // Real teardown must have run exactly once, not three times.
+    expect(editor._disposeImpl).toHaveBeenCalledTimes(1);
   });
 
   it("does not update cursor store when stale editor fires during file switch", async () => {

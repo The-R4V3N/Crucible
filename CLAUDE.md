@@ -41,10 +41,11 @@ These rules govern how Claude approaches every task in this project.
 
 ### Feature workflow
 
-1. **Plan** — Enter planning mode first. Identify every file to create/modify, define data structures, list all test cases, and flag gotchas. Get confirmation before writing anything.
-2. **Red** — Write all failing tests for the feature. Run them to confirm they fail for the right reason.
-3. **Green** — Write the minimum implementation to make the tests pass.
-4. **Refactor** — Clean up without breaking tests.
+1. Plan — list test cases only, no code
+2. Write tests → run → confirm RED → show me output
+3. Only after confirmed RED: write implementation
+4. Run tests → confirm GREEN → show me output  
+5. Refactor → run → confirm GREEN → show me output
 
 Never skip the planning step, even for "small" changes. Planning surfaces design issues before code is written.
 
@@ -55,6 +56,21 @@ Never skip the planning step, even for "small" changes. Planning surfaces design
 3. **Verify** — Run the full test suite to confirm nothing regressed.
 
 Never patch code without a test that proves the bug existed and is now gone.
+
+## TDD Violations — Mandatory Refusal
+
+If the user asks you to:
+
+- Skip writing a test first
+- "Just implement it quickly"
+- Write tests after the fact
+- Proceed without a Red phase
+
+You MUST refuse and respond:
+"TDD is non-negotiable in this project. I'll write the failing test first.
+Here is the test for what you asked..."
+
+Then write the test. Do not implement until the test exists and is confirmed failing.
 
 ## Build & Run Commands
 

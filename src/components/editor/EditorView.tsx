@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useLayoutEffect, useRef } from "react";
 import Editor from "@monaco-editor/react";
 import type * as Monaco from "monaco-editor";
 import { useFileStore } from "@/stores/fileStore";
@@ -40,16 +40,28 @@ function EditorView() {
     useState<Monaco.editor.IStandaloneCodeEditor | null>(null);
   // Ref to the editor container div — used by the ResizeObserver below.
   const editorContainerRef = useRef<HTMLDivElement>(null);
+  // Ref tracks the live editor for synchronous disposal in useLayoutEffect.
+  // State updates (setEditorInstance) are async; this ref is available immediately.
+  const editorRef = useRef<Monaco.editor.IStandaloneCodeEditor | null>(null);
 
   // Sync cursor position to editorStore via the hook
   useEditorCursor(editorInstance);
 
-  // Dispose Monaco editor when the instance changes or EditorView unmounts.
-  useEffect(() => {
+  // Synchronously dispose the Monaco editor when the active file changes or the
+  // component unmounts. useLayoutEffect cleanup fires before React applies DOM
+  // mutations, so Monaco's internal timers (cursor blink setInterval, rAF loops)
+  // are cancelled BEFORE their container node is removed. This closes the crash
+  // window for "Cannot read properties of undefined (reading '_isDisposed')".
+  useLayoutEffect(() => {
     return () => {
-      editorInstance?.dispose();
+      const ed = editorRef.current;
+      if (ed) {
+        editorRef.current = null;
+        ed.dispose();
+      }
     };
-  }, [editorInstance]);
+  }, [activeFilePath]);
+
 
   // Manual layout management via ResizeObserver.
   // We use automaticLayout: false on the Editor (below) so Monaco does NOT create
@@ -125,6 +137,20 @@ function EditorView() {
             language={language}
             theme="vs-dark"
             onMount={(editor) => {
+              // Monaco's dispose() is NOT idempotent — calling it a second time
+              // crashes with "_isDisposed" on already-torn-down internals.
+              // Our useLayoutEffect disposes synchronously (first call), but
+              // @monaco-editor/react and our useEffect safety-net also call
+              // dispose() in their passive-effect cleanups (second/third calls).
+              // Wrap dispose so only the first invocation runs the real teardown.
+              const realDispose = editor.dispose.bind(editor);
+              let disposed = false;
+              editor.dispose = () => {
+                if (disposed) return;
+                disposed = true;
+                realDispose();
+              };
+              editorRef.current = editor;
               setEditorInstance(editor);
             }}
             onChange={(value) => {

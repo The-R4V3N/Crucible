@@ -89,6 +89,31 @@ describe("useEditorCursor", () => {
     expect(() => renderHook(() => useEditorCursor(null))).not.toThrow();
   });
 
+  it("does not throw on unmount if cursor listener dispose() crashes (Monaco already disposed)", () => {
+    // When EditorView's useLayoutEffect synchronously disposes the Monaco editor
+    // and then the passive effect cleanup in useEditorCursor fires, the IDisposable
+    // from onDidChangeCursorPosition accesses already-torn-down Monaco internals
+    // and throws "_isDisposed". useEditorCursor must absorb this — it's safe to
+    // ignore because Monaco already cleared all listeners on editor.dispose().
+    const dispose = vi.fn(() => {
+      throw new TypeError(
+        "Cannot read properties of undefined (reading '_isDisposed')",
+      );
+    });
+    const editor = {
+      getPosition: () => ({ lineNumber: 1, column: 1 }),
+      onDidChangeCursorPosition: vi.fn(() => ({ dispose })),
+      _firePositionChange: vi.fn(),
+    };
+
+    const { unmount } = renderHook(() => useEditorCursor(editor as never));
+
+    // Without try/catch in useEditorCursor, this propagates up and crashes
+    // the <EditorView> component tree (seen as error boundary trigger in browser).
+    expect(() => unmount()).not.toThrow();
+    expect(dispose).toHaveBeenCalledOnce();
+  });
+
   it("does not update store when position event has null position", () => {
     const editor = makeFakeEditor();
     renderHook(() => useEditorCursor(editor as never));
