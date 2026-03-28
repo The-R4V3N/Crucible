@@ -118,10 +118,7 @@ function App() {
     await refreshGit();
   };
   const handleStageAll = async () => {
-    const files = [
-      ...(gitStatus?.unstaged_files ?? []),
-      ...(gitStatus?.untracked_files ?? []),
-    ];
+    const files = [...(gitStatus?.unstaged_files ?? []), ...(gitStatus?.untracked_files ?? [])];
     for (const f of files) await gitStage(repoPath, f);
     await refreshGit();
   };

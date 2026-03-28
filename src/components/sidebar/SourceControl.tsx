@@ -79,7 +79,10 @@ function SourceControl({
   };
 
   return (
-    <div data-testid="source-control" className="border-t border-warp-border px-3 py-3 flex flex-col gap-2">
+    <div
+      data-testid="source-control"
+      className="border-t border-warp-border px-3 py-3 flex flex-col gap-2"
+    >
       {/* Header */}
       <div className="text-xs uppercase tracking-wider text-warp-text-dim">Source Control</div>
 
@@ -88,7 +91,9 @@ function SourceControl({
         <span className="text-warp-accent">⎇</span>
         <span data-testid="git-branch">{gitStatus.branch}</span>
         {gitStatus.dirty && (
-          <span className="text-warp-warning" data-testid="git-dirty">•</span>
+          <span className="text-warp-warning" data-testid="git-dirty">
+            •
+          </span>
         )}
       </div>
 
