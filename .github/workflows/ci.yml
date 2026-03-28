@@ -17,9 +17,9 @@ jobs:
     name: Frontend (tsc + vitest)
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: 20
           cache: npm
@@ -38,7 +38,7 @@ jobs:
     name: Rust (clippy + cargo test)
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       # tauri::generate_context!() panics at compile time if dist/ doesn't exist.
       # A minimal stub is enough — the macro only checks the path, not the content,
