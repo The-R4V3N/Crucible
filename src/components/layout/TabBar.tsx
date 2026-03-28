@@ -43,14 +43,8 @@ function TabBar({ onSearchToggle }: TabBarProps) {
           const tabs = document.querySelectorAll("[data-tab-index]");
           for (const tab of tabs) {
             const rect = tab.getBoundingClientRect();
-            if (
-              moveEvent.clientX >= rect.left &&
-              moveEvent.clientX <= rect.right
-            ) {
-              const tabIdx = parseInt(
-                tab.getAttribute("data-tab-index") ?? "-1",
-                10,
-              );
+            if (moveEvent.clientX >= rect.left && moveEvent.clientX <= rect.right) {
+              const tabIdx = parseInt(tab.getAttribute("data-tab-index") ?? "-1", 10);
               setHoverIndex(tabIdx);
               break;
             }
@@ -86,8 +80,7 @@ function TabBar({ onSearchToggle }: TabBarProps) {
         {tabOrder.map((viewId, index) => {
           const isActive = viewId === activeView;
           const isDragging = dragIndex === index;
-          const isDropTarget =
-            hoverIndex === index && dragIndex !== null && dragIndex !== index;
+          const isDropTarget = hoverIndex === index && dragIndex !== null && dragIndex !== index;
           return (
             <div
               key={viewId}

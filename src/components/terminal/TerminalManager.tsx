@@ -21,9 +21,7 @@ const TerminalPane = memo(function TerminalPane({
 }) {
   // Each pane subscribes to its own isActive — no cascading re-renders from parent
   const isActive = useSessionStore((s) => {
-    const session = Object.values(s.sessions).find(
-      (sess) => sess.projectName === projectName,
-    );
+    const session = Object.values(s.sessions).find((sess) => sess.projectName === projectName);
     return session?.id === s.activeSessionId;
   });
 
@@ -33,12 +31,7 @@ const TerminalPane = memo(function TerminalPane({
       style={{ contain: "strict" }}
       data-testid={`terminal-pane-${projectName}`}
     >
-      <TerminalView
-        projectName={projectName}
-        cwd={cwd}
-        command={command}
-        onError={onError}
-      />
+      <TerminalView projectName={projectName} cwd={cwd} command={command} onError={onError} />
     </div>
   );
 });
@@ -49,10 +42,7 @@ function TerminalManager({ onError }: TerminalManagerProps) {
   const projects = useConfigStore((s) => s.config?.projects ?? []);
 
   return (
-    <div
-      className="relative h-full w-full bg-warp-bg"
-      data-testid="terminal-manager"
-    >
+    <div className="relative h-full w-full bg-warp-bg" data-testid="terminal-manager">
       {projects.map((project) => (
         <TerminalPane
           key={project.name}

@@ -38,13 +38,8 @@ function SourceControl({ gitStatus, onFileClick, projectPath }: SourceControlPro
   if (!gitStatus) return null;
 
   return (
-    <div
-      data-testid="source-control"
-      className="border-t border-warp-border px-4 py-3"
-    >
-      <div className="mb-1 text-xs uppercase tracking-wider text-warp-text-dim">
-        Source Control
-      </div>
+    <div data-testid="source-control" className="border-t border-warp-border px-4 py-3">
+      <div className="mb-1 text-xs uppercase tracking-wider text-warp-text-dim">Source Control</div>
 
       {/* Branch */}
       <div className="flex items-center gap-1.5 text-sm text-warp-text">
@@ -59,20 +54,14 @@ function SourceControl({ gitStatus, onFileClick, projectPath }: SourceControlPro
 
       {/* Changed files count */}
       {gitStatus.changed_files > 0 && (
-        <div
-          className="mt-1 text-xs text-warp-text-dim"
-          data-testid="git-changed-count"
-        >
+        <div className="mt-1 text-xs text-warp-text-dim" data-testid="git-changed-count">
           {gitStatus.changed_files} file{gitStatus.changed_files !== 1 ? "s" : ""} changed
         </div>
       )}
 
       {/* Changed files list */}
       {gitStatus.changed_file_paths.length > 0 && (
-        <div
-          className="mt-2 flex flex-col gap-0.5"
-          data-testid="changed-files-list"
-        >
+        <div className="mt-2 flex flex-col gap-0.5" data-testid="changed-files-list">
           {gitStatus.changed_file_paths.map((filePath) => (
             <button
               key={filePath}

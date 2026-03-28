@@ -32,9 +32,7 @@ class ErrorBoundary extends Component<Props, State> {
     if (this.state.hasError) {
       return (
         <div className="flex h-full w-full flex-col items-center justify-center gap-4 bg-warp-bg p-8">
-          <h1 className="text-warp-accent text-xl font-bold">
-            Something went wrong
-          </h1>
+          <h1 className="text-warp-accent text-xl font-bold">Something went wrong</h1>
           <p className="text-warp-text text-sm max-w-lg text-center">
             {this.state.error?.message ?? "Unknown error"}
           </p>

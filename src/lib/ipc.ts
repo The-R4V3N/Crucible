@@ -2,27 +2,17 @@ import { invoke } from "@tauri-apps/api/core";
 import { listen, type UnlistenFn } from "@tauri-apps/api/event";
 
 /** Create a new PTY session. Returns the session ID. */
-export async function ptyCreate(
-  path: string,
-  command?: string,
-): Promise<string> {
+export async function ptyCreate(path: string, command?: string): Promise<string> {
   return invoke<string>("pty_create", { path, command });
 }
 
 /** Write data to a PTY session's stdin. */
-export async function ptyWrite(
-  sessionId: string,
-  data: string,
-): Promise<void> {
+export async function ptyWrite(sessionId: string, data: string): Promise<void> {
   return invoke("pty_write", { sessionId, data });
 }
 
 /** Resize a PTY session. */
-export async function ptyResize(
-  sessionId: string,
-  rows: number,
-  cols: number,
-): Promise<void> {
+export async function ptyResize(sessionId: string, rows: number, cols: number): Promise<void> {
   return invoke("pty_resize", { sessionId, rows, cols });
 }
 
@@ -68,9 +58,7 @@ export async function onPtyAttention(
 }
 
 /** Listen for PTY exit events. Returns an unlisten function. */
-export async function onPtyExit(
-  callback: (payload: PtyExitPayload) => void,
-): Promise<UnlistenFn> {
+export async function onPtyExit(callback: (payload: PtyExitPayload) => void): Promise<UnlistenFn> {
   return listen<PtyExitPayload>("pty:exit", (event) => {
     callback(event.payload);
   });
@@ -86,10 +74,7 @@ export async function configLoad(path?: string): Promise<WarpConfig> {
 }
 
 /** Save WARP configuration to disk. */
-export async function configSave(
-  config: WarpConfig,
-  path?: string,
-): Promise<void> {
+export async function configSave(config: WarpConfig, path?: string): Promise<void> {
   return invoke("config_save", { config, path: path ?? null });
 }
 
@@ -116,10 +101,7 @@ export interface FileDiffInfo {
 }
 
 /** Get the diff for a file in the working directory vs HEAD. */
-export async function gitDiff(
-  repoPath: string,
-  filePath: string,
-): Promise<FileDiffInfo> {
+export async function gitDiff(repoPath: string, filePath: string): Promise<FileDiffInfo> {
   return invoke<FileDiffInfo>("git_diff", { repoPath, filePath });
 }
 
@@ -140,10 +122,7 @@ export interface FileChangedPayload {
 }
 
 /** Get the file tree for a directory. */
-export async function fileTree(
-  path: string,
-  maxDepth?: number,
-): Promise<FileNode> {
+export async function fileTree(path: string, maxDepth?: number): Promise<FileNode> {
   return invoke<FileNode>("file_tree", { path, maxDepth: maxDepth ?? null });
 }
 

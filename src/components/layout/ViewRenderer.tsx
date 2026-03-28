@@ -16,10 +16,17 @@ interface ViewRendererProps {
  *  DiffView uses display:none because Monaco DiffEditor's canvas can bleed
  *  through visibility:hidden in some WebView2 contexts, and it causes
  *  model disposal errors when receiving file path updates while invisible. */
-const ViewRenderer = memo(function ViewRenderer({ view, repoPath, diffFilePath, onError }: ViewRendererProps) {
+const ViewRenderer = memo(function ViewRenderer({
+  view,
+  repoPath,
+  diffFilePath,
+  onError,
+}: ViewRendererProps) {
   return (
     <div className="relative h-full w-full bg-warp-bg">
-      <div className={`absolute inset-0 bg-warp-bg ${view === "terminal" ? "visible" : "invisible"}`}>
+      <div
+        className={`absolute inset-0 bg-warp-bg ${view === "terminal" ? "visible" : "invisible"}`}
+      >
         <TerminalManager onError={onError} />
       </div>
       <div className={`absolute inset-0 bg-warp-bg ${view === "editor" ? "visible" : "invisible"}`}>

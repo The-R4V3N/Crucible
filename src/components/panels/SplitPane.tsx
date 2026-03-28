@@ -11,25 +11,15 @@ interface SplitPaneProps {
 }
 
 /** Resizable split pane container with draggable divider. */
-function SplitPane({
-  orientation,
-  initialRatio = 0.5,
-  minRatio = 0.1,
-  children,
-}: SplitPaneProps) {
+function SplitPane({ orientation, initialRatio = 0.5, minRatio = 0.1, children }: SplitPaneProps) {
   const [ratio, setRatio] = useState(initialRatio);
   const containerRef = useRef<HTMLDivElement>(null);
   const draggingRef = useRef(false);
 
   const childArray = Array.isArray(children) ? children : [children];
-
-  // If fewer than 2 children, just render the first child directly
-  if (childArray.length < 2) {
-    return <>{childArray[0]}</>;
-  }
-
   const isVertical = orientation === "vertical";
 
+  // All hooks must be called before any conditional returns (rules-of-hooks).
   const handleMouseDown = useCallback(
     (e: React.MouseEvent) => {
       e.preventDefault();
@@ -64,6 +54,11 @@ function SplitPane({
     [isVertical, minRatio],
   );
 
+  // If fewer than 2 children, just render the first child directly.
+  if (childArray.length < 2) {
+    return <>{childArray[0]}</>;
+  }
+
   const percentage = `${ratio * 100}%`;
 
   return (
@@ -86,17 +81,12 @@ function SplitPane({
         data-testid="split-divider"
         onMouseDown={handleMouseDown}
         className={`flex-shrink-0 bg-warp-border hover:bg-warp-accent transition-colors ${
-          isVertical
-            ? "w-1 cursor-col-resize"
-            : "h-1 cursor-row-resize"
+          isVertical ? "w-1 cursor-col-resize" : "h-1 cursor-row-resize"
         }`}
       />
 
       {/* Second pane */}
-      <div
-        data-testid="split-second"
-        className="flex-1 overflow-hidden min-w-0 min-h-0"
-      >
+      <div data-testid="split-second" className="flex-1 overflow-hidden min-w-0 min-h-0">
         {childArray[1]}
       </div>
     </div>

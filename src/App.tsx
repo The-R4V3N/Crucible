@@ -31,9 +31,7 @@ function App() {
 
   // Find the active project's path for git status
   const activeSession = activeSessionId ? sessions[activeSessionId] : null;
-  const activeProject = projects.find(
-    (p) => p.name === activeSession?.projectName,
-  );
+  const activeProject = projects.find((p) => p.name === activeSession?.projectName);
 
   // Load config on mount
   useEffect(() => {
@@ -82,9 +80,7 @@ function App() {
     const targetProject = config.active_project;
     // Wait for sessions to be created, then activate the right one
     const unsubscribe = useSessionStore.subscribe((state) => {
-      const session = Object.values(state.sessions).find(
-        (s) => s.projectName === targetProject,
-      );
+      const session = Object.values(state.sessions).find((s) => s.projectName === targetProject);
       if (session && state.activeSessionId !== session.id) {
         useSessionStore.getState().setActiveSession(session.id);
         unsubscribe();
@@ -136,11 +132,7 @@ function App() {
           )}
 
           {/* Sidebar */}
-          <Sidebar
-            projects={projects}
-            gitStatus={gitStatus}
-            projectPath={activeProject?.path}
-          />
+          <Sidebar projects={projects} gitStatus={gitStatus} projectPath={activeProject?.path} />
 
           {/* File explorer panel */}
           {explorerVisible && (
@@ -155,9 +147,7 @@ function App() {
               <SearchPanel
                 projectPath={activeProject?.path ?? "."}
                 onResultClick={(filePath) => {
-                  useFileStore
-                    .getState()
-                    .openFile(filePath, filePath.split("/").pop() ?? filePath);
+                  useFileStore.getState().openFile(filePath, filePath.split("/").pop() ?? filePath);
                   if (useUiStore.getState().splitMode) {
                     useUiStore.getState().closeSplit();
                   }
@@ -203,9 +193,7 @@ function App() {
                 const projectBase = activeProject?.path;
                 let fullPath = filePath;
                 if (projectBase) {
-                  const base = projectBase.endsWith("/")
-                    ? projectBase.slice(0, -1)
-                    : projectBase;
+                  const base = projectBase.endsWith("/") ? projectBase.slice(0, -1) : projectBase;
                   fullPath = `${base}/${filePath}`;
                 }
                 const name = filePath.split("/").pop() ?? filePath;

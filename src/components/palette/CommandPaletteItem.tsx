@@ -5,12 +5,7 @@ interface Props {
   onClick: () => void;
 }
 
-export default function CommandPaletteItem({
-  label,
-  keybinding,
-  isActive,
-  onClick,
-}: Props) {
+export default function CommandPaletteItem({ label, keybinding, isActive, onClick }: Props) {
   return (
     <li
       role="option"

@@ -111,9 +111,7 @@ export function useKeyboard({ projects }: UseKeyboardOptions) {
         const project = projects[index];
         if (project) {
           e.preventDefault();
-          const session = Object.values(sessions).find(
-            (s) => s.projectName === project.name,
-          );
+          const session = Object.values(sessions).find((s) => s.projectName === project.name);
           if (session) {
             setActiveSession(session.id);
           }

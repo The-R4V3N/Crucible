@@ -81,10 +81,7 @@ export const useConfigStore = create<ConfigState>((set) => ({
         config: {
           ...state.config,
           projects: state.config.projects.filter((p) => p.name !== name),
-          active_project:
-            state.config.active_project === name
-              ? null
-              : state.config.active_project,
+          active_project: state.config.active_project === name ? null : state.config.active_project,
         },
       };
     }),

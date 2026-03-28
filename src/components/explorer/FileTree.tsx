@@ -50,9 +50,7 @@ function FileTreeNode({ node, depth }: FileTreeNodeProps) {
         style={{ paddingLeft: `${depth * 16 + 8}px` }}
       >
         {node.is_dir && (
-          <span className="text-xs text-warp-text-dim">
-            {isExpanded ? "▼" : "▶"}
-          </span>
+          <span className="text-xs text-warp-text-dim">{isExpanded ? "▼" : "▶"}</span>
         )}
         {!node.is_dir && <span className="w-3" />}
         <span className="truncate">{node.name}</span>
