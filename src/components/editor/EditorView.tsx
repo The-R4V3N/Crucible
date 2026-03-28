@@ -61,22 +61,36 @@ function EditorView({ repoPath = null }: EditorViewProps) {
   const revertRequest = useFileStore((s) => s.revertRequest);
   const markClean = useFileStore((s) => s.markClean);
 
+  // Refs so the save/revert effects can read the latest values without
+  // those values appearing in the dependency array (which would cause
+  // spurious saves on every keystroke or file switch).
+  const activeFilePathRef = useRef(activeFilePath);
+  const contentRef = useRef(content);
+  useEffect(() => {
+    activeFilePathRef.current = activeFilePath;
+  });
+  useEffect(() => {
+    contentRef.current = content;
+  });
+
   // Save: write current editor content to disk when triggerSave() fires
   useEffect(() => {
-    if (!saveRequest || !activeFilePath) return;
-    fileWrite(activeFilePath, content).then(() => {
-      markClean(activeFilePath);
+    const path = activeFilePathRef.current;
+    if (!saveRequest || !path) return;
+    fileWrite(path, contentRef.current).then(() => {
+      markClean(path);
     });
-  }, [saveRequest]);
+  }, [saveRequest, markClean]);
 
   // Revert: reload file from disk when triggerRevert() fires
   useEffect(() => {
-    if (!revertRequest || !activeFilePath) return;
-    fileRead(activeFilePath).then((text) => {
+    const path = activeFilePathRef.current;
+    if (!revertRequest || !path) return;
+    fileRead(path).then((text) => {
       setContent(text);
-      markClean(activeFilePath);
+      markClean(path);
     });
-  }, [revertRequest]);
+  }, [revertRequest, markClean]);
 
   // Synchronously dispose the Monaco editor when the active file changes or the
   // component unmounts. useLayoutEffect cleanup fires before React applies DOM
