@@ -3,7 +3,7 @@ import { open } from "@tauri-apps/plugin-shell";
 import ShortcutsModal from "@/components/help/ShortcutsModal";
 import AboutModal from "@/components/help/AboutModal";
 
-const GITHUB_URL = "https://github.com/The-R4V3N/WARP";
+const DOCS_URL = "https://github.com/The-R4V3N/WARP#readme";
 const ISSUES_URL = "https://github.com/The-R4V3N/WARP/issues";
 
 function MenuBar() {
@@ -26,7 +26,7 @@ function MenuBar() {
 
   function handleDocs() {
     setHelpOpen(false);
-    open(GITHUB_URL);
+    open(DOCS_URL);
   }
 
   function handleIssue() {
