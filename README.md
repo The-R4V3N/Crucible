@@ -37,6 +37,7 @@ WARP is a desktop IDE built for developers who live in the terminal. It wraps mu
 ### Terminal
 
 - **Multi-project terminals** — Run multiple PTY sessions side-by-side
+- **Terminal tabs** — Multiple tabs per project with `+` button and per-tab close
 - **Split panes** — Vertical and horizontal split views (`Ctrl+\`)
 - **Session persistence** — Active project restored on restart
 - **ConPTY native** — Real Windows terminal, not a wrapper
@@ -126,9 +127,9 @@ warp/
 │       └── commands.rs      IPC command handlers
 │
 ├── src/                     React frontend
-│   ├── components/          UI — sidebar, terminal, editor, diff, panels, layout
-│   ├── hooks/               useSession, useGit, useFileWatcher, useKeyboard
-│   ├── stores/              State management (Zustand)
+│   ├── components/          UI — sidebar, terminal, editor, explorer, diff, panels, layout, palette, search
+│   ├── hooks/               useSession, useGit, useFileWatcher, useKeyboard, useEditorCursor, useGitDecorations
+│   ├── stores/              State management (Zustand) — session, editor, ui, config, file, palette
 │   ├── lib/                 Utilities — ipc, keybindings, theme
 │   └── styles/              Tailwind + custom CSS
 │
@@ -196,17 +197,6 @@ WARP stores its config in `warp_config.json` (auto-created on first run):
 
 ---
 
-## Milestones
-
-| Milestone | Focus | Status |
-|-----------|-------|--------|
-| **M1** | Core Terminal — Tauri + xterm.js + PTY | Done |
-| **M2** | Multi-session + Sidebar | Done |
-| **M3** | File Editor + Explorer | Done |
-| **M4** | Smart Features — notifications, splits | Done |
-| **M5** | Polish + Release | Done |
-
----
 
 ## Contributing
 

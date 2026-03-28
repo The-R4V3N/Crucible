@@ -137,36 +137,51 @@ warp/
 │   ├── App.tsx                  # Root layout
 │   ├── components/
 │   │   ├── sidebar/
-│   │   │   ├── Sidebar.tsx      # Main sidebar container
-│   │   │   ├── ProjectList.tsx  # Project entries with status
-│   │   │   ├── SourceControl.tsx # Git info panel
-│   │   │   └── Shortcuts.tsx    # Keyboard shortcuts reference
+│   │   │   ├── Sidebar.tsx        # Main sidebar container
+│   │   │   ├── ProjectList.tsx    # Project entries with status
+│   │   │   ├── SourceControl.tsx  # Git info panel
+│   │   │   ├── Shortcuts.tsx      # Keyboard shortcuts reference
+│   │   │   └── AddProjectButton.tsx # Add project folder picker
 │   │   ├── terminal/
-│   │   │   ├── TerminalView.tsx # xterm.js wrapper
-│   │   │   └── TerminalTabs.tsx # Terminal tab bar
+│   │   │   ├── TerminalView.tsx    # xterm.js wrapper
+│   │   │   ├── TerminalTabBar.tsx  # Per-project tab bar (+ button, per-tab close)
+│   │   │   └── TerminalManager.tsx # Multi-tab session orchestrator
 │   │   ├── editor/
 │   │   │   ├── EditorView.tsx   # Monaco editor wrapper
-│   │   │   ├── FileTree.tsx     # File explorer tree
 │   │   │   └── EditorTabs.tsx   # Open file tabs
+│   │   ├── explorer/
+│   │   │   ├── FileExplorer.tsx # File explorer container
+│   │   │   └── FileTree.tsx     # Directory tree rendering
 │   │   ├── diff/
-│   │   │   ├── DiffView.tsx     # Git diff renderer
-│   │   │   └── ChangedFiles.tsx # Changed file list
+│   │   │   └── DiffView.tsx     # Git diff renderer
 │   │   ├── panels/
 │   │   │   ├── BottomPanel.tsx  # Collapsible bottom panel
 │   │   │   └── SplitPane.tsx    # Resizable split container
+│   │   ├── palette/
+│   │   │   ├── CommandPalette.tsx     # Command palette overlay
+│   │   │   └── CommandPaletteItem.tsx # Individual palette entry
+│   │   ├── search/
+│   │   │   └── SearchPanel.tsx  # Project-wide file search
 │   │   └── layout/
 │   │       ├── TitleBar.tsx     # Custom title bar
-│   │       └── StatusBar.tsx    # Bottom status bar
+│   │       ├── StatusBar.tsx    # Bottom status bar
+│   │       ├── TabBar.tsx       # Main view tab bar (Terminal/Editor/Diff)
+│   │       ├── ViewRenderer.tsx # Active view switcher
+│   │       └── ErrorBoundary.tsx # React error boundary
 │   ├── hooks/
 │   │   ├── useSession.ts        # PTY session management
 │   │   ├── useGit.ts            # Git polling hook
 │   │   ├── useFileWatcher.ts    # File change events
 │   │   ├── useKeyboard.ts       # Global keyboard shortcuts
-│   │   └── useConfig.ts         # Config loading
+│   │   ├── useEditorCursor.ts   # Editor cursor position tracking
+│   │   └── useGitDecorations.ts # Monaco git gutter decorations
 │   ├── stores/
-│   │   ├── sessionStore.ts      # Session state (Zustand)
+│   │   ├── sessionStore.ts      # Session + terminal tab state (Zustand)
 │   │   ├── editorStore.ts       # Open files, active tab
-│   │   └── uiStore.ts           # Layout state (sidebar, panels)
+│   │   ├── uiStore.ts           # Layout state (sidebar, panels)
+│   │   ├── configStore.ts       # App configuration
+│   │   ├── fileStore.ts         # File tree state
+│   │   └── paletteStore.ts      # Command palette state
 │   ├── lib/
 │   │   ├── ipc.ts               # Tauri command wrappers
 │   │   ├── keybindings.ts       # Shortcut definitions
