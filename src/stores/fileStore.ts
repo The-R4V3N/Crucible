@@ -14,6 +14,10 @@ interface FileState {
   openFiles: OpenFile[];
   activeFilePath: string | null;
   expandedDirs: Set<string>;
+  /** Incremented by triggerSave — EditorView reacts and writes to disk. */
+  saveRequest: number;
+  /** Incremented by triggerRevert — EditorView reacts and reloads from disk. */
+  revertRequest: number;
   setTree: (tree: FileNode) => void;
   openFile: (path: string, name: string) => void;
   closeFile: (path: string) => void;
@@ -21,6 +25,8 @@ interface FileState {
   toggleDir: (path: string) => void;
   markDirty: (path: string) => void;
   markClean: (path: string) => void;
+  triggerSave: () => void;
+  triggerRevert: () => void;
 }
 
 export const useFileStore = create<FileState>((set) => ({
@@ -28,6 +34,8 @@ export const useFileStore = create<FileState>((set) => ({
   openFiles: [],
   activeFilePath: null,
   expandedDirs: new Set<string>(),
+  saveRequest: 0,
+  revertRequest: 0,
 
   setTree: (tree) => set({ tree }),
 
@@ -75,4 +83,8 @@ export const useFileStore = create<FileState>((set) => ({
     set((state) => ({
       openFiles: state.openFiles.map((f) => (f.path === path ? { ...f, isDirty: false } : f)),
     })),
+
+  triggerSave: () => set((state) => ({ saveRequest: state.saveRequest + 1 })),
+
+  triggerRevert: () => set((state) => ({ revertRequest: state.revertRequest + 1 })),
 }));

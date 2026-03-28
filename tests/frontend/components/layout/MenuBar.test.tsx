@@ -20,11 +20,6 @@ describe("MenuBar — labels", () => {
     expect(screen.getByTestId("menu-help")).toBeInTheDocument();
   });
 
-  it("File menu item is disabled", () => {
-    render(<MenuBar />);
-    expect(screen.getByTestId("menu-file")).toBeDisabled();
-  });
-
   it("Edit menu item is disabled", () => {
     render(<MenuBar />);
     expect(screen.getByTestId("menu-edit")).toBeDisabled();

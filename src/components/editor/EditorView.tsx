@@ -5,7 +5,7 @@ import { useFileStore } from "@/stores/fileStore";
 import { useEditorStore } from "@/stores/editorStore";
 import { useEditorCursor } from "@/hooks/useEditorCursor";
 import { useGitDecorations } from "@/hooks/useGitDecorations";
-import { fileRead } from "@/lib/ipc";
+import { fileRead, fileWrite } from "@/lib/ipc";
 import EditorTabs from "./EditorTabs";
 
 /** Detect language from file extension. */
@@ -56,6 +56,27 @@ function EditorView({ repoPath = null }: EditorViewProps) {
 
   // Git gutter decorations — show added/modified/deleted lines vs HEAD
   useGitDecorations({ editor: editorInstance, filePath: activeFilePath ?? null, repoPath });
+
+  const saveRequest = useFileStore((s) => s.saveRequest);
+  const revertRequest = useFileStore((s) => s.revertRequest);
+  const markClean = useFileStore((s) => s.markClean);
+
+  // Save: write current editor content to disk when triggerSave() fires
+  useEffect(() => {
+    if (!saveRequest || !activeFilePath) return;
+    fileWrite(activeFilePath, content).then(() => {
+      markClean(activeFilePath);
+    });
+  }, [saveRequest]);
+
+  // Revert: reload file from disk when triggerRevert() fires
+  useEffect(() => {
+    if (!revertRequest || !activeFilePath) return;
+    fileRead(activeFilePath).then((text) => {
+      setContent(text);
+      markClean(activeFilePath);
+    });
+  }, [revertRequest]);
 
   // Synchronously dispose the Monaco editor when the active file changes or the
   // component unmounts. useLayoutEffect cleanup fires before React applies DOM

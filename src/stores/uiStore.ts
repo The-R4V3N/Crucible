@@ -6,6 +6,12 @@ export type ViewType = "terminal" | "editor" | "diff";
 /** Split orientation or null for no split. */
 export type SplitMode = "vertical" | "horizontal" | null;
 
+/** Terminal actions registered by TerminalManager. */
+export interface TerminalActions {
+  addTab: () => void;
+  closeActiveTab: () => void;
+}
+
 /** UI layout state and actions. */
 interface UiState {
   sidebarVisible: boolean;
@@ -16,9 +22,14 @@ interface UiState {
   tabOrder: ViewType[];
   splitMode: SplitMode;
   splitViews: [ViewType, ViewType];
+  /** Terminal actions registered by TerminalManager on mount. */
+  terminalActions: TerminalActions | null;
+  /** True while the user is typing a new filename in the explorer. */
+  newFileRequested: boolean;
   toggleSidebar: () => void;
   setSidebarVisible: (visible: boolean) => void;
   toggleExplorer: () => void;
+  setExplorerVisible: (visible: boolean) => void;
   toggleBottomPanel: () => void;
   toggleSearch: () => void;
   setActiveView: (view: ViewType) => void;
@@ -27,6 +38,9 @@ interface UiState {
   splitHorizontal: () => void;
   closeSplit: () => void;
   setSplitView: (index: 0 | 1, view: ViewType) => void;
+  setTerminalActions: (actions: TerminalActions) => void;
+  requestNewFile: () => void;
+  clearNewFileRequest: () => void;
 }
 
 export const useUiStore = create<UiState>((set) => ({
@@ -38,12 +52,16 @@ export const useUiStore = create<UiState>((set) => ({
   tabOrder: ["terminal", "editor", "diff"] as ViewType[],
   splitMode: null,
   splitViews: ["terminal", "terminal"] as [ViewType, ViewType],
+  terminalActions: null,
+  newFileRequested: false,
 
   toggleSidebar: () => set((state) => ({ sidebarVisible: !state.sidebarVisible })),
 
   setSidebarVisible: (visible) => set({ sidebarVisible: visible }),
 
   toggleExplorer: () => set((state) => ({ explorerVisible: !state.explorerVisible })),
+
+  setExplorerVisible: (visible: boolean) => set({ explorerVisible: visible }),
 
   toggleBottomPanel: () => set((state) => ({ bottomPanelVisible: !state.bottomPanelVisible })),
 
@@ -73,4 +91,9 @@ export const useUiStore = create<UiState>((set) => ({
       views[index] = view;
       return { splitViews: views };
     }),
+
+  setTerminalActions: (actions) => set({ terminalActions: actions }),
+
+  requestNewFile: () => set({ newFileRequested: true }),
+  clearNewFileRequest: () => set({ newFileRequested: false }),
 }));
