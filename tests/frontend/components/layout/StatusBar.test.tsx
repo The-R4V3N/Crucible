@@ -10,6 +10,9 @@ const gitStatus: GitStatusInfo = {
   dirty: false,
   changed_files: 0,
   changed_file_paths: [],
+  staged_files: [],
+  unstaged_files: [],
+  untracked_files: [],
 };
 
 describe("StatusBar", () => {

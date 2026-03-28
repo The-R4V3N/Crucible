@@ -6,7 +6,7 @@ use uuid::Uuid;
 
 use crate::config::WarpConfig;
 use crate::files::{self, FileNode, SearchMatch};
-use crate::git::{FileDiff, GitStatus};
+use crate::git::{git_commit, git_discard, git_stage, git_unstage, FileDiff, GitStatus};
 use crate::pty::PtyManager;
 
 /// Shared PTY manager state, wrapped in a Mutex for thread safety.
@@ -160,6 +160,30 @@ pub fn git_status(path: String) -> Result<GitStatus, String> {
 #[tauri::command]
 pub fn git_diff(repo_path: String, file_path: String) -> Result<FileDiff, String> {
     crate::git::diff::get_file_diff(&repo_path, &file_path)
+}
+
+/// Stage a file (add to the git index).
+#[tauri::command]
+pub fn git_stage_file(repo_path: String, file_path: String) -> Result<(), String> {
+    git_stage(&repo_path, &file_path)
+}
+
+/// Unstage a file (restore index entry to HEAD state).
+#[tauri::command]
+pub fn git_unstage_file(repo_path: String, file_path: String) -> Result<(), String> {
+    git_unstage(&repo_path, &file_path)
+}
+
+/// Discard working-tree changes to a file (restore from HEAD).
+#[tauri::command]
+pub fn git_discard_file(repo_path: String, file_path: String) -> Result<(), String> {
+    git_discard(&repo_path, &file_path)
+}
+
+/// Create a commit with all currently staged changes.
+#[tauri::command]
+pub fn git_commit_changes(repo_path: String, message: String) -> Result<(), String> {
+    git_commit(&repo_path, &message)
 }
 
 /// Get the file tree for a directory.

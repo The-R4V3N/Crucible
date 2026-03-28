@@ -1,3 +1,4 @@
+import { useState } from "react";
 import type { GitStatusInfo } from "@/lib/ipc";
 import { useFileStore } from "@/stores/fileStore";
 import { useUiStore } from "@/stores/uiStore";
@@ -5,41 +6,85 @@ import { useUiStore } from "@/stores/uiStore";
 interface SourceControlProps {
   /** Git status for the active project. */
   gitStatus: GitStatusInfo | null;
-  /** Callback when a changed file is clicked. Defaults to opening in editor. */
+  /** Called when a file name is clicked (opens in editor). */
   onFileClick?: (filePath: string) => void;
   /** Project root path, prepended to git-relative file paths. */
   projectPath?: string;
+  /** Stage a single file. */
+  onStage?: (filePath: string) => void;
+  /** Unstage a single file. */
+  onUnstage?: (filePath: string) => void;
+  /** Discard working-tree changes to a file. */
+  onDiscard?: (filePath: string) => void;
+  /** Commit all staged changes with the given message. */
+  onCommit?: (message: string) => void;
+  /** Stage all unstaged + untracked files. */
+  onStageAll?: () => void;
+  /** Unstage all staged files. */
+  onUnstageAll?: () => void;
 }
 
-/** Source control panel showing git branch and changed files. */
-function SourceControl({ gitStatus, onFileClick, projectPath }: SourceControlProps) {
+/** Source control panel with VS Code-style staged/unstaged/untracked sections. */
+function SourceControl({
+  gitStatus,
+  onFileClick,
+  projectPath,
+  onStage,
+  onUnstage,
+  onDiscard,
+  onCommit,
+  onStageAll,
+  onUnstageAll,
+}: SourceControlProps) {
   const openFile = useFileStore((s) => s.openFile);
   const setActiveView = useUiStore((s) => s.setActiveView);
+
+  const [stagedOpen, setStagedOpen] = useState(true);
+  const [unstagedOpen, setUnstagedOpen] = useState(true);
+  const [untrackedOpen, setUntrackedOpen] = useState(true);
+  const [commitMsg, setCommitMsg] = useState("");
+
+  if (!gitStatus) return null;
+
+  const staged_files = gitStatus.staged_files ?? [];
+  const unstaged_files = gitStatus.unstaged_files ?? [];
+  const untracked_files = gitStatus.untracked_files ?? [];
+  const hasStaged = staged_files.length > 0;
+  const hasUnstaged = unstaged_files.length > 0;
+  const hasUntracked = untracked_files.length > 0;
+  const hasAnythingToStage = hasUnstaged || hasUntracked;
 
   const handleFileClick = (filePath: string) => {
     if (onFileClick) {
       onFileClick(filePath);
-    } else {
-      // Build absolute path from project root + git-relative path
-      let fullPath = filePath;
-      if (projectPath) {
-        const base = projectPath.endsWith("/") ? projectPath.slice(0, -1) : projectPath;
-        fullPath = `${base}/${filePath}`;
-      }
-      const name = filePath.split("/").pop() ?? filePath;
-      openFile(fullPath, name);
-      // Close split mode so the editor shows as a single view
-      if (useUiStore.getState().splitMode) {
-        useUiStore.getState().closeSplit();
-      }
-      setActiveView("editor");
+      return;
     }
+    let fullPath = filePath;
+    if (projectPath) {
+      const base = projectPath.endsWith("/") ? projectPath.slice(0, -1) : projectPath;
+      fullPath = `${base}/${filePath}`;
+    }
+    const name = filePath.split("/").pop() ?? filePath;
+    openFile(fullPath, name);
+    if (useUiStore.getState().splitMode) {
+      useUiStore.getState().closeSplit();
+    }
+    setActiveView("editor");
   };
-  if (!gitStatus) return null;
+
+  const handleCommit = () => {
+    if (!commitMsg.trim()) return;
+    onCommit?.(commitMsg);
+    setCommitMsg("");
+  };
 
   return (
-    <div data-testid="source-control" className="border-t border-warp-border px-4 py-3">
-      <div className="mb-1 text-xs uppercase tracking-wider text-warp-text-dim">Source Control</div>
+    <div
+      data-testid="source-control"
+      className="border-t border-warp-border px-3 py-3 flex flex-col gap-2"
+    >
+      {/* Header */}
+      <div className="text-xs uppercase tracking-wider text-warp-text-dim">Source Control</div>
 
       {/* Branch */}
       <div className="flex items-center gap-1.5 text-sm text-warp-text">
@@ -52,28 +97,177 @@ function SourceControl({ gitStatus, onFileClick, projectPath }: SourceControlPro
         )}
       </div>
 
-      {/* Changed files count */}
-      {gitStatus.changed_files > 0 && (
-        <div className="mt-1 text-xs text-warp-text-dim" data-testid="git-changed-count">
-          {gitStatus.changed_files} file{gitStatus.changed_files !== 1 ? "s" : ""} changed
+      {/* Staged Changes */}
+      {hasStaged && (
+        <div data-testid="staged-section" className="flex flex-col gap-0.5">
+          <div className="flex items-center justify-between">
+            <button
+              data-testid="staged-section-header"
+              onClick={() => setStagedOpen((o) => !o)}
+              className="flex items-center gap-1 text-xs font-medium text-warp-text-dim uppercase tracking-wide hover:text-warp-text"
+            >
+              <span>{stagedOpen ? "▾" : "▸"}</span>
+              <span>Staged Changes ({staged_files.length})</span>
+            </button>
+            {hasStaged && (
+              <button
+                data-testid="unstage-all-btn"
+                onClick={onUnstageAll}
+                title="Unstage All"
+                className="text-xs text-warp-text-dim hover:text-warp-text px-1"
+              >
+                −
+              </button>
+            )}
+          </div>
+
+          {stagedOpen &&
+            staged_files.map((filePath) => (
+              <div key={filePath} className="flex items-center gap-1 pl-3 group">
+                <button
+                  data-testid={`staged-file-${filePath}`}
+                  onClick={() => handleFileClick(filePath)}
+                  title={filePath}
+                  className="flex-1 truncate text-xs text-left text-warp-text-dim hover:text-warp-text"
+                >
+                  {filePath.split("/").pop()}
+                </button>
+                <button
+                  data-testid={`unstage-btn-${filePath}`}
+                  onClick={() => onUnstage?.(filePath)}
+                  title={`Unstage ${filePath}`}
+                  className="hidden group-hover:flex text-xs text-warp-text-dim hover:text-warp-accent px-0.5"
+                >
+                  −
+                </button>
+              </div>
+            ))}
         </div>
       )}
 
-      {/* Changed files list */}
-      {gitStatus.changed_file_paths.length > 0 && (
-        <div className="mt-2 flex flex-col gap-0.5" data-testid="changed-files-list">
-          {gitStatus.changed_file_paths.map((filePath) => (
+      {/* Unstaged Changes */}
+      {hasUnstaged && (
+        <div data-testid="unstaged-section" className="flex flex-col gap-0.5">
+          <div className="flex items-center justify-between">
             <button
-              key={filePath}
-              onClick={() => handleFileClick(filePath)}
-              className="truncate text-xs text-warp-text-dim hover:text-warp-text cursor-pointer text-left w-full"
-              title={filePath}
+              data-testid="unstaged-section-header"
+              onClick={() => setUnstagedOpen((o) => !o)}
+              className="flex items-center gap-1 text-xs font-medium text-warp-text-dim uppercase tracking-wide hover:text-warp-text"
             >
-              {filePath}
+              <span>{unstagedOpen ? "▾" : "▸"}</span>
+              <span>Unstaged Changes ({unstaged_files.length})</span>
             </button>
-          ))}
+            {hasAnythingToStage && (
+              <button
+                data-testid="stage-all-btn"
+                onClick={onStageAll}
+                title="Stage All"
+                className="text-xs text-warp-text-dim hover:text-warp-text px-1"
+              >
+                +
+              </button>
+            )}
+          </div>
+
+          {unstagedOpen &&
+            unstaged_files.map((filePath) => (
+              <div key={filePath} className="flex items-center gap-1 pl-3 group">
+                <button
+                  data-testid={`unstaged-file-${filePath}`}
+                  onClick={() => handleFileClick(filePath)}
+                  title={filePath}
+                  className="flex-1 truncate text-xs text-left text-warp-text-dim hover:text-warp-text"
+                >
+                  {filePath.split("/").pop()}
+                </button>
+                <button
+                  data-testid={`stage-btn-${filePath}`}
+                  onClick={() => onStage?.(filePath)}
+                  title={`Stage ${filePath}`}
+                  className="hidden group-hover:flex text-xs text-warp-text-dim hover:text-warp-accent px-0.5"
+                >
+                  +
+                </button>
+                <button
+                  data-testid={`discard-btn-${filePath}`}
+                  onClick={() => onDiscard?.(filePath)}
+                  title={`Discard changes to ${filePath}`}
+                  className="hidden group-hover:flex text-xs text-warp-text-dim hover:text-red-400 px-0.5"
+                >
+                  ↺
+                </button>
+              </div>
+            ))}
         </div>
       )}
+
+      {/* Untracked Files */}
+      {hasUntracked && (
+        <div data-testid="untracked-section" className="flex flex-col gap-0.5">
+          <div className="flex items-center justify-between">
+            <button
+              data-testid="untracked-section-header"
+              onClick={() => setUntrackedOpen((o) => !o)}
+              className="flex items-center gap-1 text-xs font-medium text-warp-text-dim uppercase tracking-wide hover:text-warp-text"
+            >
+              <span>{untrackedOpen ? "▾" : "▸"}</span>
+              <span>Untracked Files ({untracked_files.length})</span>
+            </button>
+            {!hasUnstaged && hasUntracked && (
+              <button
+                data-testid="stage-all-btn"
+                onClick={onStageAll}
+                title="Stage All"
+                className="text-xs text-warp-text-dim hover:text-warp-text px-1"
+              >
+                +
+              </button>
+            )}
+          </div>
+
+          {untrackedOpen &&
+            untracked_files.map((filePath) => (
+              <div key={filePath} className="flex items-center gap-1 pl-3 group">
+                <button
+                  data-testid={`untracked-file-${filePath}`}
+                  onClick={() => handleFileClick(filePath)}
+                  title={filePath}
+                  className="flex-1 truncate text-xs text-left text-warp-text-dim hover:text-warp-text"
+                >
+                  {filePath.split("/").pop()}
+                </button>
+                <button
+                  data-testid={`stage-btn-${filePath}`}
+                  onClick={() => onStage?.(filePath)}
+                  title={`Stage ${filePath}`}
+                  className="hidden group-hover:flex text-xs text-warp-text-dim hover:text-warp-accent px-0.5"
+                >
+                  +
+                </button>
+              </div>
+            ))}
+        </div>
+      )}
+
+      {/* Commit */}
+      <div className="flex flex-col gap-1.5 pt-1">
+        <textarea
+          data-testid="commit-message"
+          value={commitMsg}
+          onChange={(e) => setCommitMsg(e.target.value)}
+          placeholder="Commit message"
+          rows={2}
+          className="w-full resize-none rounded border border-warp-border bg-warp-bg px-2 py-1 text-xs text-warp-text placeholder-warp-text-dim focus:outline-none focus:border-warp-accent"
+        />
+        <button
+          data-testid="commit-btn"
+          onClick={handleCommit}
+          disabled={!commitMsg.trim()}
+          className="w-full rounded bg-warp-accent px-2 py-1 text-xs font-medium text-black disabled:opacity-40 disabled:cursor-not-allowed hover:opacity-90"
+        >
+          Commit
+        </button>
+      </div>
     </div>
   );
 }

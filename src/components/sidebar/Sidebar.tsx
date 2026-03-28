@@ -10,10 +10,26 @@ interface SidebarProps {
   projects: ProjectConfig[];
   gitStatus?: GitStatusInfo | null;
   projectPath?: string;
+  onStage?: (filePath: string) => void;
+  onUnstage?: (filePath: string) => void;
+  onDiscard?: (filePath: string) => void;
+  onCommit?: (message: string) => void;
+  onStageAll?: () => void;
+  onUnstageAll?: () => void;
 }
 
 /** Left sidebar showing project list, source control, and shortcuts. */
-function Sidebar({ projects, gitStatus, projectPath }: SidebarProps) {
+function Sidebar({
+  projects,
+  gitStatus,
+  projectPath,
+  onStage,
+  onUnstage,
+  onDiscard,
+  onCommit,
+  onStageAll,
+  onUnstageAll,
+}: SidebarProps) {
   const sidebarVisible = useUiStore((s) => s.sidebarVisible);
 
   if (!sidebarVisible) return null;
@@ -35,7 +51,16 @@ function Sidebar({ projects, gitStatus, projectPath }: SidebarProps) {
       </div>
 
       {/* Source control */}
-      <SourceControl gitStatus={gitStatus ?? null} projectPath={projectPath} />
+      <SourceControl
+        gitStatus={gitStatus ?? null}
+        projectPath={projectPath}
+        onStage={onStage}
+        onUnstage={onUnstage}
+        onDiscard={onDiscard}
+        onCommit={onCommit}
+        onStageAll={onStageAll}
+        onUnstageAll={onUnstageAll}
+      />
 
       {/* Shortcuts reference */}
       <Shortcuts />
