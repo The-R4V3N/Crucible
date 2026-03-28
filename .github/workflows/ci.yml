@@ -1,0 +1,62 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+# Cancel in-progress runs on the same branch when a new push arrives.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ── Frontend: type check + tests (~3 min) ──────────────────────────────────
+  frontend:
+    name: Frontend (tsc + vitest)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type check
+        run: npm run lint
+
+      - name: Tests
+        run: npm run test
+
+  # ── Rust: clippy + tests (~8 min, runs in parallel with frontend) ──────────
+  rust:
+    name: Rust (clippy + cargo test)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      # tauri::generate_context!() panics at compile time if dist/ doesn't exist.
+      # A minimal stub is enough — the macro only checks the path, not the content,
+      # during clippy/test (dev profile). This avoids a full Vite build (~60s).
+      - name: Create dist stub for tauri::generate_context!
+        shell: bash
+        run: |
+          mkdir -p dist
+          echo '<!DOCTYPE html><html><body></body></html>' > dist/index.html
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+
+      - name: Clippy (zero warnings)
+        run: cargo clippy --manifest-path src-tauri/Cargo.toml -- -D warnings
+
+      - name: Tests
+        run: cargo test --manifest-path src-tauri/Cargo.toml
