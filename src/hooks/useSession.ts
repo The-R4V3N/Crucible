@@ -16,6 +16,10 @@ import {
 interface UseSessionOptions {
   /** Project name this session belongs to. */
   projectName?: string;
+  /** Stable key linking this session to its tab in TerminalManager. */
+  tabKey?: string;
+  /** Display label shown in the tab bar. */
+  label?: string;
   /** Working directory for the PTY session. */
   cwd: string;
   /** Command to run. Defaults to powershell.exe. */
@@ -44,6 +48,8 @@ interface UseSessionReturn {
 /** Hook to manage a single PTY session lifecycle. */
 export function useSession({
   projectName,
+  tabKey,
+  label,
   cwd,
   command,
   onOutput,
@@ -80,7 +86,7 @@ export function useSession({
         }
 
         sessionIdRef.current = id;
-        addSession(id, projectName);
+        addSession(id, projectName, tabKey, label);
         updateStatus(id, "running");
 
         // Listen for output

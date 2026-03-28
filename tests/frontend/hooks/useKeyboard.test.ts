@@ -33,12 +33,16 @@ describe("useKeyboard", () => {
           projectName: "alpha",
           status: "running",
           needsAttention: false,
+          tabKey: "",
+          label: "",
         },
         s2: {
           id: "s2",
           projectName: "beta",
           status: "running",
           needsAttention: false,
+          tabKey: "",
+          label: "",
         },
       },
       activeSessionId: "s1",
@@ -49,14 +53,10 @@ describe("useKeyboard", () => {
     renderHook(() => useKeyboard({ projects: mockProjects }));
     expect(useUiStore.getState().sidebarVisible).toBe(true);
 
-    window.dispatchEvent(
-      new KeyboardEvent("keydown", { key: "b", ctrlKey: true }),
-    );
+    window.dispatchEvent(new KeyboardEvent("keydown", { key: "b", ctrlKey: true }));
     expect(useUiStore.getState().sidebarVisible).toBe(false);
 
-    window.dispatchEvent(
-      new KeyboardEvent("keydown", { key: "b", ctrlKey: true }),
-    );
+    window.dispatchEvent(new KeyboardEvent("keydown", { key: "b", ctrlKey: true }));
     expect(useUiStore.getState().sidebarVisible).toBe(true);
   });
 
@@ -85,9 +85,7 @@ describe("useKeyboard", () => {
 
   it("Ctrl+Shift+P opens command palette", () => {
     renderHook(() => useKeyboard({ projects: mockProjects }));
-    window.dispatchEvent(
-      new KeyboardEvent("keydown", { key: "P", ctrlKey: true, shiftKey: true }),
-    );
+    window.dispatchEvent(new KeyboardEvent("keydown", { key: "P", ctrlKey: true, shiftKey: true }));
     const s = usePaletteStore.getState();
     expect(s.open).toBe(true);
     expect(s.mode).toBe("command");
@@ -110,26 +108,18 @@ describe("useKeyboard", () => {
   it("Ctrl+B does not toggle sidebar when palette is open", () => {
     usePaletteStore.setState({ open: true });
     renderHook(() => useKeyboard({ projects: mockProjects }));
-    window.dispatchEvent(
-      new KeyboardEvent("keydown", { key: "b", ctrlKey: true }),
-    );
+    window.dispatchEvent(new KeyboardEvent("keydown", { key: "b", ctrlKey: true }));
     expect(useUiStore.getState().sidebarVisible).toBe(true);
   });
 
   it("subscribes to palette:open-command Tauri event on mount", () => {
     renderHook(() => useKeyboard({ projects: mockProjects }));
-    expect(mockListen).toHaveBeenCalledWith(
-      "palette:open-command",
-      expect.any(Function),
-    );
+    expect(mockListen).toHaveBeenCalledWith("palette:open-command", expect.any(Function));
   });
 
   it("subscribes to palette:open-file Tauri event on mount", () => {
     renderHook(() => useKeyboard({ projects: mockProjects }));
-    expect(mockListen).toHaveBeenCalledWith(
-      "palette:open-file",
-      expect.any(Function),
-    );
+    expect(mockListen).toHaveBeenCalledWith("palette:open-file", expect.any(Function));
   });
 
   it("palette:open-command event opens command palette", async () => {

@@ -34,6 +34,10 @@ const WARP_THEME = {
 interface TerminalViewProps {
   /** Project name this terminal belongs to. */
   projectName?: string;
+  /** Stable tab key linking this view to its TerminalManager tab. */
+  tabKey?: string;
+  /** Display label shown in the tab bar. */
+  label?: string;
   /** Working directory for the PTY session. */
   cwd: string;
   /** Command to run. Defaults to powershell.exe. */
@@ -43,7 +47,7 @@ interface TerminalViewProps {
 }
 
 /** Terminal component that renders xterm.js connected to a PTY session. */
-function TerminalView({ projectName, cwd, command, onError }: TerminalViewProps) {
+function TerminalView({ projectName, tabKey, label, cwd, command, onError }: TerminalViewProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const terminalRef = useRef<Terminal | null>(null);
   const fitAddonRef = useRef<FitAddon | null>(null);
@@ -71,6 +75,8 @@ function TerminalView({ projectName, cwd, command, onError }: TerminalViewProps)
 
   const { write, resize } = useSession({
     projectName,
+    tabKey,
+    label,
     cwd,
     command,
     onOutput: (data) => {

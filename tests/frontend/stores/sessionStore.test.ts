@@ -19,7 +19,14 @@ describe("sessionStore", () => {
   it("addSession adds a session with starting status", () => {
     useSessionStore.getState().addSession("s1", "project-a");
     const state = useSessionStore.getState();
-    expect(state.sessions["s1"]).toEqual({ id: "s1", projectName: "project-a", status: "starting", needsAttention: false });
+    expect(state.sessions["s1"]).toEqual({
+      id: "s1",
+      projectName: "project-a",
+      tabKey: "",
+      label: "",
+      status: "starting",
+      needsAttention: false,
+    });
   });
 
   it("addSession defaults projectName to 'default'", () => {

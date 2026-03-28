@@ -7,6 +7,10 @@ export type SessionStatus = "starting" | "running" | "stopped" | "error";
 export interface Session {
   id: string;
   projectName: string;
+  /** Links this session to its TerminalManager tab entry. */
+  tabKey: string;
+  /** Display label shown in the terminal tab bar. */
+  label: string;
   status: SessionStatus;
   needsAttention: boolean;
 }
@@ -15,7 +19,7 @@ export interface Session {
 interface SessionState {
   sessions: Record<string, Session>;
   activeSessionId: string | null;
-  addSession: (id: string, projectName?: string) => void;
+  addSession: (id: string, projectName?: string, tabKey?: string, label?: string) => void;
   updateStatus: (id: string, status: SessionStatus) => void;
   removeSession: (id: string) => void;
   setActiveSession: (id: string | null) => void;
@@ -27,11 +31,11 @@ export const useSessionStore = create<SessionState>((set, get) => ({
   sessions: {},
   activeSessionId: null,
 
-  addSession: (id, projectName = "default") =>
+  addSession: (id, projectName = "default", tabKey = "", label = "") =>
     set((state) => ({
       sessions: {
         ...state.sessions,
-        [id]: { id, projectName, status: "starting", needsAttention: false },
+        [id]: { id, projectName, tabKey, label, status: "starting", needsAttention: false },
       },
       activeSessionId: state.activeSessionId ?? id,
     })),
