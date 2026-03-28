@@ -30,6 +30,7 @@ Thumbs.db
 
 # Tauri
 src-tauri/target/
+src-tauri/gen/schemas/
 
 # User config (generated at runtime)
 warp_config.json
