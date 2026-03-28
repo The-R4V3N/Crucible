@@ -17,6 +17,7 @@ import { useFileWatcher } from "@/hooks/useFileWatcher";
 import { useFileStore } from "@/stores/fileStore";
 import { configLoad, configSave } from "@/lib/ipc";
 import StatusBar from "@/components/layout/StatusBar";
+import CommandPalette from "@/components/palette/CommandPalette";
 
 function App() {
   const [error, setError] = useState<string | null>(null);
@@ -120,96 +121,105 @@ function App() {
     <div className="flex flex-col h-screen w-screen bg-warp-bg text-warp-text font-mono overflow-hidden">
       <TitleBar />
       <ErrorBoundary>
-      <div className="flex flex-1 min-h-0">
-      {/* Error banner */}
-      {error && (
-        <div className="absolute top-0 left-0 right-0 bg-warp-error/90 text-white p-2 text-sm z-50">
-          {error}
-          <button
-            onClick={() => setError(null)}
-            className="ml-2 text-white/70 hover:text-white"
-          >
-            dismiss
-          </button>
-        </div>
-      )}
-
-      {/* Sidebar */}
-      <Sidebar projects={projects} gitStatus={gitStatus} projectPath={activeProject?.path} />
-
-      {/* File explorer panel */}
-      {explorerVisible && (
-        <div className="w-60 flex-shrink-0 border-r border-warp-border">
-          <FileExplorer />
-        </div>
-      )}
-
-      {/* Search panel */}
-      {searchVisible && (
-        <div className="w-72 flex-shrink-0 border-r border-warp-border">
-          <SearchPanel
-            projectPath={activeProject?.path ?? "."}
-            onResultClick={(filePath) => {
-              useFileStore.getState().openFile(filePath, filePath.split("/").pop() ?? filePath);
-              if (useUiStore.getState().splitMode) {
-                useUiStore.getState().closeSplit();
-              }
-              useUiStore.getState().setActiveView("editor");
-            }}
-          />
-        </div>
-      )}
-
-      {/* Main content area */}
-      <main className="flex-1 min-w-0 flex flex-col bg-warp-bg">
-        <TabBar onSearchToggle={toggleSearch} />
-        <div className="flex-1 min-h-0">
-          {splitMode ? (
-            <SplitPane orientation={splitMode}>
-              <ViewRenderer
-                view={splitViews[0]}
-                repoPath={activeProject?.path ?? "."}
-                diffFilePath={activeFilePath}
-                onError={setError}
-              />
-              <ViewRenderer
-                view={splitViews[1]}
-                repoPath={activeProject?.path ?? "."}
-                diffFilePath={activeFilePath}
-                onError={setError}
-              />
-            </SplitPane>
-          ) : (
-            <ViewRenderer
-              view={activeView}
-              repoPath={activeProject?.path ?? "."}
-              diffFilePath={activeFilePath}
-              onError={setError}
-            />
+        <div className="flex flex-1 min-h-0">
+          {/* Error banner */}
+          {error && (
+            <div className="absolute top-0 left-0 right-0 bg-warp-error/90 text-white p-2 text-sm z-50">
+              {error}
+              <button
+                onClick={() => setError(null)}
+                className="ml-2 text-white/70 hover:text-white"
+              >
+                dismiss
+              </button>
+            </div>
           )}
-        </div>
 
-        {/* Bottom panel */}
-        <BottomPanel
-          changedFiles={gitStatus?.changed_file_paths ?? []}
-          onFileClick={(filePath) => {
-            const projectBase = activeProject?.path;
-            let fullPath = filePath;
-            if (projectBase) {
-              const base = projectBase.endsWith("/") ? projectBase.slice(0, -1) : projectBase;
-              fullPath = `${base}/${filePath}`;
-            }
-            const name = filePath.split("/").pop() ?? filePath;
-            useFileStore.getState().openFile(fullPath, name);
-            if (useUiStore.getState().splitMode) {
-              useUiStore.getState().closeSplit();
-            }
-            useUiStore.getState().setActiveView("editor");
-          }}
-        />
-        <StatusBar gitStatus={gitStatus} />
-      </main>
-      </div>
+          {/* Sidebar */}
+          <Sidebar
+            projects={projects}
+            gitStatus={gitStatus}
+            projectPath={activeProject?.path}
+          />
+
+          {/* File explorer panel */}
+          {explorerVisible && (
+            <div className="w-60 flex-shrink-0 border-r border-warp-border">
+              <FileExplorer />
+            </div>
+          )}
+
+          {/* Search panel */}
+          {searchVisible && (
+            <div className="w-72 flex-shrink-0 border-r border-warp-border">
+              <SearchPanel
+                projectPath={activeProject?.path ?? "."}
+                onResultClick={(filePath) => {
+                  useFileStore
+                    .getState()
+                    .openFile(filePath, filePath.split("/").pop() ?? filePath);
+                  if (useUiStore.getState().splitMode) {
+                    useUiStore.getState().closeSplit();
+                  }
+                  useUiStore.getState().setActiveView("editor");
+                }}
+              />
+            </div>
+          )}
+
+          {/* Main content area */}
+          <main className="flex-1 min-w-0 flex flex-col bg-warp-bg">
+            <TabBar onSearchToggle={toggleSearch} />
+            <div className="flex-1 min-h-0">
+              {splitMode ? (
+                <SplitPane orientation={splitMode}>
+                  <ViewRenderer
+                    view={splitViews[0]}
+                    repoPath={activeProject?.path ?? "."}
+                    diffFilePath={activeFilePath}
+                    onError={setError}
+                  />
+                  <ViewRenderer
+                    view={splitViews[1]}
+                    repoPath={activeProject?.path ?? "."}
+                    diffFilePath={activeFilePath}
+                    onError={setError}
+                  />
+                </SplitPane>
+              ) : (
+                <ViewRenderer
+                  view={activeView}
+                  repoPath={activeProject?.path ?? "."}
+                  diffFilePath={activeFilePath}
+                  onError={setError}
+                />
+              )}
+            </div>
+
+            {/* Bottom panel */}
+            <BottomPanel
+              changedFiles={gitStatus?.changed_file_paths ?? []}
+              onFileClick={(filePath) => {
+                const projectBase = activeProject?.path;
+                let fullPath = filePath;
+                if (projectBase) {
+                  const base = projectBase.endsWith("/")
+                    ? projectBase.slice(0, -1)
+                    : projectBase;
+                  fullPath = `${base}/${filePath}`;
+                }
+                const name = filePath.split("/").pop() ?? filePath;
+                useFileStore.getState().openFile(fullPath, name);
+                if (useUiStore.getState().splitMode) {
+                  useUiStore.getState().closeSplit();
+                }
+                useUiStore.getState().setActiveView("editor");
+              }}
+            />
+            <StatusBar gitStatus={gitStatus} />
+          </main>
+        </div>
+        <CommandPalette />
       </ErrorBoundary>
     </div>
   );

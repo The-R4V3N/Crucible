@@ -1,6 +1,8 @@
 import { useEffect } from "react";
+import { listen } from "@tauri-apps/api/event";
 import { useUiStore } from "@/stores/uiStore";
 import { useSessionStore } from "@/stores/sessionStore";
+import { usePaletteStore } from "@/stores/paletteStore";
 import type { ProjectConfig } from "@/stores/configStore";
 
 interface UseKeyboardOptions {
@@ -25,6 +27,23 @@ export function useKeyboard({ projects }: UseKeyboardOptions) {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      // Ctrl+Shift+P — open command palette
+      if (e.ctrlKey && e.shiftKey && e.key === "P") {
+        e.preventDefault();
+        usePaletteStore.getState().openCommandPalette();
+        return;
+      }
+
+      // Ctrl+P — open file palette
+      if (e.ctrlKey && !e.shiftKey && e.key === "p") {
+        e.preventDefault();
+        usePaletteStore.getState().openFilePalette();
+        return;
+      }
+
+      // Suppress all other shortcuts when palette is open
+      if (usePaletteStore.getState().open) return;
+
       // Ctrl+B — toggle sidebar
       if (e.ctrlKey && e.key === "b") {
         e.preventDefault();
@@ -119,4 +138,19 @@ export function useKeyboard({ projects }: UseKeyboardOptions) {
     splitMode,
     setActiveSession,
   ]);
+
+  // Tauri global shortcuts bypass WebView2's Ctrl+P/Ctrl+Shift+P interception on Windows.
+  useEffect(() => {
+    const unlistenFns: Array<() => void> = [];
+
+    listen("palette:open-command", () => {
+      usePaletteStore.getState().openCommandPalette();
+    }).then((fn) => unlistenFns.push(fn));
+
+    listen("palette:open-file", () => {
+      usePaletteStore.getState().openFilePalette();
+    }).then((fn) => unlistenFns.push(fn));
+
+    return () => unlistenFns.forEach((fn) => fn());
+  }, []);
 }

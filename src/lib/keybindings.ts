@@ -10,6 +10,8 @@ export interface Keybinding {
 
 /** All defined keyboard shortcuts. */
 export const keybindings: Keybinding[] = [
+  { key: "Ctrl+Shift+P", description: "Open command palette", scope: "global" },
+  { key: "Ctrl+P", description: "Open file palette", scope: "global" },
   { key: "Ctrl+B", description: "Toggle sidebar", scope: "global" },
   { key: "F1", description: "Project 1", scope: "global" },
   { key: "F2", description: "Project 2", scope: "global" },
