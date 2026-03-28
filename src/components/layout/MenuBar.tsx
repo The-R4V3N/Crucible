@@ -14,10 +14,7 @@ const ISSUES_URL = "https://github.com/The-R4V3N/WARP/issues";
 
 type OpenMenu = "file" | "help" | null;
 
-function useMenuRef(
-  isOpen: boolean,
-  onClose: () => void,
-): React.RefObject<HTMLDivElement | null> {
+function useMenuRef(isOpen: boolean, onClose: () => void): React.RefObject<HTMLDivElement | null> {
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (!isOpen) return;
@@ -43,8 +40,7 @@ function MenuBar() {
   const terminalActions = useUiStore((s) => s.terminalActions);
   const addProject = useConfigStore((s) => s.addProject);
 
-  const toggle = (menu: OpenMenu) =>
-    setOpenMenu((prev) => (prev === menu ? null : menu));
+  const toggle = (menu: OpenMenu) => setOpenMenu((prev) => (prev === menu ? null : menu));
 
   const close = () => setOpenMenu(null);
 
@@ -171,47 +167,81 @@ function MenuBar() {
               data-testid="file-dropdown"
               className="absolute left-0 top-full mt-0.5 w-56 rounded border border-warp-border bg-warp-bg shadow-xl z-50 py-1"
             >
-              <button data-testid="file-item-new-file" onClick={handleNewFile}
-                className="menu-item w-full text-left px-4 py-1.5 text-warp-text-dim hover:text-warp-text hover:bg-warp-sidebar transition-colors">
+              <button
+                data-testid="file-item-new-file"
+                onClick={handleNewFile}
+                className="menu-item w-full text-left px-4 py-1.5 text-warp-text-dim hover:text-warp-text hover:bg-warp-sidebar transition-colors"
+              >
                 New File…
               </button>
-              <button data-testid="file-item-open-file" onClick={handleOpenFile}
-                className="menu-item w-full text-left px-4 py-1.5 text-warp-text-dim hover:text-warp-text hover:bg-warp-sidebar transition-colors">
+              <button
+                data-testid="file-item-open-file"
+                onClick={handleOpenFile}
+                className="menu-item w-full text-left px-4 py-1.5 text-warp-text-dim hover:text-warp-text hover:bg-warp-sidebar transition-colors"
+              >
                 Open File…
               </button>
-              <button data-testid="file-item-open-folder" onClick={handleOpenFolder}
-                className="menu-item w-full text-left px-4 py-1.5 text-warp-text-dim hover:text-warp-text hover:bg-warp-sidebar transition-colors">
+              <button
+                data-testid="file-item-open-folder"
+                onClick={handleOpenFolder}
+                className="menu-item w-full text-left px-4 py-1.5 text-warp-text-dim hover:text-warp-text hover:bg-warp-sidebar transition-colors"
+              >
                 Open Folder…
               </button>
               <div className="my-1 border-t border-warp-border/60" />
-              <button data-testid="file-item-save" onClick={handleSave} disabled={!hasFile}
-                className="menu-item w-full text-left px-4 py-1.5 text-warp-text-dim hover:text-warp-text hover:bg-warp-sidebar transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
+              <button
+                data-testid="file-item-save"
+                onClick={handleSave}
+                disabled={!hasFile}
+                className="menu-item w-full text-left px-4 py-1.5 text-warp-text-dim hover:text-warp-text hover:bg-warp-sidebar transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              >
                 Save
               </button>
-              <button data-testid="file-item-save-as" onClick={handleSaveAs} disabled={!hasFile}
-                className="menu-item w-full text-left px-4 py-1.5 text-warp-text-dim hover:text-warp-text hover:bg-warp-sidebar transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
+              <button
+                data-testid="file-item-save-as"
+                onClick={handleSaveAs}
+                disabled={!hasFile}
+                className="menu-item w-full text-left px-4 py-1.5 text-warp-text-dim hover:text-warp-text hover:bg-warp-sidebar transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              >
                 Save As…
               </button>
-              <button data-testid="file-item-revert" onClick={handleRevert} disabled={!hasFile}
-                className="menu-item w-full text-left px-4 py-1.5 text-warp-text-dim hover:text-warp-text hover:bg-warp-sidebar transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
+              <button
+                data-testid="file-item-revert"
+                onClick={handleRevert}
+                disabled={!hasFile}
+                className="menu-item w-full text-left px-4 py-1.5 text-warp-text-dim hover:text-warp-text hover:bg-warp-sidebar transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              >
                 Revert File
               </button>
-              <button data-testid="file-item-close-editor" onClick={handleCloseEditor} disabled={!hasFile}
-                className="menu-item w-full text-left px-4 py-1.5 text-warp-text-dim hover:text-warp-text hover:bg-warp-sidebar transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
+              <button
+                data-testid="file-item-close-editor"
+                onClick={handleCloseEditor}
+                disabled={!hasFile}
+                className="menu-item w-full text-left px-4 py-1.5 text-warp-text-dim hover:text-warp-text hover:bg-warp-sidebar transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              >
                 Close Editor Tab
               </button>
               <div className="my-1 border-t border-warp-border/60" />
-              <button data-testid="file-item-new-terminal" onClick={handleNewTerminal}
-                className="menu-item w-full text-left px-4 py-1.5 text-warp-text-dim hover:text-warp-text hover:bg-warp-sidebar transition-colors">
+              <button
+                data-testid="file-item-new-terminal"
+                onClick={handleNewTerminal}
+                className="menu-item w-full text-left px-4 py-1.5 text-warp-text-dim hover:text-warp-text hover:bg-warp-sidebar transition-colors"
+              >
                 New Terminal
               </button>
-              <button data-testid="file-item-close-terminal" onClick={handleCloseTerminal}
-                className="menu-item w-full text-left px-4 py-1.5 text-warp-text-dim hover:text-warp-text hover:bg-warp-sidebar transition-colors">
+              <button
+                data-testid="file-item-close-terminal"
+                onClick={handleCloseTerminal}
+                className="menu-item w-full text-left px-4 py-1.5 text-warp-text-dim hover:text-warp-text hover:bg-warp-sidebar transition-colors"
+              >
                 Close Terminal Tab
               </button>
               <div className="my-1 border-t border-warp-border/60" />
-              <button data-testid="file-item-exit" onClick={handleExit}
-                className="menu-item w-full text-left px-4 py-1.5 text-warp-text-dim hover:text-warp-text hover:bg-warp-sidebar transition-colors">
+              <button
+                data-testid="file-item-exit"
+                onClick={handleExit}
+                className="menu-item w-full text-left px-4 py-1.5 text-warp-text-dim hover:text-warp-text hover:bg-warp-sidebar transition-colors"
+              >
                 Exit
               </button>
             </div>
@@ -246,22 +276,34 @@ function MenuBar() {
               data-testid="help-dropdown"
               className="absolute left-0 top-full mt-0.5 w-52 rounded border border-warp-border bg-warp-bg shadow-xl z-50 py-1"
             >
-              <button data-testid="help-item-shortcuts" onClick={handleShortcuts}
-                className="w-full text-left px-4 py-1.5 text-warp-text-dim hover:text-warp-text hover:bg-warp-sidebar transition-colors">
+              <button
+                data-testid="help-item-shortcuts"
+                onClick={handleShortcuts}
+                className="w-full text-left px-4 py-1.5 text-warp-text-dim hover:text-warp-text hover:bg-warp-sidebar transition-colors"
+              >
                 Keyboard Shortcuts
               </button>
               <div className="my-1 border-t border-warp-border/60" />
-              <button data-testid="help-item-docs" onClick={handleDocs}
-                className="w-full text-left px-4 py-1.5 text-warp-text-dim hover:text-warp-text hover:bg-warp-sidebar transition-colors">
+              <button
+                data-testid="help-item-docs"
+                onClick={handleDocs}
+                className="w-full text-left px-4 py-1.5 text-warp-text-dim hover:text-warp-text hover:bg-warp-sidebar transition-colors"
+              >
                 View Documentation
               </button>
-              <button data-testid="help-item-issue" onClick={handleIssue}
-                className="w-full text-left px-4 py-1.5 text-warp-text-dim hover:text-warp-text hover:bg-warp-sidebar transition-colors">
+              <button
+                data-testid="help-item-issue"
+                onClick={handleIssue}
+                className="w-full text-left px-4 py-1.5 text-warp-text-dim hover:text-warp-text hover:bg-warp-sidebar transition-colors"
+              >
                 Report an Issue
               </button>
               <div className="my-1 border-t border-warp-border/60" />
-              <button data-testid="help-item-about" onClick={handleAbout}
-                className="w-full text-left px-4 py-1.5 text-warp-text-dim hover:text-warp-text hover:bg-warp-sidebar transition-colors">
+              <button
+                data-testid="help-item-about"
+                onClick={handleAbout}
+                className="w-full text-left px-4 py-1.5 text-warp-text-dim hover:text-warp-text hover:bg-warp-sidebar transition-colors"
+              >
                 About WARP
               </button>
             </div>
