@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Sidebar from "@/components/sidebar/Sidebar";
 import TitleBar from "@/components/layout/TitleBar";
+import MenuBar from "@/components/layout/MenuBar";
 import ErrorBoundary from "@/components/layout/ErrorBoundary";
 import TabBar from "@/components/layout/TabBar";
 import ViewRenderer from "@/components/layout/ViewRenderer";
@@ -144,6 +145,7 @@ function App() {
   return (
     <div className="flex flex-col h-screen w-screen bg-warp-bg text-warp-text font-mono overflow-hidden">
       <TitleBar />
+      <MenuBar />
       <ErrorBoundary>
         <div className="flex flex-1 min-h-0">
           {/* Error banner */}
