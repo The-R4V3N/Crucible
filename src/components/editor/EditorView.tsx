@@ -34,6 +34,7 @@ function detectLanguage(path: string): string {
 function EditorView() {
   const activeFilePath = useFileStore((s) => s.activeFilePath);
   const openFiles = useFileStore((s) => s.openFiles);
+  const markDirty = useFileStore((s) => s.markDirty);
   const [content, setContent] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [editorInstance, setEditorInstance] =
@@ -156,6 +157,7 @@ function EditorView() {
             onChange={(value) => {
               if (value !== undefined) {
                 setContent(value);
+                if (activeFilePath) markDirty(activeFilePath);
               }
             }}
             options={{

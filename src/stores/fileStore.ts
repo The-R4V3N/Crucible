@@ -5,6 +5,7 @@ import type { FileNode } from "@/lib/ipc";
 export interface OpenFile {
   path: string;
   name: string;
+  isDirty?: boolean;
 }
 
 /** File store state and actions. */
@@ -18,6 +19,8 @@ interface FileState {
   closeFile: (path: string) => void;
   setActiveFile: (path: string | null) => void;
   toggleDir: (path: string) => void;
+  markDirty: (path: string) => void;
+  markClean: (path: string) => void;
 }
 
 export const useFileStore = create<FileState>((set) => ({
@@ -63,4 +66,18 @@ export const useFileStore = create<FileState>((set) => ({
       }
       return { expandedDirs: next };
     }),
+
+  markDirty: (path) =>
+    set((state) => ({
+      openFiles: state.openFiles.map((f) =>
+        f.path === path ? { ...f, isDirty: true } : f,
+      ),
+    })),
+
+  markClean: (path) =>
+    set((state) => ({
+      openFiles: state.openFiles.map((f) =>
+        f.path === path ? { ...f, isDirty: false } : f,
+      ),
+    })),
 }));

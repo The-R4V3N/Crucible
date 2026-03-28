@@ -48,4 +48,24 @@ describe("EditorTabs", () => {
     fireEvent.click(screen.getByTestId("close-/tmp/a.ts"));
     expect(useFileStore.getState().openFiles).toHaveLength(0);
   });
+
+  it("shows dirty indicator dot when file is dirty", () => {
+    useFileStore.getState().openFile("/tmp/a.ts", "a.ts");
+    useFileStore.getState().markDirty("/tmp/a.ts");
+    render(<EditorTabs />);
+    expect(screen.getByTestId("dirty-/tmp/a.ts")).toBeInTheDocument();
+  });
+
+  it("does not show dirty indicator when file is clean", () => {
+    useFileStore.getState().openFile("/tmp/a.ts", "a.ts");
+    render(<EditorTabs />);
+    expect(screen.queryByTestId("dirty-/tmp/a.ts")).not.toBeInTheDocument();
+  });
+
+  it("close button is hidden by default via opacity-0 class", () => {
+    useFileStore.getState().openFile("/tmp/a.ts", "a.ts");
+    render(<EditorTabs />);
+    const closeBtn = screen.getByTestId("close-/tmp/a.ts");
+    expect(closeBtn.className).toContain("opacity-0");
+  });
 });

@@ -18,7 +18,7 @@ function EditorTabs() {
           <div
             key={file.path}
             data-testid={`tab-${file.path}`}
-            className={`flex items-center gap-1 px-3 text-sm cursor-pointer border-b-2 ${
+            className={`group flex items-center gap-1 px-3 text-sm cursor-pointer border-b-2 ${
               isActive
                 ? "border-warp-accent text-warp-text bg-warp-bg"
                 : "border-transparent text-warp-text-dim hover:text-warp-text"
@@ -26,13 +26,21 @@ function EditorTabs() {
             onClick={() => setActiveFile(file.path)}
           >
             <span>{file.name}</span>
+            {file.isDirty && (
+              <span
+                data-testid={`dirty-${file.path}`}
+                className="text-warp-accent text-xs"
+              >
+                •
+              </span>
+            )}
             <button
               data-testid={`close-${file.path}`}
               onClick={(e) => {
                 e.stopPropagation();
                 closeFile(file.path);
               }}
-              className="ml-1 text-xs text-warp-text-dim hover:text-warp-error"
+              className="ml-1 text-xs text-warp-text-dim hover:text-warp-error opacity-0 group-hover:opacity-100"
             >
               ×
             </button>

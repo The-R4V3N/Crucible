@@ -43,6 +43,8 @@ function makeFakeEditor() {
 
 // Capture the last fake editor passed to onMount so tests can inspect it
 let lastFakeEditor: ReturnType<typeof makeFakeEditor> | null = null;
+// Capture the last onChange callback so tests can simulate user typing
+let lastOnChange: ((value: string | undefined) => void) | null = null;
 
 // Mock Monaco editor — calls onMount after mount (mirrors real Monaco behaviour)
 vi.mock("@monaco-editor/react", () => ({
@@ -51,11 +53,14 @@ vi.mock("@monaco-editor/react", () => ({
       value,
       language,
       onMount,
+      onChange,
     }: {
       value: string;
       language: string;
       onMount?: (editor: ReturnType<typeof makeFakeEditor>) => void;
+      onChange?: (value: string | undefined) => void;
     }) => {
+      lastOnChange = onChange ?? null;
       useEffect(() => {
         if (onMount) {
           const fakeEditor = makeFakeEditor();
@@ -88,6 +93,7 @@ describe("EditorView", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     lastFakeEditor = null;
+    lastOnChange = null;
     useFileStore.setState({
       tree: null,
       openFiles: [],
@@ -250,6 +256,18 @@ describe("EditorView", () => {
 
     // Real teardown must have run exactly once, not three times.
     expect(editor._disposeImpl).toHaveBeenCalledTimes(1);
+  });
+
+  it("marks active file as dirty when editor content changes", async () => {
+    useFileStore.getState().openFile("/tmp/a.ts", "a.ts");
+    render(<EditorView />);
+    await screen.findByTestId("monaco-editor");
+
+    act(() => {
+      lastOnChange?.("new content");
+    });
+
+    expect(useFileStore.getState().openFiles[0]?.isDirty).toBe(true);
   });
 
   it("does not update cursor store when stale editor fires during file switch", async () => {

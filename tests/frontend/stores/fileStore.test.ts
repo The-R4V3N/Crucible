@@ -84,4 +84,30 @@ describe("fileStore", () => {
     useFileStore.getState().toggleDir("/tmp/src");
     expect(useFileStore.getState().expandedDirs.has("/tmp/src")).toBe(false);
   });
+
+  it("openFile sets isDirty to false by default", () => {
+    useFileStore.getState().openFile("/tmp/a.ts", "a.ts");
+    expect(useFileStore.getState().openFiles[0]?.isDirty).toBeFalsy();
+  });
+
+  it("markDirty sets isDirty true on matching file", () => {
+    useFileStore.getState().openFile("/tmp/a.ts", "a.ts");
+    useFileStore.getState().markDirty("/tmp/a.ts");
+    expect(useFileStore.getState().openFiles[0]?.isDirty).toBe(true);
+  });
+
+  it("markClean sets isDirty false on matching file", () => {
+    useFileStore.getState().openFile("/tmp/a.ts", "a.ts");
+    useFileStore.getState().markDirty("/tmp/a.ts");
+    useFileStore.getState().markClean("/tmp/a.ts");
+    expect(useFileStore.getState().openFiles[0]?.isDirty).toBe(false);
+  });
+
+  it("markDirty on unknown path is a no-op", () => {
+    useFileStore.getState().openFile("/tmp/a.ts", "a.ts");
+    expect(() =>
+      useFileStore.getState().markDirty("/tmp/nonexistent.ts"),
+    ).not.toThrow();
+    expect(useFileStore.getState().openFiles[0]?.isDirty).toBeFalsy();
+  });
 });
