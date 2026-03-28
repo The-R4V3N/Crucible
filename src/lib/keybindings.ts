@@ -25,4 +25,13 @@ export const keybindings: Keybinding[] = [
   { key: "F10", description: "Project 10", scope: "global" },
   { key: "F11", description: "Project 11", scope: "global" },
   { key: "F12", description: "Project 12", scope: "global" },
+  // Terminal
+  { key: "Ctrl+\\", description: "Split vertical", scope: "terminal" },
+  { key: "Ctrl+Shift+\\", description: "Split horizontal", scope: "terminal" },
+  { key: "Ctrl+W", description: "Close split / close tab", scope: "terminal" },
+  { key: "Ctrl+R", description: "Restart active session", scope: "terminal" },
+  // Editor
+  { key: "Ctrl+S", description: "Save file", scope: "editor" },
+  { key: "Ctrl+F", description: "Find in file", scope: "editor" },
+  { key: "Ctrl+O", description: "Open file", scope: "editor" },
 ];

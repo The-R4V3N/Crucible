@@ -27,6 +27,10 @@ vi.mock("@xterm/addon-fit", () => {
 
 vi.mock("@xterm/xterm/css/xterm.css", () => ({}));
 
+vi.mock("@tauri-apps/plugin-shell", () => ({
+  open: vi.fn(),
+}));
+
 vi.mock("@tauri-apps/api/window", () => ({
   getCurrentWindow: () => ({
     minimize: vi.fn(),
