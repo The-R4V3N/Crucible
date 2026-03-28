@@ -38,6 +38,11 @@ jobs:
       - name: Frontend tests (Vitest)
         run: npm run test
 
+      # Build the frontend before Rust checks — tauri::generate_context!() is a
+      # proc macro that runs at compile time and panics if ../dist doesn't exist.
+      - name: Build frontend (required for tauri::generate_context!)
+        run: npm run build:vite
+
       # ── Rust setup ────────────────────────────────────────────────────────
       - name: Set up Rust (stable)
         uses: dtolnay/rust-toolchain@stable
