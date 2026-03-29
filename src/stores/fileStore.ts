@@ -27,6 +27,7 @@ interface FileState {
   markClean: (path: string) => void;
   triggerSave: () => void;
   triggerRevert: () => void;
+  collapseAll: () => void;
 }
 
 export const useFileStore = create<FileState>((set) => ({
@@ -87,4 +88,6 @@ export const useFileStore = create<FileState>((set) => ({
   triggerSave: () => set((state) => ({ saveRequest: state.saveRequest + 1 })),
 
   triggerRevert: () => set((state) => ({ revertRequest: state.revertRequest + 1 })),
+
+  collapseAll: () => set({ expandedDirs: new Set<string>() }),
 }));

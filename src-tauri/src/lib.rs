@@ -63,6 +63,7 @@ pub fn run() {
             commands::file_tree,
             commands::file_read,
             commands::file_write,
+            commands::dir_create,
             commands::file_watch_start,
             commands::file_search,
         ])

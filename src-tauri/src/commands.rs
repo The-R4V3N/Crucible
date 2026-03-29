@@ -207,6 +207,12 @@ pub fn file_write(path: String, content: String) -> Result<(), String> {
     files::write_file(&std::path::PathBuf::from(&path), &content)
 }
 
+/// Create a directory and all required parent directories.
+#[tauri::command]
+pub fn dir_create(path: String) -> Result<(), String> {
+    files::create_dir(&std::path::PathBuf::from(&path))
+}
+
 /// Search for a pattern in project files.
 #[tauri::command]
 pub fn file_search(
