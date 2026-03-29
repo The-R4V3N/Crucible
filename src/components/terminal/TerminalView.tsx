@@ -145,6 +145,17 @@ function TerminalView({ projectName, tabKey, label, cwd, command, onError }: Ter
       // Let F-keys and global shortcuts pass through to the window handler.
       // NOTE: Ctrl+D is NOT passed through — it must reach the shell as EOF.
       terminal.attachCustomKeyEventHandler((e: KeyboardEvent) => {
+        if (!terminal) return true;
+        // Ctrl+C: copy selection if any; otherwise send SIGINT (^C) to the shell
+        if (e.ctrlKey && !e.shiftKey && e.key === "c") {
+          if (terminal.hasSelection()) {
+            if (e.type === "keydown") {
+              navigator.clipboard.writeText(terminal.getSelection());
+            }
+            return false;
+          }
+          return true;
+        }
         // F1-F12: project switching
         if (/^F\d+$/.test(e.key)) return false;
         // Ctrl+B, Ctrl+E, Ctrl+Shift+D, Ctrl+Shift+F, Ctrl+1/2/3, Ctrl+`, Ctrl+W

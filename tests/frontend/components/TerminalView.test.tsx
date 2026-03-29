@@ -12,6 +12,8 @@ vi.mock("@xterm/xterm", () => {
     dispose: vi.fn(),
     focus: vi.fn(),
     attachCustomKeyEventHandler: vi.fn(),
+    hasSelection: vi.fn().mockReturnValue(false),
+    getSelection: vi.fn().mockReturnValue(""),
   }));
   return { Terminal };
 });
@@ -95,5 +97,67 @@ describe("TerminalView", () => {
     const instance = MockTerminal.mock.results[0]?.value;
     unmount();
     expect(instance.dispose).toHaveBeenCalled();
+  });
+
+  it("registers attachCustomKeyEventHandler", () => {
+    render(<TerminalView cwd="/test" />);
+    const instance = MockTerminal.mock.results[0]?.value;
+    expect(instance.attachCustomKeyEventHandler).toHaveBeenCalledWith(expect.any(Function));
+  });
+
+  it("Ctrl+C with selection copies to clipboard and blocks xterm", async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, "clipboard", {
+      value: { writeText },
+      configurable: true,
+    });
+    render(<TerminalView cwd="/test" />);
+    const instance = MockTerminal.mock.results[0]?.value;
+    instance.hasSelection.mockReturnValue(true);
+    instance.getSelection.mockReturnValue("copied text");
+
+    const handler = instance.attachCustomKeyEventHandler.mock.calls[0]?.[0] as (
+      e: KeyboardEvent,
+    ) => boolean;
+    const event = new KeyboardEvent("keydown", { ctrlKey: true, key: "c" });
+    const result = handler(event);
+
+    expect(result).toBe(false);
+    expect(writeText).toHaveBeenCalledWith("copied text");
+  });
+
+  it("Ctrl+C without selection passes through to PTY as SIGINT", () => {
+    render(<TerminalView cwd="/test" />);
+    const instance = MockTerminal.mock.results[0]?.value;
+    instance.hasSelection.mockReturnValue(false);
+
+    const handler = instance.attachCustomKeyEventHandler.mock.calls[0]?.[0] as (
+      e: KeyboardEvent,
+    ) => boolean;
+    const event = new KeyboardEvent("keydown", { ctrlKey: true, key: "c" });
+    const result = handler(event);
+
+    expect(result).toBe(true);
+  });
+
+  it("Ctrl+C on keyup with selection does not copy again", () => {
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, "clipboard", {
+      value: { writeText },
+      configurable: true,
+    });
+    render(<TerminalView cwd="/test" />);
+    const instance = MockTerminal.mock.results[0]?.value;
+    instance.hasSelection.mockReturnValue(true);
+    instance.getSelection.mockReturnValue("text");
+
+    const handler = instance.attachCustomKeyEventHandler.mock.calls[0]?.[0] as (
+      e: KeyboardEvent,
+    ) => boolean;
+    const event = new KeyboardEvent("keyup", { ctrlKey: true, key: "c" });
+    const result = handler(event);
+
+    expect(result).toBe(false);
+    expect(writeText).not.toHaveBeenCalled();
   });
 });
