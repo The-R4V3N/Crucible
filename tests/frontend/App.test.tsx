@@ -90,7 +90,7 @@ describe("App", () => {
   beforeEach(() => {
     useConfigStore.setState({ config: null, isLoaded: false });
     useSessionStore.setState({ sessions: {}, activeSessionId: null });
-    useUiStore.setState({ sidebarVisible: true, explorerVisible: false, bottomPanelVisible: false, searchVisible: false, activeView: "terminal", tabOrder: ["terminal", "editor", "diff"], splitMode: null, splitViews: ["terminal", "terminal"] });
+    useUiStore.setState({ activePanel: "source-control", sidebarVisible: true, explorerVisible: false, bottomPanelVisible: false, searchVisible: false, activeView: "terminal", tabOrder: ["terminal", "editor", "diff"], splitMode: null, splitViews: ["terminal", "terminal"], newFileRequested: false, newFolderRequested: false });
   });
 
   it("shows loading state initially", () => {
