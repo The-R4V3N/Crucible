@@ -26,6 +26,8 @@ interface UiState {
   terminalActions: TerminalActions | null;
   /** True while the user is typing a new filename in the explorer. */
   newFileRequested: boolean;
+  /** True while the user is typing a new folder name in the explorer. */
+  newFolderRequested: boolean;
   toggleSidebar: () => void;
   setSidebarVisible: (visible: boolean) => void;
   toggleExplorer: () => void;
@@ -41,6 +43,8 @@ interface UiState {
   setTerminalActions: (actions: TerminalActions) => void;
   requestNewFile: () => void;
   clearNewFileRequest: () => void;
+  requestNewFolder: () => void;
+  clearNewFolderRequest: () => void;
 }
 
 export const useUiStore = create<UiState>((set) => ({
@@ -54,6 +58,7 @@ export const useUiStore = create<UiState>((set) => ({
   splitViews: ["terminal", "terminal"] as [ViewType, ViewType],
   terminalActions: null,
   newFileRequested: false,
+  newFolderRequested: false,
 
   toggleSidebar: () => set((state) => ({ sidebarVisible: !state.sidebarVisible })),
 
@@ -96,4 +101,6 @@ export const useUiStore = create<UiState>((set) => ({
 
   requestNewFile: () => set({ newFileRequested: true }),
   clearNewFileRequest: () => set({ newFileRequested: false }),
+  requestNewFolder: () => set({ newFolderRequested: true }),
+  clearNewFolderRequest: () => set({ newFolderRequested: false }),
 }));

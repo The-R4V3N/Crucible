@@ -164,6 +164,11 @@ export async function fileWrite(path: string, content: string): Promise<void> {
   return invoke("file_write", { path, content });
 }
 
+/** Create a directory (and any required parent directories). */
+export async function dirCreate(path: string): Promise<void> {
+  return invoke("dir_create", { path });
+}
+
 /** Start watching a directory for file changes. */
 export async function fileWatchStart(path: string): Promise<void> {
   return invoke("file_watch_start", { path });

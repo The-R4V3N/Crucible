@@ -20,6 +20,12 @@ pub fn read_file(path: &Path) -> Result<String, String> {
         .map_err(|e| format!("failed to read file: {e}"))
 }
 
+/// Create a directory and all required parent directories.
+pub fn create_dir(path: &Path) -> Result<(), String> {
+    std::fs::create_dir_all(path)
+        .map_err(|e| format!("failed to create directory: {e}"))
+}
+
 /// Write content to a file, creating parent directories if needed.
 pub fn write_file(path: &Path, content: &str) -> Result<(), String> {
     if let Some(parent) = path.parent() {
@@ -94,6 +100,43 @@ mod tests {
 
         let content = fs::read_to_string(&file).unwrap();
         assert_eq!(content, "new content");
+
+        let _ = fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn test_create_dir_creates_directory() {
+        let dir = std::env::temp_dir().join("warp_files_test_create_dir");
+        let _ = fs::remove_dir_all(&dir);
+
+        create_dir(&dir).unwrap();
+
+        assert!(dir.exists());
+        assert!(dir.is_dir());
+
+        let _ = fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn test_create_dir_creates_nested_directories() {
+        let dir = std::env::temp_dir().join("warp_files_test_create_dir_nested/a/b/c");
+        let _ = fs::remove_dir_all(std::env::temp_dir().join("warp_files_test_create_dir_nested"));
+
+        create_dir(&dir).unwrap();
+
+        assert!(dir.exists());
+        assert!(dir.is_dir());
+
+        let _ = fs::remove_dir_all(std::env::temp_dir().join("warp_files_test_create_dir_nested"));
+    }
+
+    #[test]
+    fn test_create_dir_is_idempotent() {
+        let dir = std::env::temp_dir().join("warp_files_test_create_dir_idem");
+        fs::create_dir_all(&dir).unwrap();
+
+        // calling again on an existing dir should succeed
+        assert!(create_dir(&dir).is_ok());
 
         let _ = fs::remove_dir_all(&dir);
     }
