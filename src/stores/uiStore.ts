@@ -24,6 +24,8 @@ interface UiState {
   splitViews: [ViewType, ViewType];
   /** Terminal actions registered by TerminalManager on mount. */
   terminalActions: TerminalActions | null;
+  /** Which panel is currently shown in the sidebar area. */
+  activePanel: "explorer" | "search" | "source-control" | null;
   /** True while the user is typing a new filename in the explorer. */
   newFileRequested: boolean;
   /** True while the user is typing a new folder name in the explorer. */
@@ -41,6 +43,7 @@ interface UiState {
   closeSplit: () => void;
   setSplitView: (index: 0 | 1, view: ViewType) => void;
   setTerminalActions: (actions: TerminalActions) => void;
+  togglePanel: (panel: "explorer" | "search" | "source-control") => void;
   requestNewFile: () => void;
   clearNewFileRequest: () => void;
   requestNewFolder: () => void;
@@ -57,8 +60,12 @@ export const useUiStore = create<UiState>((set) => ({
   splitMode: null,
   splitViews: ["terminal", "terminal"] as [ViewType, ViewType],
   terminalActions: null,
+  activePanel: null,
   newFileRequested: false,
   newFolderRequested: false,
+
+  togglePanel: (panel) =>
+    set((state) => ({ activePanel: state.activePanel === panel ? null : panel })),
 
   toggleSidebar: () => set((state) => ({ sidebarVisible: !state.sidebarVisible })),
 

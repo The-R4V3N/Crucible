@@ -19,6 +19,7 @@ import { useFileStore } from "@/stores/fileStore";
 import { configLoad, configSave, gitStage, gitUnstage, gitDiscard, gitCommit } from "@/lib/ipc";
 import StatusBar from "@/components/layout/StatusBar";
 import CommandPalette from "@/components/palette/CommandPalette";
+import ActivityBar from "@/components/layout/ActivityBar";
 
 function App() {
   const [error, setError] = useState<string | null>(null);
@@ -55,10 +56,9 @@ function App() {
   }, [setConfig]);
 
   const activeView = useUiStore((s) => s.activeView);
-  const explorerVisible = useUiStore((s) => s.explorerVisible);
+  const activePanel = useUiStore((s) => s.activePanel);
   const splitMode = useUiStore((s) => s.splitMode);
   const splitViews = useUiStore((s) => s.splitViews);
-  const searchVisible = useUiStore((s) => s.searchVisible);
   const toggleSearch = useUiStore((s) => s.toggleSearch);
   const activeFilePath = useFileStore((s) => s.activeFilePath);
 
@@ -161,39 +161,40 @@ function App() {
             </div>
           )}
 
-          {/* Sidebar */}
-          <Sidebar
-            projects={projects}
-            gitStatus={gitStatus}
-            projectPath={activeProject?.path}
-            onStage={handleStage}
-            onUnstage={handleUnstage}
-            onDiscard={handleDiscard}
-            onCommit={handleCommit}
-            onStageAll={handleStageAll}
-            onUnstageAll={handleUnstageAll}
-          />
+          {/* Activity Bar */}
+          <ActivityBar />
 
-          {/* File explorer panel */}
-          {explorerVisible && (
-            <div className="w-60 flex-shrink-0 border-r border-warp-border">
-              <FileExplorer />
-            </div>
-          )}
-
-          {/* Search panel */}
-          {searchVisible && (
-            <div className="w-72 flex-shrink-0 border-r border-warp-border">
-              <SearchPanel
-                projectPath={activeProject?.path ?? "."}
-                onResultClick={(filePath) => {
-                  useFileStore.getState().openFile(filePath, filePath.split("/").pop() ?? filePath);
-                  if (useUiStore.getState().splitMode) {
-                    useUiStore.getState().closeSplit();
-                  }
-                  useUiStore.getState().setActiveView("editor");
-                }}
-              />
+          {/* Unified sidebar panel — content driven by Activity Bar */}
+          {activePanel && (
+            <div className="w-60 flex-shrink-0 border-r border-warp-border flex flex-col h-full">
+              {activePanel === "explorer" && <FileExplorer />}
+              {activePanel === "search" && (
+                <SearchPanel
+                  projectPath={activeProject?.path ?? "."}
+                  onResultClick={(filePath) => {
+                    useFileStore
+                      .getState()
+                      .openFile(filePath, filePath.split("/").pop() ?? filePath);
+                    if (useUiStore.getState().splitMode) {
+                      useUiStore.getState().closeSplit();
+                    }
+                    useUiStore.getState().setActiveView("editor");
+                  }}
+                />
+              )}
+              {activePanel === "source-control" && (
+                <Sidebar
+                  projects={projects}
+                  gitStatus={gitStatus}
+                  projectPath={activeProject?.path}
+                  onStage={handleStage}
+                  onUnstage={handleUnstage}
+                  onDiscard={handleDiscard}
+                  onCommit={handleCommit}
+                  onStageAll={handleStageAll}
+                  onUnstageAll={handleUnstageAll}
+                />
+              )}
             </div>
           )}
 
