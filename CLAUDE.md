@@ -49,7 +49,7 @@ These rules govern how Claude approaches every task in this project.
 1. Plan — list test cases only, no code
 2. Write tests → run → confirm RED → show me output
 3. Only after confirmed RED: write implementation
-4. Run tests → confirm GREEN → show me output  
+4. Run tests → confirm GREEN → show me output
 5. Refactor → run → confirm GREEN → show me output
 
 Never skip the planning step, even for "small" changes. Planning surfaces design issues before code is written.
@@ -119,10 +119,6 @@ warp/
 ├── tests/
 │   ├── rust/                # Rust integration tests
 │   └── frontend/            # React component + hook tests
-├── .claude/                 # Claude Code configuration
-│   ├── agents/              # Specialized sub-agents
-│   ├── commands/            # Custom slash commands
-│   └── skills/              # Reusable skills
 └── ARCHITECTURE.md          # Full project blueprint
 ```
 
@@ -151,14 +147,13 @@ warp/
 
 - Commit messages: imperative mood, lowercase. Example: `add PTY session spawn logic`
 - One logical change per commit. Don't bundle unrelated changes.
-- Branch naming: `m1/core-terminal`, `m2/sidebar`, `m3/editor`, etc.
+- Branch naming: `feature/<issue>-short-description`. Example: `feature/47-explorer-icons`
 - Never commit to `master` directly. Always use feature branches + PR.
 - Run all tests before pushing.
 
 ### General
 
 - No hardcoded paths or secrets. Use config or environment variables.
-- Add `.omc/` and `node_modules/` and `target/` to `.gitignore`.
 - Keep dependencies minimal. Justify every new crate/package.
 - Prefer composition over inheritance. Small functions over large ones.
 - When in doubt, refer to `ARCHITECTURE.md`.
@@ -179,40 +174,3 @@ Commands defined in `src-tauri/src/commands.rs`. Frontend calls via `@tauri-apps
 - Theme: Dark (VS Code dark base)
 - Font: Cascadia Code (monospace)
 - See `ARCHITECTURE.md` for full color token reference.
-
-## Skills
-
-### Self-Learning Skill (`.claude/skills/SKILLS.md`)
-
-Active during all sessions. Detects learning opportunities (corrections, debug fixes, architecture decisions, gotchas) and proposes saving them to persistent memory. Always confirm before saving. See the skill file for trigger types, confirmation protocol, and storage routing.
-
-**Memory file locations:**
-
-```
-~/.claude/projects/D--Development-WARP/memory/
-├── MEMORY.md        # Index + hard rules (auto-loaded)
-├── patterns.md      # Code patterns & conventions
-├── debugging.md     # Debug solutions & workarounds
-├── preferences.md   # User preferences
-├── decisions.md     # Architecture Decision Records
-└── gotchas.md       # Known pitfalls & edge cases
-```
-
-## Agents
-
-Specialized sub-agents in `.claude/agents/`:
-
-- **rust-backend** — Rust/Tauri backend work (PTY, git, files, IPC)
-- **react-frontend** — React/TypeScript frontend (components, hooks, xterm.js, Monaco)
-- **reviewer** — Code review with TDD compliance checklist
-- **architect** — Architecture decisions, module boundaries, trade-off analysis
-
-## Milestones
-
-Current milestone tracked in branch names:
-
-- **M1** — Core Terminal (Tauri + xterm.js + PTY)
-- **M2** — Multi-session + Sidebar
-- **M3** — File Editor + Explorer
-- **M4** — Smart Features (notifications, splits)
-- **M5** — Polish + Release
