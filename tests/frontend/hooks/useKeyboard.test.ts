@@ -19,7 +19,7 @@ const mockProjects = [
 
 describe("useKeyboard", () => {
   beforeEach(() => {
-    useUiStore.setState({ sidebarVisible: true });
+    useUiStore.setState({ activePanel: "explorer", lastActivePanel: null });
     usePaletteStore.setState({
       open: false,
       mode: "command",
@@ -49,15 +49,37 @@ describe("useKeyboard", () => {
     });
   });
 
-  it("Ctrl+B toggles sidebar", () => {
+  it("Ctrl+B closes the sidebar when a panel is open", () => {
+    useUiStore.setState({ activePanel: "explorer" });
     renderHook(() => useKeyboard({ projects: mockProjects }));
-    expect(useUiStore.getState().sidebarVisible).toBe(true);
 
     window.dispatchEvent(new KeyboardEvent("keydown", { key: "b", ctrlKey: true }));
-    expect(useUiStore.getState().sidebarVisible).toBe(false);
+    expect(useUiStore.getState().activePanel).toBeNull();
+  });
+
+  it("Ctrl+B restores the last active panel when sidebar is closed", () => {
+    useUiStore.setState({ activePanel: null, lastActivePanel: "explorer" as const });
+    renderHook(() => useKeyboard({ projects: mockProjects }));
 
     window.dispatchEvent(new KeyboardEvent("keydown", { key: "b", ctrlKey: true }));
-    expect(useUiStore.getState().sidebarVisible).toBe(true);
+    expect(useUiStore.getState().activePanel).toBe("explorer");
+  });
+
+  it("Ctrl+B opens explorer by default when no previous panel", () => {
+    useUiStore.setState({ activePanel: null, lastActivePanel: null });
+    renderHook(() => useKeyboard({ projects: mockProjects }));
+
+    window.dispatchEvent(new KeyboardEvent("keydown", { key: "b", ctrlKey: true }));
+    expect(useUiStore.getState().activePanel).toBe("explorer");
+  });
+
+  it("Ctrl+B remembers the closed panel for the next open", () => {
+    useUiStore.setState({ activePanel: "search" });
+    renderHook(() => useKeyboard({ projects: mockProjects }));
+
+    window.dispatchEvent(new KeyboardEvent("keydown", { key: "b", ctrlKey: true }));
+    expect(useUiStore.getState().activePanel).toBeNull();
+    expect(useUiStore.getState().lastActivePanel).toBe("search");
   });
 
   it("F1 switches to first project", () => {
@@ -106,10 +128,11 @@ describe("useKeyboard", () => {
   });
 
   it("Ctrl+B does not toggle sidebar when palette is open", () => {
+    useUiStore.setState({ activePanel: "explorer" });
     usePaletteStore.setState({ open: true });
     renderHook(() => useKeyboard({ projects: mockProjects }));
     window.dispatchEvent(new KeyboardEvent("keydown", { key: "b", ctrlKey: true }));
-    expect(useUiStore.getState().sidebarVisible).toBe(true);
+    expect(useUiStore.getState().activePanel).toBe("explorer");
   });
 
   it("subscribes to palette:open-command Tauri event on mount", () => {
