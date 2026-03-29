@@ -5,59 +5,33 @@ use portable_pty::{native_pty_system, Child, CommandBuilder, MasterPty, PtySize}
 
 use super::error::PtyError;
 
-/// Read the user-level PATH from the Windows registry and merge it
-/// with the current process PATH to ensure user-installed tools are available.
+/// Build the PATH string for a PTY session on Windows.
+///
+/// Combines (in priority order):
+///   1. `%USERPROFILE%\.local\bin`  — Claude Code CLI install location
+///   2. The current process PATH     — tools available to WARP itself
+///   3. Machine + User registry PATH — system and user-installed tools
+///      (read via .NET API which natively expands `REG_EXPAND_SZ` values)
+///
+/// Falls back to an empty string if PowerShell cannot be invoked.
 #[cfg(windows)]
-fn get_user_path_from_registry() -> String {
+fn get_effective_path_from_powershell() -> String {
     use std::process::Command;
-    // Query the user's PATH from the registry
-    let output = Command::new("reg")
-        .args([
-            "query",
-            "HKCU\\Environment",
-            "/v",
-            "Path",
-        ])
+    let script = concat!(
+        "$m = [System.Environment]::GetEnvironmentVariable('PATH','Machine');",
+        "$u = [System.Environment]::GetEnvironmentVariable('PATH','User');",
+        "$l = \"$env:USERPROFILE\\.local\\bin\";",
+        "Write-Output \"$l;$env:PATH;$m;$u\""
+    );
+    let output = Command::new("powershell")
+        .args(["-NoProfile", "-Command", script])
         .output();
-
     match output {
-        Ok(out) => {
-            let stdout = String::from_utf8_lossy(&out.stdout);
-            // Parse the REG_EXPAND_SZ or REG_SZ value from the output
-            // Format: "    Path    REG_EXPAND_SZ    value"
-            for line in stdout.lines() {
-                let trimmed = line.trim();
-                if trimmed.starts_with("Path") || trimmed.starts_with("PATH") {
-                    // Split by whitespace and take everything after REG_*_SZ
-                    let parts: Vec<&str> = trimmed.splitn(3, "    ").collect();
-                    if let Some(value) = parts.last() {
-                        return value.trim().to_string();
-                    }
-                }
-            }
-            String::new()
+        Ok(out) if out.status.success() && !out.stdout.is_empty() => {
+            String::from_utf8_lossy(&out.stdout).trim().to_string()
         }
-        Err(_) => String::new(),
+        _ => String::new(),
     }
-}
-
-/// Merge user PATH entries into an existing PATH string, avoiding duplicates.
-#[cfg(windows)]
-fn merge_path(current: &str, user_path: &str) -> String {
-    let current_entries: std::collections::HashSet<String> = current
-        .split(';')
-        .map(|s| s.trim().to_lowercase())
-        .collect();
-
-    let mut result = current.to_string();
-    for entry in user_path.split(';') {
-        let entry = entry.trim();
-        if !entry.is_empty() && !current_entries.contains(&entry.to_lowercase()) {
-            result.push(';');
-            result.push_str(entry);
-        }
-    }
-    result
 }
 
 /// Represents the current state of a PTY session.
@@ -127,15 +101,13 @@ impl PtySession {
         let mut cmd = CommandBuilder::new(command);
         cmd.cwd(cwd);
 
-        // On Windows, merge user-level PATH from registry so tools like
-        // claude, cargo, etc. are available in the PTY session
+        // On Windows, use the PowerShell-evaluated PATH (with profile loaded)
+        // so that profile-set entries like `~\.local\bin` (Claude CLI) are available.
         #[cfg(windows)]
         {
-            let user_path = get_user_path_from_registry();
-            if !user_path.is_empty() {
-                let current_path = std::env::var("PATH").unwrap_or_default();
-                let merged = merge_path(&current_path, &user_path);
-                cmd.env("PATH", &merged);
+            let ps_path = get_effective_path_from_powershell();
+            if !ps_path.is_empty() {
+                cmd.env("PATH", &ps_path);
             }
         }
 
@@ -343,12 +315,49 @@ mod tests {
 
     #[cfg(windows)]
     #[test]
-    fn test_get_user_path_returns_entries() {
-        let user_path = get_user_path_from_registry();
-        // On a dev machine, user PATH should have at least one entry
+    fn test_effective_path_from_powershell_not_empty() {
+        let path = get_effective_path_from_powershell();
+        assert!(!path.is_empty(), "effective PATH from powershell should not be empty");
+    }
+
+    #[cfg(windows)]
+    #[test]
+    fn test_effective_path_contains_windows_system32() {
+        let path = get_effective_path_from_powershell();
+        let path_lower = path.to_lowercase();
         assert!(
-            !user_path.is_empty(),
-            "user PATH from registry should not be empty"
+            path_lower.contains("windows\\system32"),
+            "effective PATH should contain Windows\\System32, got: {path}"
         );
     }
+
+    #[cfg(windows)]
+    #[test]
+    fn test_effective_path_includes_local_bin() {
+        let path = get_effective_path_from_powershell();
+        let userprofile = std::env::var("USERPROFILE").unwrap_or_default();
+        if userprofile.is_empty() {
+            return;
+        }
+        let local_bin = format!(r"{userprofile}\.local\bin").to_lowercase();
+        let path_lower = path.to_lowercase();
+        assert!(
+            path_lower.contains(&local_bin),
+            "effective PATH should include ~\\.local\\bin (where claude.exe lives), got: {path}"
+        );
+    }
+
+    #[cfg(windows)]
+    #[test]
+    fn test_effective_path_no_unexpanded_vars() {
+        let path = get_effective_path_from_powershell();
+        for entry in path.split(';') {
+            let entry: &str = entry;
+            assert!(
+                !entry.contains('%'),
+                "unexpanded env var in effective PATH entry: {entry}"
+            );
+        }
+    }
+
 }
