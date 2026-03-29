@@ -26,6 +26,8 @@ interface UiState {
   terminalActions: TerminalActions | null;
   /** Which panel is currently shown in the sidebar area. */
   activePanel: "explorer" | "search" | "source-control" | null;
+  /** The last non-null panel, used to restore when Ctrl+B re-opens the sidebar. */
+  lastActivePanel: "explorer" | "search" | "source-control" | null;
   /** True while the user is typing a new filename in the explorer. */
   newFileRequested: boolean;
   /** True while the user is typing a new folder name in the explorer. */
@@ -61,13 +63,20 @@ export const useUiStore = create<UiState>((set) => ({
   splitViews: ["terminal", "terminal"] as [ViewType, ViewType],
   terminalActions: null,
   activePanel: null,
+  lastActivePanel: null,
   newFileRequested: false,
   newFolderRequested: false,
 
   togglePanel: (panel) =>
     set((state) => ({ activePanel: state.activePanel === panel ? null : panel })),
 
-  toggleSidebar: () => set((state) => ({ sidebarVisible: !state.sidebarVisible })),
+  toggleSidebar: () =>
+    set((state) => {
+      if (state.activePanel !== null) {
+        return { activePanel: null, lastActivePanel: state.activePanel };
+      }
+      return { activePanel: state.lastActivePanel ?? "source-control" };
+    }),
 
   setSidebarVisible: (visible) => set({ sidebarVisible: visible }),
 

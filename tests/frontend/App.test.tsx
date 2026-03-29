@@ -70,7 +70,17 @@ vi.mock("@/lib/ipc", () => ({
   ptyKill: vi.fn().mockResolvedValue(undefined),
   onPtyOutput: vi.fn().mockResolvedValue(vi.fn()),
   onPtyExit: vi.fn().mockResolvedValue(vi.fn()),
-  gitStatus: vi.fn().mockResolvedValue({ branch: "main", dirty: false, changed_files: 0, changed_file_paths: [], staged_files: [], unstaged_files: [], untracked_files: [] }),
+  gitStatus: vi
+    .fn()
+    .mockResolvedValue({
+      branch: "main",
+      dirty: false,
+      changed_files: 0,
+      changed_file_paths: [],
+      staged_files: [],
+      unstaged_files: [],
+      untracked_files: [],
+    }),
   gitDiff: vi.fn().mockResolvedValue({ path: "", old_content: "", new_content: "" }),
   fileTree: vi.fn().mockResolvedValue({ name: "root", path: "/tmp", is_dir: true, children: [] }),
   fileRead: vi.fn().mockResolvedValue(""),
@@ -90,7 +100,20 @@ describe("App", () => {
   beforeEach(() => {
     useConfigStore.setState({ config: null, isLoaded: false });
     useSessionStore.setState({ sessions: {}, activeSessionId: null });
-    useUiStore.setState({ activePanel: "source-control", sidebarVisible: true, explorerVisible: false, bottomPanelVisible: false, searchVisible: false, activeView: "terminal", tabOrder: ["terminal", "editor", "diff"], splitMode: null, splitViews: ["terminal", "terminal"], newFileRequested: false, newFolderRequested: false });
+    useUiStore.setState({
+      activePanel: "source-control",
+      lastActivePanel: null,
+      sidebarVisible: true,
+      explorerVisible: false,
+      bottomPanelVisible: false,
+      searchVisible: false,
+      activeView: "terminal",
+      tabOrder: ["terminal", "editor", "diff"],
+      splitMode: null,
+      splitViews: ["terminal", "terminal"],
+      newFileRequested: false,
+      newFolderRequested: false,
+    });
   });
 
   it("shows loading state initially", () => {

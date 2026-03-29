@@ -3,22 +3,30 @@ import { useUiStore } from "@/stores/uiStore";
 
 describe("uiStore", () => {
   beforeEach(() => {
-    useUiStore.setState({ sidebarVisible: true });
+    useUiStore.setState({ sidebarVisible: true, activePanel: null, lastActivePanel: null });
   });
 
   it("sidebar is visible by default", () => {
     expect(useUiStore.getState().sidebarVisible).toBe(true);
   });
 
-  it("toggleSidebar hides sidebar", () => {
+  it("toggleSidebar closes the active panel and remembers it", () => {
+    useUiStore.setState({ activePanel: "explorer" });
     useUiStore.getState().toggleSidebar();
-    expect(useUiStore.getState().sidebarVisible).toBe(false);
+    expect(useUiStore.getState().activePanel).toBeNull();
+    expect(useUiStore.getState().lastActivePanel).toBe("explorer");
   });
 
-  it("toggleSidebar shows sidebar again", () => {
+  it("toggleSidebar restores the last active panel", () => {
+    useUiStore.setState({ activePanel: null, lastActivePanel: "search" as const });
     useUiStore.getState().toggleSidebar();
+    expect(useUiStore.getState().activePanel).toBe("search");
+  });
+
+  it("toggleSidebar opens source-control when no previous panel", () => {
+    useUiStore.setState({ activePanel: null, lastActivePanel: null });
     useUiStore.getState().toggleSidebar();
-    expect(useUiStore.getState().sidebarVisible).toBe(true);
+    expect(useUiStore.getState().activePanel).toBe("source-control");
   });
 
   it("setSidebarVisible sets explicit value", () => {
