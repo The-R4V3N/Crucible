@@ -23,10 +23,10 @@ describe("uiStore", () => {
     expect(useUiStore.getState().activePanel).toBe("search");
   });
 
-  it("toggleSidebar opens source-control when no previous panel", () => {
+  it("toggleSidebar opens explorer when no previous panel", () => {
     useUiStore.setState({ activePanel: null, lastActivePanel: null });
     useUiStore.getState().toggleSidebar();
-    expect(useUiStore.getState().activePanel).toBe("source-control");
+    expect(useUiStore.getState().activePanel).toBe("explorer");
   });
 
   it("setSidebarVisible sets explicit value", () => {

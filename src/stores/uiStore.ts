@@ -75,7 +75,7 @@ export const useUiStore = create<UiState>((set) => ({
       if (state.activePanel !== null) {
         return { activePanel: null, lastActivePanel: state.activePanel };
       }
-      return { activePanel: state.lastActivePanel ?? "source-control" };
+      return { activePanel: state.lastActivePanel ?? "explorer" };
     }),
 
   setSidebarVisible: (visible) => set({ sidebarVisible: visible }),
