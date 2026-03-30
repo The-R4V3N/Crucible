@@ -162,7 +162,7 @@ function App() {
           )}
 
           {/* Activity Bar */}
-          <ActivityBar />
+          <ActivityBar changedFiles={gitStatus?.changed_files ?? 0} />
 
           {/* Unified sidebar panel — content driven by Activity Bar */}
           {activePanel && (
