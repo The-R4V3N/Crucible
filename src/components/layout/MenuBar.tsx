@@ -7,12 +7,13 @@ import AboutModal from "@/components/help/AboutModal";
 import { useFileStore } from "@/stores/fileStore";
 import { useUiStore } from "@/stores/uiStore";
 import { useConfigStore } from "@/stores/configStore";
+import { usePaletteStore } from "@/stores/paletteStore";
 import { fileWrite, configSave } from "@/lib/ipc";
 
 const DOCS_URL = "https://github.com/The-R4V3N/WARP#readme";
 const ISSUES_URL = "https://github.com/The-R4V3N/WARP/issues";
 
-type OpenMenu = "file" | "help" | null;
+type OpenMenu = "file" | "edit" | "help" | null;
 
 function useMenuRef(isOpen: boolean, onClose: () => void): React.RefObject<HTMLDivElement | null> {
   const ref = useRef<HTMLDivElement>(null);
@@ -37,6 +38,7 @@ function MenuBar() {
   const openFile = useFileStore((s) => s.openFile);
   const triggerSave = useFileStore((s) => s.triggerSave);
   const triggerRevert = useFileStore((s) => s.triggerRevert);
+  const triggerFind = useFileStore((s) => s.triggerFind);
   const terminalActions = useUiStore((s) => s.terminalActions);
   const addProject = useConfigStore((s) => s.addProject);
 
@@ -45,6 +47,7 @@ function MenuBar() {
   const close = () => setOpenMenu(null);
 
   const fileRef = useMenuRef(openMenu === "file", close);
+  const editRef = useMenuRef(openMenu === "edit", close);
   const helpRef = useMenuRef(openMenu === "help", close);
 
   // --- File actions ---
@@ -116,6 +119,23 @@ function MenuBar() {
   function handleExit() {
     close();
     getCurrentWindow().close();
+  }
+
+  // --- Edit actions ---
+
+  function handleFindInFile() {
+    close();
+    triggerFind();
+  }
+
+  function handleFindInProject() {
+    close();
+    useUiStore.getState().togglePanel("search");
+  }
+
+  function handleCommandPalette() {
+    close();
+    usePaletteStore.getState().openCommandPalette();
   }
 
   // --- Help actions ---
@@ -248,14 +268,54 @@ function MenuBar() {
           )}
         </div>
 
-        {/* Edit — disabled until issue #45 */}
-        <button
-          data-testid="menu-edit"
-          disabled
-          className="px-2 py-0.5 text-warp-text-dim opacity-40 cursor-not-allowed"
-        >
-          Edit
-        </button>
+        {/* Edit */}
+        <div ref={editRef} className="relative">
+          <button
+            data-testid="menu-edit"
+            onClick={() => toggle("edit")}
+            className={`px-2 py-0.5 transition-colors ${
+              openMenu === "edit"
+                ? "bg-warp-accent/20 text-warp-accent"
+                : "text-warp-text-dim hover:text-warp-text hover:bg-warp-bg/50"
+            }`}
+          >
+            Edit
+          </button>
+
+          {openMenu === "edit" && (
+            <div
+              data-testid="edit-dropdown"
+              className="absolute left-0 top-full mt-0.5 w-64 rounded border border-warp-border bg-warp-bg shadow-xl z-50 py-1"
+            >
+              <button
+                data-testid="edit-item-find-in-file"
+                onClick={handleFindInFile}
+                disabled={!hasFile}
+                className="menu-item w-full text-left px-4 py-1.5 flex items-center justify-between text-warp-text-dim hover:text-warp-text hover:bg-warp-sidebar transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                <span>Find in File</span>
+                <span className="text-warp-text-dim/60 text-[10px]">Ctrl+F</span>
+              </button>
+              <button
+                data-testid="edit-item-find-in-project"
+                onClick={handleFindInProject}
+                className="menu-item w-full text-left px-4 py-1.5 flex items-center justify-between text-warp-text-dim hover:text-warp-text hover:bg-warp-sidebar transition-colors"
+              >
+                <span>Find in Project</span>
+                <span className="text-warp-text-dim/60 text-[10px]">Ctrl+Shift+F</span>
+              </button>
+              <div className="my-1 border-t border-warp-border/60" />
+              <button
+                data-testid="edit-item-command-palette"
+                onClick={handleCommandPalette}
+                className="menu-item w-full text-left px-4 py-1.5 flex items-center justify-between text-warp-text-dim hover:text-warp-text hover:bg-warp-sidebar transition-colors"
+              >
+                <span>Command Palette</span>
+                <span className="text-warp-text-dim/60 text-[10px]">Ctrl+Shift+P</span>
+              </button>
+            </div>
+          )}
+        </div>
 
         {/* Help */}
         <div ref={helpRef} className="relative">
