@@ -13,6 +13,7 @@ import { useConfigStore } from "@/stores/configStore";
 import { useSessionStore } from "@/stores/sessionStore";
 import { useUiStore } from "@/stores/uiStore";
 import { useKeyboard } from "@/hooks/useKeyboard";
+import { useAutoSave } from "@/hooks/useAutoSave";
 import { useGit } from "@/hooks/useGit";
 import { useFileWatcher } from "@/hooks/useFileWatcher";
 import { useFileStore } from "@/stores/fileStore";
@@ -93,6 +94,9 @@ function App() {
 
   // Keyboard shortcuts
   useKeyboard({ projects });
+
+  // Auto-save on window blur
+  useAutoSave();
 
   // Git status for active project
   const { status: gitStatus, refresh: refreshGit } = useGit({

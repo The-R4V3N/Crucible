@@ -92,6 +92,22 @@ function EditorView({ repoPath = null }: EditorViewProps) {
     });
   }, [revertRequest, markClean]);
 
+  // Auto-save: write the current file to disk when switching to a different file
+  // (covers editor tab switches and switching away from the editor view entirely).
+  useEffect(() => {
+    const pathToSave = activeFilePath;
+    return () => {
+      if (!pathToSave) return;
+      const { openFiles } = useFileStore.getState();
+      const file = openFiles.find((f) => f.path === pathToSave);
+      if (file?.isDirty) {
+        void fileWrite(pathToSave, contentRef.current).then(() => {
+          useFileStore.getState().markClean(pathToSave);
+        });
+      }
+    };
+  }, [activeFilePath]);
+
   // Synchronously dispose the Monaco editor when the active file changes or the
   // component unmounts. useLayoutEffect cleanup fires before React applies DOM
   // mutations, so Monaco's internal timers (cursor blink setInterval, rAF loops)
