@@ -18,6 +18,8 @@ interface FileState {
   saveRequest: number;
   /** Incremented by triggerRevert — EditorView reacts and reloads from disk. */
   revertRequest: number;
+  /** Incremented by triggerFind — EditorView reacts and opens the find widget. */
+  findRequest: number;
   setTree: (tree: FileNode) => void;
   openFile: (path: string, name: string) => void;
   closeFile: (path: string) => void;
@@ -27,6 +29,7 @@ interface FileState {
   markClean: (path: string) => void;
   triggerSave: () => void;
   triggerRevert: () => void;
+  triggerFind: () => void;
   collapseAll: () => void;
 }
 
@@ -37,6 +40,7 @@ export const useFileStore = create<FileState>((set) => ({
   expandedDirs: new Set<string>(),
   saveRequest: 0,
   revertRequest: 0,
+  findRequest: 0,
 
   setTree: (tree) => set({ tree }),
 
@@ -88,6 +92,8 @@ export const useFileStore = create<FileState>((set) => ({
   triggerSave: () => set((state) => ({ saveRequest: state.saveRequest + 1 })),
 
   triggerRevert: () => set((state) => ({ revertRequest: state.revertRequest + 1 })),
+
+  triggerFind: () => set((state) => ({ findRequest: state.findRequest + 1 })),
 
   collapseAll: () => set({ expandedDirs: new Set<string>() }),
 }));

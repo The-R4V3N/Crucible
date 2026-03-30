@@ -59,6 +59,7 @@ function EditorView({ repoPath = null }: EditorViewProps) {
 
   const saveRequest = useFileStore((s) => s.saveRequest);
   const revertRequest = useFileStore((s) => s.revertRequest);
+  const findRequest = useFileStore((s) => s.findRequest);
   const markClean = useFileStore((s) => s.markClean);
 
   // Refs so the save/revert effects can read the latest values without
@@ -91,6 +92,12 @@ function EditorView({ repoPath = null }: EditorViewProps) {
       markClean(path);
     });
   }, [revertRequest, markClean]);
+
+  // Find: open Monaco find widget when triggerFind() fires
+  useEffect(() => {
+    if (!findRequest || !editorInstance) return;
+    editorInstance.trigger("", "actions.find", null);
+  }, [findRequest, editorInstance]);
 
   // Auto-save: write the current file to disk when switching to a different file
   // (covers editor tab switches and switching away from the editor view entirely).
