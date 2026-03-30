@@ -1,9 +1,16 @@
 import { useUiStore } from "@/stores/uiStore";
 
+interface ActivityBarProps {
+  /** Number of changed files to show as a badge on the Source Control icon. */
+  changedFiles?: number;
+}
+
 /** VS Code-style vertical Activity Bar — narrow icon strip on the far left. */
-function ActivityBar() {
+function ActivityBar({ changedFiles = 0 }: ActivityBarProps) {
   const activePanel = useUiStore((s) => s.activePanel);
   const togglePanel = useUiStore((s) => s.togglePanel);
+
+  const badgeLabel = changedFiles > 99 ? "99+" : String(changedFiles);
 
   function iconClass(panel: "explorer" | "search" | "source-control") {
     const isActive = activePanel === panel;
@@ -47,11 +54,19 @@ function ActivityBar() {
         data-testid="activity-source-control"
         title="Source Control"
         onClick={() => togglePanel("source-control")}
-        className={iconClass("source-control")}
+        className={`${iconClass("source-control")} relative`}
       >
         <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
           <path d="M6 2a3 3 0 1 1 0 6 3 3 0 0 1 0-6zm12 0a3 3 0 1 1 0 6 3 3 0 0 1 0-6zM6 16a3 3 0 1 1 0 6 3 3 0 0 1 0-6zm0-3a1 1 0 0 1 1 1v1.268A5.002 5.002 0 0 1 6 24a5 5 0 0 1-1-9.897V14a1 1 0 0 1 1-1zm12-8a1 1 0 0 1 1 1v3.586l1.293-1.293a1 1 0 0 1 1.414 1.414l-3 3a1 1 0 0 1-1.414 0l-3-3a1 1 0 0 1 1.414-1.414L17 9.586V6a1 1 0 0 1 1-1zM7 15.1A3.001 3.001 0 0 0 6 21a3 3 0 0 0 1-5.9V15.1z" />
         </svg>
+        {changedFiles > 0 && (
+          <span
+            data-testid="source-control-badge"
+            className="absolute top-1 right-1 min-w-[14px] h-[14px] rounded-full bg-warp-accent text-black text-[9px] font-bold leading-none flex items-center justify-center px-0.5"
+          >
+            {badgeLabel}
+          </span>
+        )}
       </button>
 
       {/* Settings — gear (future feature) */}

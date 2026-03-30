@@ -84,4 +84,30 @@ describe("ActivityBar", () => {
     render(<ActivityBar />);
     expect(screen.getByTestId("activity-source-control")).toHaveClass("text-warp-accent");
   });
+
+  it("no badge shown when changedFiles is 0", () => {
+    render(<ActivityBar changedFiles={0} />);
+    expect(screen.queryByTestId("source-control-badge")).not.toBeInTheDocument();
+  });
+
+  it("no badge shown when changedFiles is omitted", () => {
+    render(<ActivityBar />);
+    expect(screen.queryByTestId("source-control-badge")).not.toBeInTheDocument();
+  });
+
+  it("badge shows count when changedFiles is greater than 0", () => {
+    render(<ActivityBar changedFiles={3} />);
+    expect(screen.getByTestId("source-control-badge")).toBeInTheDocument();
+    expect(screen.getByTestId("source-control-badge")).toHaveTextContent("3");
+  });
+
+  it("badge shows 99+ when changedFiles exceeds 99", () => {
+    render(<ActivityBar changedFiles={120} />);
+    expect(screen.getByTestId("source-control-badge")).toHaveTextContent("99+");
+  });
+
+  it("badge shows exactly 99 when changedFiles is 99", () => {
+    render(<ActivityBar changedFiles={99} />);
+    expect(screen.getByTestId("source-control-badge")).toHaveTextContent("99");
+  });
 });
