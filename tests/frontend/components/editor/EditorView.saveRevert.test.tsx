@@ -101,6 +101,63 @@ describe("EditorView — save on triggerSave", () => {
   });
 });
 
+describe("EditorView — auto-save on tab switch", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    lastOnChange = null;
+    mockFileRead.mockResolvedValue("original content");
+    useFileStore.setState({
+      tree: null,
+      openFiles: [
+        { path: "/tmp/a.ts", name: "a.ts", isDirty: true },
+        { path: "/tmp/b.ts", name: "b.ts", isDirty: false },
+      ],
+      activeFilePath: "/tmp/a.ts",
+      expandedDirs: new Set(),
+      saveRequest: 0,
+      revertRequest: 0,
+    });
+    useEditorStore.setState({ cursorLine: 1, cursorCol: 1, language: "plaintext" });
+  });
+
+  it("saves dirty file when switching to another file", async () => {
+    render(<EditorView />);
+    await screen.findByTestId("monaco-editor");
+
+    // Simulate user typing
+    act(() => { lastOnChange?.("edited content"); });
+
+    // Switch to another file
+    act(() => {
+      useFileStore.setState({ activeFilePath: "/tmp/b.ts" });
+    });
+
+    await waitFor(() => {
+      expect(mockFileWrite).toHaveBeenCalledWith("/tmp/a.ts", "edited content");
+    });
+  });
+
+  it("does not save clean file when switching to another file", async () => {
+    useFileStore.setState({
+      openFiles: [
+        { path: "/tmp/a.ts", name: "a.ts", isDirty: false },
+        { path: "/tmp/b.ts", name: "b.ts", isDirty: false },
+      ],
+    });
+
+    render(<EditorView />);
+    await screen.findByTestId("monaco-editor");
+
+    act(() => {
+      useFileStore.setState({ activeFilePath: "/tmp/b.ts" });
+    });
+
+    await waitFor(() => {
+      expect(mockFileWrite).not.toHaveBeenCalled();
+    });
+  });
+});
+
 describe("EditorView — revert on triggerRevert", () => {
   beforeEach(() => {
     vi.clearAllMocks();
