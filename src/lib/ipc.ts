@@ -194,6 +194,16 @@ export async function fileSearch(
   });
 }
 
+/** Rename a file or directory. */
+export async function fileRename(oldPath: string, newPath: string): Promise<void> {
+  return invoke("file_rename", { oldPath, newPath });
+}
+
+/** Delete a file or directory. */
+export async function fileDelete(path: string): Promise<void> {
+  return invoke("file_delete", { path });
+}
+
 /** Listen for file change events. Returns an unlisten function. */
 export async function onFileChanged(
   callback: (payload: FileChangedPayload) => void,

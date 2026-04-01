@@ -32,6 +32,16 @@ interface UiState {
   newFileRequested: boolean;
   /** True while the user is typing a new folder name in the explorer. */
   newFolderRequested: boolean;
+  /** Open context menu state. */
+  contextMenu: { x: number; y: number; targetPath: string; isDir: boolean } | null;
+  /** Path of the node currently being renamed inline. */
+  renameTargetPath: string | null;
+  /** Path pending delete confirmation. */
+  deleteConfirmPath: string | null;
+  /** Target directory for new file from context menu (null = use tree root). */
+  newFileTargetDir: string | null;
+  /** Target directory for new folder from context menu (null = use tree root). */
+  newFolderTargetDir: string | null;
   toggleSidebar: () => void;
   setSidebarVisible: (visible: boolean) => void;
   toggleExplorer: () => void;
@@ -46,10 +56,16 @@ interface UiState {
   setSplitView: (index: 0 | 1, view: ViewType) => void;
   setTerminalActions: (actions: TerminalActions) => void;
   togglePanel: (panel: "explorer" | "search" | "source-control") => void;
-  requestNewFile: () => void;
+  requestNewFile: (targetDir?: string) => void;
   clearNewFileRequest: () => void;
-  requestNewFolder: () => void;
+  requestNewFolder: (targetDir?: string) => void;
   clearNewFolderRequest: () => void;
+  setContextMenu: (menu: { x: number; y: number; targetPath: string; isDir: boolean }) => void;
+  clearContextMenu: () => void;
+  setRenameTarget: (path: string) => void;
+  clearRenameTarget: () => void;
+  setDeleteConfirm: (path: string) => void;
+  clearDeleteConfirm: () => void;
 }
 
 export const useUiStore = create<UiState>((set) => ({
@@ -66,6 +82,11 @@ export const useUiStore = create<UiState>((set) => ({
   lastActivePanel: null,
   newFileRequested: false,
   newFolderRequested: false,
+  contextMenu: null,
+  renameTargetPath: null,
+  deleteConfirmPath: null,
+  newFileTargetDir: null,
+  newFolderTargetDir: null,
 
   togglePanel: (panel) =>
     set((state) => ({ activePanel: state.activePanel === panel ? null : panel })),
@@ -115,8 +136,16 @@ export const useUiStore = create<UiState>((set) => ({
 
   setTerminalActions: (actions) => set({ terminalActions: actions }),
 
-  requestNewFile: () => set({ newFileRequested: true }),
-  clearNewFileRequest: () => set({ newFileRequested: false }),
-  requestNewFolder: () => set({ newFolderRequested: true }),
-  clearNewFolderRequest: () => set({ newFolderRequested: false }),
+  requestNewFile: (targetDir?: string) =>
+    set({ newFileRequested: true, newFileTargetDir: targetDir ?? null }),
+  clearNewFileRequest: () => set({ newFileRequested: false, newFileTargetDir: null }),
+  requestNewFolder: (targetDir?: string) =>
+    set({ newFolderRequested: true, newFolderTargetDir: targetDir ?? null }),
+  clearNewFolderRequest: () => set({ newFolderRequested: false, newFolderTargetDir: null }),
+  setContextMenu: (menu) => set({ contextMenu: menu }),
+  clearContextMenu: () => set({ contextMenu: null }),
+  setRenameTarget: (path) => set({ renameTargetPath: path }),
+  clearRenameTarget: () => set({ renameTargetPath: null }),
+  setDeleteConfirm: (path) => set({ deleteConfirmPath: path }),
+  clearDeleteConfirm: () => set({ deleteConfirmPath: null }),
 }));

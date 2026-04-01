@@ -64,6 +64,8 @@ pub fn run() {
             commands::file_read,
             commands::file_write,
             commands::dir_create,
+            commands::file_rename,
+            commands::file_delete,
             commands::file_watch_start,
             commands::file_search,
         ])
