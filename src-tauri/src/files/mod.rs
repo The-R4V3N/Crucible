@@ -26,6 +26,29 @@ pub fn create_dir(path: &Path) -> Result<(), String> {
         .map_err(|e| format!("failed to create directory: {e}"))
 }
 
+/// Rename (or move) a file or directory.
+pub fn rename_path(old: &Path, new: &Path) -> Result<(), String> {
+    if !old.exists() {
+        return Err(format!("not found: {}", old.display()));
+    }
+    std::fs::rename(old, new)
+        .map_err(|e| format!("failed to rename: {e}"))
+}
+
+/// Delete a file or directory (recursive for directories).
+pub fn delete_path(path: &Path) -> Result<(), String> {
+    if !path.exists() {
+        return Err(format!("not found: {}", path.display()));
+    }
+    if path.is_dir() {
+        std::fs::remove_dir_all(path)
+            .map_err(|e| format!("failed to delete directory: {e}"))
+    } else {
+        std::fs::remove_file(path)
+            .map_err(|e| format!("failed to delete file: {e}"))
+    }
+}
+
 /// Write content to a file, creating parent directories if needed.
 pub fn write_file(path: &Path, content: &str) -> Result<(), String> {
     if let Some(parent) = path.parent() {
@@ -153,5 +176,84 @@ mod tests {
         assert_eq!(content, "deep content");
 
         let _ = fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn test_rename_path_renames_file() {
+        let dir = std::env::temp_dir().join("warp_files_test_rename_file");
+        let _ = fs::remove_dir_all(&dir);
+        fs::create_dir_all(&dir).unwrap();
+        let old = dir.join("old.txt");
+        let new_path = dir.join("new.txt");
+        fs::write(&old, "content").unwrap();
+
+        rename_path(&old, &new_path).unwrap();
+
+        assert!(!old.exists());
+        assert!(new_path.exists());
+        assert_eq!(fs::read_to_string(&new_path).unwrap(), "content");
+        let _ = fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn test_rename_path_renames_directory() {
+        let dir = std::env::temp_dir().join("warp_files_test_rename_dir");
+        let _ = fs::remove_dir_all(&dir);
+        fs::create_dir_all(&dir).unwrap();
+        let old = dir.join("old_dir");
+        let new_path = dir.join("new_dir");
+        fs::create_dir_all(&old).unwrap();
+        fs::write(old.join("file.txt"), "x").unwrap();
+
+        rename_path(&old, &new_path).unwrap();
+
+        assert!(!old.exists());
+        assert!(new_path.exists());
+        assert!(new_path.join("file.txt").exists());
+        let _ = fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn test_rename_path_source_not_found() {
+        let result = rename_path(
+            Path::new("/nonexistent_warp_test/old.txt"),
+            Path::new("/nonexistent_warp_test/new.txt"),
+        );
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_delete_path_removes_file() {
+        let dir = std::env::temp_dir().join("warp_files_test_delete_file");
+        let _ = fs::remove_dir_all(&dir);
+        fs::create_dir_all(&dir).unwrap();
+        let file = dir.join("to_delete.txt");
+        fs::write(&file, "content").unwrap();
+
+        delete_path(&file).unwrap();
+
+        assert!(!file.exists());
+        let _ = fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn test_delete_path_removes_directory_recursively() {
+        let dir = std::env::temp_dir().join("warp_files_test_delete_dir");
+        let _ = fs::remove_dir_all(&dir);
+        let target = dir.join("to_delete");
+        fs::create_dir_all(target.join("nested")).unwrap();
+        fs::write(target.join("nested/file.txt"), "x").unwrap();
+
+        delete_path(&target).unwrap();
+
+        assert!(!target.exists());
+        let _ = fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn test_delete_path_not_found() {
+        let result = delete_path(Path::new("/nonexistent_warp_test/path.txt"));
+        assert!(result.is_err());
+        assert!(result.unwrap_err().contains("not found"));
     }
 }

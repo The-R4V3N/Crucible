@@ -213,6 +213,21 @@ pub fn dir_create(path: String) -> Result<(), String> {
     files::create_dir(&std::path::PathBuf::from(&path))
 }
 
+/// Rename a file or directory.
+#[tauri::command]
+pub fn file_rename(old_path: String, new_path: String) -> Result<(), String> {
+    files::rename_path(
+        &std::path::PathBuf::from(&old_path),
+        &std::path::PathBuf::from(&new_path),
+    )
+}
+
+/// Delete a file or directory.
+#[tauri::command]
+pub fn file_delete(path: String) -> Result<(), String> {
+    files::delete_path(&std::path::PathBuf::from(&path))
+}
+
 /// Search for a pattern in project files.
 #[tauri::command]
 pub fn file_search(

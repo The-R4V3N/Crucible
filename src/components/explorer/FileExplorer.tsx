@@ -1,8 +1,9 @@
 import { useRef, useEffect, useState } from "react";
 import { useFileStore } from "@/stores/fileStore";
 import { useUiStore } from "@/stores/uiStore";
-import { fileWrite, dirCreate, fileTree } from "@/lib/ipc";
+import { fileWrite, dirCreate, fileTree, fileDelete } from "@/lib/ipc";
 import FileTree from "./FileTree";
+import ContextMenu from "./ContextMenu";
 
 /** Inline input shown at the top of the explorer when creating a new file. */
 function NewFileInput({ rootPath }: { rootPath: string }) {
@@ -41,7 +42,7 @@ function NewFileInput({ rootPath }: { rootPath: string }) {
         value={name}
         onChange={(e) => setName(e.target.value)}
         onKeyDown={handleKeyDown}
-        className="w-full bg-warp-bg border border-warp-accent text-warp-text text-sm px-2 py-0.5 outline-none"
+        className="w-full border border-warp-accent bg-warp-bg px-2 py-0.5 text-sm text-warp-text outline-none"
         placeholder="filename…"
       />
     </div>
@@ -85,9 +86,50 @@ function NewFolderInput({ rootPath }: { rootPath: string }) {
         value={name}
         onChange={(e) => setName(e.target.value)}
         onKeyDown={handleKeyDown}
-        className="w-full bg-warp-bg border border-warp-accent text-warp-text text-sm px-2 py-0.5 outline-none"
+        className="w-full border border-warp-accent bg-warp-bg px-2 py-0.5 text-sm text-warp-text outline-none"
         placeholder="folder name…"
       />
+    </div>
+  );
+}
+
+/** Confirmation dialog rendered before deleting a file/folder. */
+function DeleteConfirmDialog({
+  targetPath,
+  onConfirm,
+  onCancel,
+}: {
+  targetPath: string;
+  onConfirm: () => void;
+  onCancel: () => void;
+}) {
+  const name = targetPath.split("/").pop() ?? targetPath;
+  return (
+    <div
+      data-testid="delete-confirm-dialog"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+    >
+      <div className="mx-4 w-full max-w-sm border border-warp-border bg-warp-sidebar p-4 shadow-lg">
+        <p className="mb-4 text-sm text-warp-text">
+          Delete <span className="text-warp-accent">{name}</span>? This cannot be undone.
+        </p>
+        <div className="flex justify-end gap-2">
+          <button
+            data-testid="delete-cancel-button"
+            onClick={onCancel}
+            className="border border-warp-border px-3 py-1 text-sm text-warp-text-dim transition-colors hover:border-warp-text hover:text-warp-text"
+          >
+            Cancel
+          </button>
+          <button
+            data-testid="delete-confirm-button"
+            onClick={onConfirm}
+            className="bg-red-600 px-3 py-1 text-sm text-white transition-colors hover:bg-red-700"
+          >
+            Delete
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
@@ -99,8 +141,14 @@ function FileExplorer() {
   const setTree = useFileStore((s) => s.setTree);
   const newFileRequested = useUiStore((s) => s.newFileRequested);
   const newFolderRequested = useUiStore((s) => s.newFolderRequested);
+  const newFileTargetDir = useUiStore((s) => s.newFileTargetDir);
+  const newFolderTargetDir = useUiStore((s) => s.newFolderTargetDir);
   const requestNewFile = useUiStore((s) => s.requestNewFile);
   const requestNewFolder = useUiStore((s) => s.requestNewFolder);
+  const contextMenu = useUiStore((s) => s.contextMenu);
+  const clearContextMenu = useUiStore((s) => s.clearContextMenu);
+  const deleteConfirmPath = useUiStore((s) => s.deleteConfirmPath);
+  const clearDeleteConfirm = useUiStore((s) => s.clearDeleteConfirm);
 
   async function handleRefresh() {
     if (!tree) return;
@@ -108,15 +156,25 @@ function FileExplorer() {
     setTree(updated);
   }
 
+  async function handleDeleteConfirm() {
+    if (!deleteConfirmPath) return;
+    await fileDelete(deleteConfirmPath);
+    clearDeleteConfirm();
+    if (tree) {
+      const updated = await fileTree(tree.path);
+      setTree(updated);
+    }
+  }
+
   return (
     <div data-testid="file-explorer" className="group flex h-full flex-col bg-warp-sidebar">
       <div className="flex items-center px-4 py-2">
         <span className="flex-1 text-xs uppercase tracking-wider text-warp-text-dim">Explorer</span>
-        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+        <div className="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
           <button
             data-testid="icon-new-file"
             title="New File"
-            onClick={requestNewFile}
+            onClick={() => requestNewFile()}
             className="p-0.5 text-warp-text-dim hover:text-warp-text"
           >
             <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
@@ -126,7 +184,7 @@ function FileExplorer() {
           <button
             data-testid="icon-new-folder"
             title="New Folder"
-            onClick={requestNewFolder}
+            onClick={() => requestNewFolder()}
             className="p-0.5 text-warp-text-dim hover:text-warp-text"
           >
             <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
@@ -155,11 +213,28 @@ function FileExplorer() {
           </button>
         </div>
       </div>
-      {newFileRequested && tree && <NewFileInput rootPath={tree.path} />}
-      {newFolderRequested && tree && <NewFolderInput rootPath={tree.path} />}
+      {newFileRequested && tree && <NewFileInput rootPath={newFileTargetDir ?? tree.path} />}
+      {newFolderRequested && tree && <NewFolderInput rootPath={newFolderTargetDir ?? tree.path} />}
       <div className="flex-1 overflow-y-auto">
         <FileTree tree={tree} />
       </div>
+      {contextMenu && tree && (
+        <ContextMenu
+          x={contextMenu.x}
+          y={contextMenu.y}
+          targetPath={contextMenu.targetPath}
+          isDir={contextMenu.isDir}
+          projectRoot={tree.path}
+          onClose={clearContextMenu}
+        />
+      )}
+      {deleteConfirmPath && (
+        <DeleteConfirmDialog
+          targetPath={deleteConfirmPath}
+          onConfirm={handleDeleteConfirm}
+          onCancel={clearDeleteConfirm}
+        />
+      )}
     </div>
   );
 }

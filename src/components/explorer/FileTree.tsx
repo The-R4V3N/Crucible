@@ -1,4 +1,7 @@
+import { useEffect, useRef, useState } from "react";
 import { useFileStore } from "@/stores/fileStore";
+import { useUiStore } from "@/stores/uiStore";
+import { fileRename, fileTree } from "@/lib/ipc";
 import type { FileNode } from "@/lib/ipc";
 
 interface FileTreeProps {
@@ -28,9 +31,27 @@ function FileTreeNode({ node, depth }: FileTreeNodeProps) {
   const toggleDir = useFileStore((s) => s.toggleDir);
   const openFile = useFileStore((s) => s.openFile);
   const activeFilePath = useFileStore((s) => s.activeFilePath);
+  const tree = useFileStore((s) => s.tree);
+  const setTree = useFileStore((s) => s.setTree);
+
+  const setContextMenu = useUiStore((s) => s.setContextMenu);
+  const renameTargetPath = useUiStore((s) => s.renameTargetPath);
+  const clearRenameTarget = useUiStore((s) => s.clearRenameTarget);
+
+  const [renameName, setRenameName] = useState(node.name);
+  const renameInputRef = useRef<HTMLInputElement>(null);
 
   const isExpanded = expandedDirs.has(node.path);
   const isActive = node.path === activeFilePath;
+  const isRenaming = renameTargetPath === node.path;
+
+  useEffect(() => {
+    if (isRenaming) {
+      setRenameName(node.name);
+      renameInputRef.current?.focus();
+      renameInputRef.current?.select();
+    }
+  }, [isRenaming, node.name]);
 
   const handleClick = () => {
     if (node.is_dir) {
@@ -40,10 +61,53 @@ function FileTreeNode({ node, depth }: FileTreeNodeProps) {
     }
   };
 
+  const handleContextMenu = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setContextMenu({ x: e.clientX, y: e.clientY, targetPath: node.path, isDir: node.is_dir });
+  };
+
+  async function commitRename() {
+    const trimmed = renameName.trim();
+    if (!trimmed || trimmed === node.name) {
+      clearRenameTarget();
+      return;
+    }
+    const lastSlash = node.path.lastIndexOf("/");
+    const parent = lastSlash >= 0 ? node.path.slice(0, lastSlash) : "";
+    const newPath = parent ? `${parent}/${trimmed}` : trimmed;
+    await fileRename(node.path, newPath);
+    if (tree) {
+      const updated = await fileTree(tree.path);
+      setTree(updated);
+    }
+    clearRenameTarget();
+  }
+
+  if (isRenaming) {
+    return (
+      <div>
+        <div className="px-2 py-0.5" style={{ paddingLeft: `${depth * 16 + 8}px` }}>
+          <input
+            ref={renameInputRef}
+            data-testid="rename-input"
+            value={renameName}
+            onChange={(e) => setRenameName(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") commitRename();
+              else if (e.key === "Escape") clearRenameTarget();
+            }}
+            className="w-full border border-warp-accent bg-warp-bg px-2 py-0.5 text-sm text-warp-text outline-none"
+          />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div>
       <button
         onClick={handleClick}
+        onContextMenu={handleContextMenu}
         className={`flex w-full items-center gap-1 px-2 py-0.5 text-left text-sm hover:bg-warp-bg/50 ${
           isActive ? "bg-warp-bg text-warp-accent" : "text-warp-text"
         }`}
