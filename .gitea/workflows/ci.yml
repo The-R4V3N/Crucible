@@ -54,7 +54,9 @@ jobs:
             libgtk-3-dev \
             libayatana-appindicator3-dev \
             librsvg2-dev \
-            patchelf
+            patchelf \
+            libssl-dev \
+            pkg-config
 
       # Minimal dist stub so tauri::generate_context!() compiles
       - name: Create dist stub
