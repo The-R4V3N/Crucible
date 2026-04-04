@@ -7,7 +7,7 @@
 [![Built with Tauri](https://img.shields.io/badge/built%20with-Tauri%20v2-FFC131?style=for-the-badge&logo=tauri&logoColor=white)](https://v2.tauri.app)
 [![React](https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react&logoColor=white)](https://react.dev)
 [![Rust](https://img.shields.io/badge/Rust-backend-DEA584?style=for-the-badge&logo=rust&logoColor=white)](https://www.rust-lang.org/)
-[![License MIT](https://img.shields.io/badge/license-CC%20BY--NC--SA%204.0-blue?style=for-the-badge)](LICENSE)
+[![License CC BY-NC-SA 4.0](https://img.shields.io/badge/license-CC%20BY--NC--SA%204.0-blue?style=for-the-badge)](LICENSE)
 
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178c6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![xterm.js](https://img.shields.io/badge/terminal-xterm.js-000000?logo=windowsterminal&logoColor=white)](#tech-stack)
