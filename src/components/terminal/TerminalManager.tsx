@@ -22,6 +22,15 @@ const TerminalPane = memo(function TerminalPane({
     return session?.id === s.activeSessionId;
   });
 
+  const fontFamily = useConfigStore((s) => s.config?.font_family);
+  const fontSize = useConfigStore((s) => s.config?.font_size);
+  const cursorStyle = useConfigStore((s) => s.config?.cursor_style) as
+    | "bar"
+    | "block"
+    | "underline"
+    | undefined;
+  const terminalTheme = useConfigStore((s) => s.config?.terminal_theme);
+
   return (
     <div
       className={`absolute inset-0 bg-warp-bg ${isActive ? "visible" : "invisible"}`}
@@ -35,6 +44,10 @@ const TerminalPane = memo(function TerminalPane({
         cwd={tab.cwd}
         command={tab.command}
         onError={onError}
+        fontFamily={fontFamily}
+        fontSize={fontSize}
+        cursorStyle={cursorStyle}
+        terminalTheme={terminalTheme}
       />
     </div>
   );

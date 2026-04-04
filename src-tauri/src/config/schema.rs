@@ -53,6 +53,30 @@ pub struct WarpConfig {
     /// Last active project name (for session restore).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub active_project: Option<String>,
+    /// Git branch prefix for new branches.
+    #[serde(default = "default_branch_prefix")]
+    pub branch_prefix: String,
+    /// UI zoom scale factor (1.0 = 100%).
+    #[serde(default = "default_ui_zoom")]
+    pub ui_zoom: f32,
+    /// Sidebar position: "left" or "right".
+    #[serde(default = "default_sidebar_position")]
+    pub sidebar_position: String,
+    /// Terminal cursor style: "bar", "block", or "underline".
+    #[serde(default = "default_cursor_style")]
+    pub cursor_style: String,
+    /// Terminal theme: "dark" or "light".
+    #[serde(default = "default_terminal_theme")]
+    pub terminal_theme: String,
+    /// Divider color hex between terminal panes.
+    #[serde(default = "default_divider_color")]
+    pub divider_color: String,
+    /// Default project path for new projects.
+    #[serde(default)]
+    pub default_project_path: String,
+    /// Shell command to use in terminal.
+    #[serde(default = "default_command")]
+    pub shell_command: String,
 }
 
 impl Default for NotificationConfig {
@@ -109,6 +133,30 @@ fn default_sidebar_width() -> u16 {
 
 fn default_true() -> bool {
     true
+}
+
+fn default_branch_prefix() -> String {
+    "feature/".to_string()
+}
+
+fn default_ui_zoom() -> f32 {
+    1.0
+}
+
+fn default_sidebar_position() -> String {
+    "left".to_string()
+}
+
+fn default_cursor_style() -> String {
+    "bar".to_string()
+}
+
+fn default_terminal_theme() -> String {
+    "dark".to_string()
+}
+
+fn default_divider_color() -> String {
+    "#1E1E2E".to_string()
 }
 
 #[cfg(test)]
@@ -202,6 +250,14 @@ mod tests {
             sidebar_width: 240,
             notifications: NotificationConfig::default(),
             active_project: Some("roundtrip".to_string()),
+            branch_prefix: "feature/".to_string(),
+            ui_zoom: 1.0,
+            sidebar_position: "left".to_string(),
+            cursor_style: "bar".to_string(),
+            terminal_theme: "dark".to_string(),
+            divider_color: "#1E1E2E".to_string(),
+            default_project_path: String::new(),
+            shell_command: "powershell.exe".to_string(),
         };
 
         let dir = std::env::temp_dir();
@@ -225,6 +281,62 @@ mod tests {
     }
 
     #[test]
+    fn test_new_config_fields_have_defaults() {
+        let json = r#"{ "projects": [] }"#;
+        let config: WarpConfig = serde_json::from_str(json).unwrap();
+        assert_eq!(config.branch_prefix, "feature/");
+        assert!((config.ui_zoom - 1.0_f32).abs() < f32::EPSILON);
+        assert_eq!(config.sidebar_position, "left");
+        assert_eq!(config.cursor_style, "bar");
+        assert_eq!(config.terminal_theme, "dark");
+        assert_eq!(config.divider_color, "#1E1E2E");
+        assert_eq!(config.default_project_path, "");
+        assert_eq!(config.shell_command, "powershell.exe");
+    }
+
+    #[test]
+    fn test_new_fields_roundtrip() {
+        let json = r##"{
+            "projects": [],
+            "branch_prefix": "fix/",
+            "ui_zoom": 1.25,
+            "sidebar_position": "right",
+            "cursor_style": "block",
+            "terminal_theme": "light",
+            "divider_color": "#FF0000",
+            "default_project_path": "C:/Projects",
+            "shell_command": "bash.exe"
+        }"##;
+        let config: WarpConfig = serde_json::from_str(json).unwrap();
+        assert_eq!(config.branch_prefix, "fix/");
+        assert!((config.ui_zoom - 1.25_f32).abs() < 0.001);
+        assert_eq!(config.sidebar_position, "right");
+        assert_eq!(config.cursor_style, "block");
+        assert_eq!(config.terminal_theme, "light");
+        assert_eq!(config.divider_color, "#FF0000");
+        assert_eq!(config.default_project_path, "C:/Projects");
+        assert_eq!(config.shell_command, "bash.exe");
+    }
+
+    #[test]
+    fn test_old_config_without_new_fields_still_loads() {
+        // Simulate an existing config.json that was saved before these fields existed
+        let json = r##"{
+            "projects": [{ "name": "p1", "path": "/tmp" }],
+            "theme": "dark",
+            "accent_color": "#00E5FF",
+            "font_family": "Cascadia Code",
+            "font_size": 14,
+            "sidebar_width": 240
+        }"##;
+        let config: WarpConfig = serde_json::from_str(json).unwrap();
+        // Should load without error and use defaults for new fields
+        assert_eq!(config.branch_prefix, "feature/");
+        assert_eq!(config.cursor_style, "bar");
+        assert_eq!(config.projects[0].name, "p1");
+    }
+
+    #[test]
     fn test_active_project_omitted_from_json_when_none() {
         let config = WarpConfig {
             projects: vec![],
@@ -235,6 +347,14 @@ mod tests {
             sidebar_width: 240,
             notifications: NotificationConfig::default(),
             active_project: None,
+            branch_prefix: "feature/".to_string(),
+            ui_zoom: 1.0,
+            sidebar_position: "left".to_string(),
+            cursor_style: "bar".to_string(),
+            terminal_theme: "dark".to_string(),
+            divider_color: "#1E1E2E".to_string(),
+            default_project_path: String::new(),
+            shell_command: "powershell.exe".to_string(),
         };
         let json = serde_json::to_string(&config).unwrap();
         assert!(!json.contains("active_project"));

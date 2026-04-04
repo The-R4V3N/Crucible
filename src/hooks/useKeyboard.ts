@@ -41,6 +41,13 @@ export function useKeyboard({ projects }: UseKeyboardOptions) {
         return;
       }
 
+      // Ctrl+, — open settings
+      if (e.ctrlKey && e.key === ",") {
+        e.preventDefault();
+        useUiStore.getState().openSettings();
+        return;
+      }
+
       // Suppress all other shortcuts when palette is open
       if (usePaletteStore.getState().open) return;
 

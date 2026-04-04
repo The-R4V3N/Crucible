@@ -10,7 +10,7 @@ export default {
           border: "#3E3E3E",
           text: "#CCCCCC",
           "text-dim": "#808080",
-          accent: "#00E5FF",
+          accent: "var(--warp-accent)",
           success: "#4EC9B0",
           warning: "#E5C07B",
           error: "#F44747",

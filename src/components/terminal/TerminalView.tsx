@@ -5,8 +5,8 @@ import { useSession } from "@/hooks/useSession";
 import { useSessionStore } from "@/stores/sessionStore";
 import "@xterm/xterm/css/xterm.css";
 
-/** WARP terminal color theme. */
-const WARP_THEME = {
+/** WARP terminal color theme — dark. */
+const WARP_THEME_DARK = {
   background: "#1E1E1E",
   foreground: "#CCCCCC",
   cursor: "#00E5FF",
@@ -31,6 +31,36 @@ const WARP_THEME = {
   brightWhite: "#FFFFFF",
 };
 
+/** WARP terminal color theme — light. */
+const WARP_THEME_LIGHT = {
+  background: "#FFFFFF",
+  foreground: "#1E1E1E",
+  cursor: "#007ACC",
+  cursorAccent: "#FFFFFF",
+  selectionBackground: "#ADD6FF",
+  selectionForeground: "#1E1E1E",
+  black: "#000000",
+  red: "#CD3131",
+  green: "#00BC00",
+  yellow: "#949800",
+  blue: "#0451A5",
+  magenta: "#BC05BC",
+  cyan: "#0598BC",
+  white: "#555555",
+  brightBlack: "#666666",
+  brightRed: "#CD3131",
+  brightGreen: "#14CE14",
+  brightYellow: "#B5BA00",
+  brightBlue: "#0451A5",
+  brightMagenta: "#BC05BC",
+  brightCyan: "#0598BC",
+  brightWhite: "#A5A5A5",
+};
+
+function resolveTheme(terminalTheme?: string) {
+  return terminalTheme === "light" ? WARP_THEME_LIGHT : WARP_THEME_DARK;
+}
+
 interface TerminalViewProps {
   /** Project name this terminal belongs to. */
   projectName?: string;
@@ -44,13 +74,50 @@ interface TerminalViewProps {
   command?: string;
   /** Callback for errors during session setup. */
   onError?: (error: string) => void;
+  /** Font family from config. */
+  fontFamily?: string;
+  /** Font size from config. */
+  fontSize?: number;
+  /** Cursor style from config. */
+  cursorStyle?: "bar" | "block" | "underline";
+  /** Terminal theme from config ("dark" | "light"). */
+  terminalTheme?: string;
 }
 
 /** Terminal component that renders xterm.js connected to a PTY session. */
-function TerminalView({ projectName, tabKey, label, cwd, command, onError }: TerminalViewProps) {
+function TerminalView({
+  projectName,
+  tabKey,
+  label,
+  cwd,
+  command,
+  onError,
+  fontFamily,
+  fontSize,
+  cursorStyle,
+  terminalTheme,
+}: TerminalViewProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const terminalRef = useRef<Terminal | null>(null);
   const fitAddonRef = useRef<FitAddon | null>(null);
+
+  // Keep refs in sync so init effect can read latest values without re-running
+  const fontFamilyRef = useRef(fontFamily);
+  const fontSizeRef = useRef(fontSize);
+  const cursorStyleRef = useRef(cursorStyle);
+  const terminalThemeRef = useRef(terminalTheme);
+  useEffect(() => {
+    fontFamilyRef.current = fontFamily;
+  }, [fontFamily]);
+  useEffect(() => {
+    fontSizeRef.current = fontSize;
+  }, [fontSize]);
+  useEffect(() => {
+    cursorStyleRef.current = cursorStyle;
+  }, [cursorStyle]);
+  useEffect(() => {
+    terminalThemeRef.current = terminalTheme;
+  }, [terminalTheme]);
 
   // Targeted selector: only re-render when THIS project's needsAttention changes
   const needsAttention = useSessionStore((s) => {
@@ -90,8 +157,6 @@ function TerminalView({ projectName, tabKey, label, cwd, command, onError }: Ter
       terminalRef.current?.write(`\r\n\x1b[31m[Error: ${err}]\x1b[0m\r\n`);
     },
     onReady: () => {
-      // Sync xterm dimensions to the PTY now that the session is connected.
-      // The initial fit/resize may have fired before the session was ready.
       const terminal = terminalRef.current;
       if (terminal && terminal.rows > 0 && terminal.cols > 0) {
         resize(terminal.rows, terminal.cols);
@@ -121,16 +186,17 @@ function TerminalView({ projectName, tabKey, label, cwd, command, onError }: Ter
 
     const initTerminal = () => {
       if (opened) return;
-      // Wait until container has real dimensions
       if (container.offsetWidth === 0 || container.offsetHeight === 0) return;
 
       opened = true;
       terminal = new Terminal({
-        theme: WARP_THEME,
-        fontFamily: '"Cascadia Code", Consolas, monospace',
-        fontSize: 14,
+        theme: resolveTheme(terminalThemeRef.current),
+        fontFamily: fontFamilyRef.current
+          ? `"${fontFamilyRef.current}", Consolas, monospace`
+          : '"Cascadia Code", Consolas, monospace',
+        fontSize: fontSizeRef.current ?? 14,
         cursorBlink: true,
-        cursorStyle: "bar",
+        cursorStyle: cursorStyleRef.current ?? "bar",
         allowProposedApi: true,
       });
 
@@ -159,32 +225,26 @@ function TerminalView({ projectName, tabKey, label, cwd, command, onError }: Ter
         // F1-F12: project switching
         if (/^F\d+$/.test(e.key)) return false;
         // Ctrl+B, Ctrl+E, Ctrl+Shift+D, Ctrl+Shift+F, Ctrl+1/2/3, Ctrl+`, Ctrl+W
-        // Ctrl+D is intentionally NOT here — it must reach the shell as EOF
         if (e.ctrlKey && e.shiftKey && ["D", "F"].includes(e.key)) return false;
         if (e.ctrlKey && !e.shiftKey && ["b", "e", "1", "2", "3", "`", "w", "\\"].includes(e.key))
           return false;
         return true;
       });
 
-      // Forward keyboard input to PTY
       terminal.onData((data) => {
         write(data);
       });
 
-      // Forward resize events to PTY
       terminal.onResize(({ rows, cols }) => {
         resize(rows, cols);
       });
     };
 
-    // Try immediately if visible
     initTerminal();
 
-    // Handle window resize
     const handleResize = () => safeFit();
     window.addEventListener("resize", handleResize);
 
-    // Observe container — init when it becomes visible, fit on size changes
     resizeObserver = new ResizeObserver(() => {
       if (!opened) {
         initTerminal();
@@ -203,6 +263,19 @@ function TerminalView({ projectName, tabKey, label, cwd, command, onError }: Ter
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Live-update terminal options when config props change
+  useEffect(() => {
+    const terminal = terminalRef.current;
+    if (!terminal) return;
+    terminal.options.fontFamily = fontFamily
+      ? `"${fontFamily}", Consolas, monospace`
+      : '"Cascadia Code", Consolas, monospace';
+    terminal.options.fontSize = fontSize ?? 14;
+    terminal.options.cursorStyle = cursorStyle ?? "bar";
+    terminal.options.theme = resolveTheme(terminalTheme);
+    fitAddonRef.current?.fit();
+  }, [fontFamily, fontSize, cursorStyle, terminalTheme]);
 
   return (
     <div

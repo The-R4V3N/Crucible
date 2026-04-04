@@ -133,6 +133,14 @@ pub fn config_load(path: Option<String>) -> Result<WarpConfig, String> {
             sidebar_width: 240,
             notifications: crate::config::schema::NotificationConfig::default(),
             active_project: None,
+            branch_prefix: "feature/".to_string(),
+            ui_zoom: 1.0,
+            sidebar_position: "left".to_string(),
+            cursor_style: "bar".to_string(),
+            terminal_theme: "dark".to_string(),
+            divider_color: "#1E1E2E".to_string(),
+            default_project_path: String::new(),
+            shell_command: "powershell.exe".to_string(),
         };
         crate::config::schema::save_config(&default_config, &config_path)?;
         return Ok(default_config);
@@ -260,6 +268,79 @@ struct PtyAttentionPayload {
     needs_attention: bool,
 }
 
+/// Enumerate installed font family names from the Windows registry.
+fn list_system_fonts() -> Result<Vec<String>, String> {
+    #[cfg(target_os = "windows")]
+    {
+        use winreg::enums::HKEY_LOCAL_MACHINE;
+        use winreg::RegKey;
+
+        let hklm = RegKey::predef(HKEY_LOCAL_MACHINE);
+        let fonts_key = hklm
+            .open_subkey(r"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Fonts")
+            .map_err(|e| format!("failed to open fonts registry key: {e}"))?;
+
+        let mut families: std::collections::HashSet<String> = std::collections::HashSet::new();
+        for (name, _value) in fonts_key.enum_values().filter_map(|r| r.ok()) {
+            // Font names look like "Cascadia Code (TrueType)" or "Arial Bold (TrueType)"
+            // Extract family name: take the part before " (" or the whole name
+            let family = if let Some(idx) = name.find(" (") {
+                name[..idx].to_string()
+            } else {
+                name.clone()
+            };
+            // Strip style suffixes like " Bold", " Italic", " Bold Italic", " Light", etc.
+            let family = strip_font_style_suffix(&family);
+            if !family.is_empty() {
+                families.insert(family);
+            }
+        }
+
+        let mut result: Vec<String> = families.into_iter().collect();
+        result.sort();
+        Ok(result)
+    }
+
+    #[cfg(not(target_os = "windows"))]
+    {
+        // Non-Windows: return an empty list (CI on Linux will get this)
+        Ok(vec![])
+    }
+}
+
+/// Strip common font style suffixes to get the family name.
+fn strip_font_style_suffix(name: &str) -> String {
+    let suffixes = [
+        " Bold Italic",
+        " Bold",
+        " Italic",
+        " Light Italic",
+        " Light",
+        " Medium Italic",
+        " Medium",
+        " SemiBold Italic",
+        " SemiBold",
+        " ExtraBold",
+        " Thin",
+        " Black",
+        " Condensed",
+        " ExtraLight",
+        " Regular",
+    ];
+    for suffix in &suffixes {
+        if let Some(stripped) = name.strip_suffix(suffix) {
+            return stripped.to_string();
+        }
+    }
+    name.to_string()
+}
+
+/// List installed font family names.
+#[tauri::command]
+pub fn list_fonts() -> Result<Vec<String>, String> {
+    list_system_fonts()
+}
+
 /// Read PTY output in a loop and emit events to the frontend.
 fn read_pty_output(mut reader: Box<dyn Read + Send>, session_id: &str, app: &AppHandle) {
     let mut buf = [0u8; 4096];
@@ -310,5 +391,24 @@ fn read_pty_output(mut reader: Box<dyn Read + Send>, session_id: &str, app: &App
                 break;
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    #[cfg(target_os = "windows")]
+    fn test_list_system_fonts_returns_nonempty_sorted_list() {
+        let fonts = list_system_fonts().unwrap();
+        assert!(!fonts.is_empty(), "expected at least one installed font");
+        // Should be sorted alphabetically
+        let mut sorted = fonts.clone();
+        sorted.sort();
+        assert_eq!(fonts, sorted);
+        // Cascadia Code is typically installed on Windows dev machines
+        // (don't assert specific font — just check format: no empty strings)
+        assert!(fonts.iter().all(|f| !f.is_empty()));
     }
 }

@@ -21,7 +21,7 @@ describe("ActivityBar", () => {
     expect(screen.getByTitle("Explorer")).toBeInTheDocument();
     expect(screen.getByTitle("Search")).toBeInTheDocument();
     expect(screen.getByTitle("Source Control")).toBeInTheDocument();
-    expect(screen.getByTitle("Settings")).toBeInTheDocument();
+    expect(screen.getByTitle("Settings (Ctrl+,)")).toBeInTheDocument();
   });
 
   it("clicking Explorer sets activePanel to explorer", () => {
@@ -56,9 +56,9 @@ describe("ActivityBar", () => {
     expect(useUiStore.getState().activePanel).toBe("search");
   });
 
-  it("Settings button is disabled", () => {
+  it("Settings button is enabled", () => {
     render(<ActivityBar />);
-    expect(screen.getByTestId("activity-settings")).toBeDisabled();
+    expect(screen.getByTestId("activity-settings")).not.toBeDisabled();
   });
 
   it("Explorer icon has accent class when activePanel is explorer", () => {
