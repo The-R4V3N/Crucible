@@ -40,6 +40,7 @@ WARP is a desktop IDE built for developers who live in the terminal. It wraps mu
 - **Terminal tabs** — Multiple tabs per project with `+` button and per-tab close
 - **Split panes** — Vertical and horizontal split views (`Ctrl+\`)
 - **Session persistence** — Active project restored on restart
+- **Auto-save** — Files saved automatically on tab switch and window blur
 - **ConPTY native** — Real Windows terminal, not a wrapper
 
 </td>
@@ -48,8 +49,11 @@ WARP is a desktop IDE built for developers who live in the terminal. It wraps mu
 ### Editor & Files
 
 - **Monaco editor** — Syntax highlighting, file tabs, full editing
-- **File explorer** — Browse and open files from the sidebar
-- **Project search** — Search across all project files (`Ctrl+K`)
+- **File explorer** — Browse, open, rename, delete files from the sidebar
+- **Right-click context menu** — New file/folder, rename inline, delete with confirmation, copy path
+- **Project search** — Search across all project files (`Ctrl+Shift+F`)
+- **Find in file** — Search within the active file (`Ctrl+F`)
+- **Command Palette** — Quick access to all commands (`Ctrl+Shift+P`)
 
 </td>
 </tr>
@@ -58,9 +62,10 @@ WARP is a desktop IDE built for developers who live in the terminal. It wraps mu
 
 ### Git
 
-- **Branch status** — Current branch always visible
-- **Changed files** — See what's modified at a glance
+- **Branch status** — Current branch always visible in status bar
+- **Changed files** — Badge count on the Source Control icon
 - **Inline diffs** — Review changes without leaving the IDE
+- **Stage/unstage/discard** — Full git workflow from the sidebar
 
 </td>
 <td width="50%" valign="top">
@@ -69,7 +74,9 @@ WARP is a desktop IDE built for developers who live in the terminal. It wraps mu
 
 - **Project management** — Add/remove projects via folder picker
 - **Smart notifications** — Attention detection with sidebar indicators and border glow
+- **Settings modal** — Font, theme, cursor, zoom, sidebar position, accent color — all configurable
 - **Keyboard-driven** — F-key project switching, full keybinding support
+- **Edit menu** — Find in File, Find in Project, Command Palette via menu bar
 
 </td>
 </tr>
@@ -127,8 +134,8 @@ warp/
 │       └── commands.rs      IPC command handlers
 │
 ├── src/                     React frontend
-│   ├── components/          UI — sidebar, terminal, editor, explorer, diff, panels, layout, palette, search
-│   ├── hooks/               useSession, useGit, useFileWatcher, useKeyboard, useEditorCursor, useGitDecorations
+│   ├── components/          UI — sidebar, terminal, editor, explorer, diff, panels, layout, settings, palette, search
+│   ├── hooks/               useSession, useGit, useFileWatcher, useKeyboard, useAutoSave, useEditorCursor, useGitDecorations
 │   ├── stores/              State management (Zustand) — session, editor, ui, config, file, palette
 │   ├── lib/                 Utilities — ipc, keybindings, theme
 │   └── styles/              Tailwind + custom CSS
@@ -154,6 +161,11 @@ Commands defined in `src-tauri/src/commands.rs`, called via `@tauri-apps/api`:
 | `file_tree(path)` | List directory tree |
 | `file_read(path)` | Read file contents |
 | `file_write(path, content)` | Write file contents |
+| `file_rename(old_path, new_path)` | Rename or move a file |
+| `file_delete(path)` | Delete a file |
+| `config_load()` | Load config from disk |
+| `config_save(config)` | Persist config to disk |
+| `list_fonts()` | List installed system fonts (Windows registry) |
 
 **Events:** `pty:output` · `pty:exit` · `file:changed`
 
@@ -180,7 +192,7 @@ Commands defined in `src-tauri/src/commands.rs`, called via `@tauri-apps/api`:
 
 ## Configuration
 
-WARP stores its config in `warp_config.json` (auto-created on first run):
+WARP stores its config in `warp_config.json` (auto-created on first run, never committed):
 
 ```json
 {
@@ -191,12 +203,21 @@ WARP stores its config in `warp_config.json` (auto-created on first run):
   "accent_color": "#00E5FF",
   "font_family": "Cascadia Code",
   "font_size": 14,
+  "cursor_style": "bar",
+  "terminal_theme": "dark",
+  "divider_color": "#1E1E2E",
+  "ui_zoom": 1.0,
+  "sidebar_position": "left",
+  "default_project_path": "",
+  "shell_command": "powershell.exe",
+  "branch_prefix": "feature/",
   "active_project": "my-app"
 }
 ```
 
----
+All settings are editable through the **Settings modal** (gear icon in the activity bar).
 
+---
 
 ## Contributing
 

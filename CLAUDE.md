@@ -111,18 +111,14 @@ warp/
 │       ├── config/          # Config loading + validation
 │       └── commands.rs      # Tauri IPC command handlers
 ├── src/                     # React frontend
-│   ├── components/          # UI components (sidebar/, terminal/, editor/, diff/, panels/, layout/)
-│   ├── hooks/               # React hooks (useSession, useGit, useFileWatcher, useKeyboard)
-│   ├── stores/              # State management (Zustand)
+│   ├── components/          # UI components (sidebar/, terminal/, editor/, diff/, panels/, layout/, settings/, explorer/, search/, palette/)
+│   ├── hooks/               # React hooks (useSession, useGit, useFileWatcher, useKeyboard, useAutoSave, useEditorCursor, useGitDecorations)
+│   ├── stores/              # State management (Zustand) — session, editor, ui, config, file, palette
 │   ├── lib/                 # Utilities (ipc.ts, keybindings.ts, theme.ts)
 │   └── styles/              # Tailwind + custom CSS
 ├── tests/
 │   ├── rust/                # Rust integration tests
 │   └── frontend/            # React component + hook tests
-├── .claude/                 # Claude Code configuration
-│   ├── agents/              # Specialized sub-agents
-│   ├── commands/            # Custom slash commands
-│   └── skills/              # Reusable skills
 └── ARCHITECTURE.md          # Full project blueprint
 ```
 
@@ -151,14 +147,13 @@ warp/
 
 - Commit messages: imperative mood, lowercase. Example: `add PTY session spawn logic`
 - One logical change per commit. Don't bundle unrelated changes.
-- Branch naming: `m1/core-terminal`, `m2/sidebar`, `m3/editor`, etc.
+- Branch naming: `feature/<issue-number>-short-description` (e.g. `feature/66-settings-ui`)
 - Never commit to `master` directly. Always use feature branches + PR.
 - Run all tests before pushing.
 
 ### General
 
 - No hardcoded paths or secrets. Use config or environment variables.
-- Add `.omc/` and `node_modules/` and `target/` to `.gitignore`.
 - Keep dependencies minimal. Justify every new crate/package.
 - Prefer composition over inheritance. Small functions over large ones.
 - When in doubt, refer to `ARCHITECTURE.md`.
@@ -167,11 +162,24 @@ warp/
 
 Commands defined in `src-tauri/src/commands.rs`. Frontend calls via `@tauri-apps/api`:
 
-- `pty_create(path, command) → session_id`
-- `pty_write(session_id, data)` / `pty_resize(session_id, rows, cols)` / `pty_kill(session_id)`
-- `git_status(path)` / `git_diff(path)`
-- `file_tree(path)` / `file_read(path)` / `file_write(path, content)`
-- Events: `pty:output`, `pty:exit`, `file:changed`
+| Command | Description |
+|---------|-------------|
+| `pty_create(path, command)` | Spawn a new PTY session → returns `session_id` |
+| `pty_write(session_id, data)` | Write input to PTY |
+| `pty_resize(session_id, rows, cols)` | Resize the terminal |
+| `pty_kill(session_id)` | Kill a PTY session |
+| `git_status(path)` | Get git status for a project |
+| `git_diff(path)` | Get git diff output |
+| `file_tree(path)` | List directory tree |
+| `file_read(path)` | Read file contents |
+| `file_write(path, content)` | Write file contents |
+| `file_rename(old_path, new_path)` | Rename or move a file |
+| `file_delete(path)` | Delete a file |
+| `config_load()` | Load config from disk |
+| `config_save(config)` | Persist config to disk |
+| `list_fonts()` | List installed system fonts (Windows registry) |
+
+**Events:** `pty:output` · `pty:exit` · `file:changed`
 
 ## Brand
 
@@ -179,40 +187,3 @@ Commands defined in `src-tauri/src/commands.rs`. Frontend calls via `@tauri-apps
 - Theme: Dark (VS Code dark base)
 - Font: Cascadia Code (monospace)
 - See `ARCHITECTURE.md` for full color token reference.
-
-## Skills
-
-### Self-Learning Skill (`.claude/skills/SKILLS.md`)
-
-Active during all sessions. Detects learning opportunities (corrections, debug fixes, architecture decisions, gotchas) and proposes saving them to persistent memory. Always confirm before saving. See the skill file for trigger types, confirmation protocol, and storage routing.
-
-**Memory file locations:**
-
-```
-~/.claude/projects/D--Development-WARP/memory/
-├── MEMORY.md        # Index + hard rules (auto-loaded)
-├── patterns.md      # Code patterns & conventions
-├── debugging.md     # Debug solutions & workarounds
-├── preferences.md   # User preferences
-├── decisions.md     # Architecture Decision Records
-└── gotchas.md       # Known pitfalls & edge cases
-```
-
-## Agents
-
-Specialized sub-agents in `.claude/agents/`:
-
-- **rust-backend** — Rust/Tauri backend work (PTY, git, files, IPC)
-- **react-frontend** — React/TypeScript frontend (components, hooks, xterm.js, Monaco)
-- **reviewer** — Code review with TDD compliance checklist
-- **architect** — Architecture decisions, module boundaries, trade-off analysis
-
-## Milestones
-
-Current milestone tracked in branch names:
-
-- **M1** — Core Terminal (Tauri + xterm.js + PTY)
-- **M2** — Multi-session + Sidebar
-- **M3** — File Editor + Explorer
-- **M4** — Smart Features (notifications, splits)
-- **M5** — Polish + Release
