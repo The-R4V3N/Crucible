@@ -29,6 +29,9 @@
     "react-dom": "^19",
     "zustand": "^5"
   },
+  "overrides": {
+    "dompurify": "^3.3.3"
+  },
   "devDependencies": {
     "@tauri-apps/cli": "^2",
     "@testing-library/jest-dom": "^6",
