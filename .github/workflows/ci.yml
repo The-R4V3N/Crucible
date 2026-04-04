@@ -56,6 +56,8 @@ jobs:
           echo '<!DOCTYPE html><html><body></body></html>' > dist/index.html
 
       - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
 
       - uses: swatinem/rust-cache@v2
         with:

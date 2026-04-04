@@ -230,7 +230,7 @@ impl PtySession {
     }
 }
 
-#[cfg(all(test, target_os = "windows"))]
+#[cfg(test)]
 mod tests {
     use super::*;
 
