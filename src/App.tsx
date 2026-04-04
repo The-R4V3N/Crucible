@@ -21,6 +21,7 @@ import { configLoad, configSave, gitStage, gitUnstage, gitDiscard, gitCommit } f
 import StatusBar from "@/components/layout/StatusBar";
 import CommandPalette from "@/components/palette/CommandPalette";
 import ActivityBar from "@/components/layout/ActivityBar";
+import SettingsModal from "@/components/settings/SettingsModal";
 
 function App() {
   const [error, setError] = useState<string | null>(null);
@@ -52,6 +53,14 @@ function App() {
           sidebar_width: 240,
           notifications: { visual: true, border_glow: true, sound: false },
           active_project: null,
+          branch_prefix: "feature/",
+          ui_zoom: 1.0,
+          sidebar_position: "left",
+          cursor_style: "bar",
+          terminal_theme: "dark",
+          divider_color: "#1E1E2E",
+          default_project_path: "",
+          shell_command: "powershell.exe",
         });
       });
   }, [setConfig]);
@@ -253,6 +262,7 @@ function App() {
           </main>
         </div>
         <CommandPalette />
+        <SettingsModal />
       </ErrorBoundary>
     </div>
   );

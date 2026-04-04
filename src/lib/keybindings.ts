@@ -34,4 +34,6 @@ export const keybindings: Keybinding[] = [
   { key: "Ctrl+S", description: "Save file", scope: "editor" },
   { key: "Ctrl+F", description: "Find in file", scope: "editor" },
   { key: "Ctrl+O", description: "Open file", scope: "editor" },
+  // Settings
+  { key: "Ctrl+,", description: "Open Settings", scope: "global" },
 ];

@@ -68,6 +68,7 @@ pub fn run() {
             commands::file_delete,
             commands::file_watch_start,
             commands::file_search,
+            commands::list_fonts,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

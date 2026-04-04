@@ -204,6 +204,11 @@ export async function fileDelete(path: string): Promise<void> {
   return invoke("file_delete", { path });
 }
 
+/** List installed font family names from the system. */
+export async function listFonts(): Promise<string[]> {
+  return invoke<string[]>("list_fonts");
+}
+
 /** Listen for file change events. Returns an unlisten function. */
 export async function onFileChanged(
   callback: (payload: FileChangedPayload) => void,

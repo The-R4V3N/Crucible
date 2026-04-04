@@ -38,6 +38,10 @@ interface UiState {
   renameTargetPath: string | null;
   /** Path pending delete confirmation. */
   deleteConfirmPath: string | null;
+  /** True when the settings modal is open. */
+  settingsOpen: boolean;
+  openSettings: () => void;
+  closeSettings: () => void;
   /** Target directory for new file from context menu (null = use tree root). */
   newFileTargetDir: string | null;
   /** Target directory for new folder from context menu (null = use tree root). */
@@ -85,6 +89,7 @@ export const useUiStore = create<UiState>((set) => ({
   contextMenu: null,
   renameTargetPath: null,
   deleteConfirmPath: null,
+  settingsOpen: false,
   newFileTargetDir: null,
   newFolderTargetDir: null,
 
@@ -148,4 +153,6 @@ export const useUiStore = create<UiState>((set) => ({
   clearRenameTarget: () => set({ renameTargetPath: null }),
   setDeleteConfirm: (path) => set({ deleteConfirmPath: path }),
   clearDeleteConfirm: () => set({ deleteConfirmPath: null }),
+  openSettings: () => set({ settingsOpen: true }),
+  closeSettings: () => set({ settingsOpen: false }),
 }));
