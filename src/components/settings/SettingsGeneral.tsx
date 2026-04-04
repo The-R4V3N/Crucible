@@ -1,21 +1,15 @@
-import { useConfigStore } from "@/stores/configStore";
-import { configSave } from "@/lib/ipc";
+import type { WarpConfig } from "@/stores/configStore";
+
+interface Props {
+  config: WarpConfig;
+  onChange: (patch: Partial<WarpConfig>) => void;
+}
 
 const LABEL_CLASS = "block text-xs uppercase tracking-wider text-warp-text-dim mb-1";
 const INPUT_CLASS =
   "w-full bg-warp-bg border border-warp-border px-3 py-1.5 text-sm text-warp-text outline-none focus:border-warp-accent";
 
-function SettingsGeneral() {
-  const config = useConfigStore((s) => s.config);
-  const updateConfig = useConfigStore((s) => s.updateConfig);
-
-  if (!config) return null;
-
-  async function save(patch: Parameters<typeof updateConfig>[0]) {
-    updateConfig(patch);
-    await configSave({ ...config!, ...patch });
-  }
-
+function SettingsGeneral({ config, onChange }: Props) {
   return (
     <div data-testid="settings-page-general" className="space-y-6">
       <h2 className="text-base font-semibold text-warp-text">General</h2>
@@ -25,10 +19,10 @@ function SettingsGeneral() {
         <input
           data-testid="setting-default-project-path"
           type="text"
-          defaultValue={config.default_project_path}
+          value={config.default_project_path}
           className={INPUT_CLASS}
           placeholder="C:\Projects"
-          onBlur={(e) => save({ default_project_path: e.target.value })}
+          onChange={(e) => onChange({ default_project_path: e.target.value })}
         />
       </div>
 
@@ -37,10 +31,10 @@ function SettingsGeneral() {
         <input
           data-testid="setting-shell-command"
           type="text"
-          defaultValue={config.shell_command}
+          value={config.shell_command}
           className={INPUT_CLASS}
           placeholder="powershell.exe"
-          onBlur={(e) => save({ shell_command: e.target.value })}
+          onChange={(e) => onChange({ shell_command: e.target.value })}
         />
       </div>
 
@@ -49,10 +43,10 @@ function SettingsGeneral() {
         <input
           data-testid="setting-branch-prefix"
           type="text"
-          defaultValue={config.branch_prefix}
+          value={config.branch_prefix}
           className={INPUT_CLASS}
           placeholder="feature/"
-          onBlur={(e) => save({ branch_prefix: e.target.value })}
+          onChange={(e) => onChange({ branch_prefix: e.target.value })}
         />
         <p className="mt-1 text-xs text-warp-text-dim">
           Prefix applied to new git branches (e.g. feature/, fix/)

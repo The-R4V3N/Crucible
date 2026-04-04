@@ -14,6 +14,7 @@ vi.mock("@xterm/xterm", () => {
     attachCustomKeyEventHandler: vi.fn(),
     hasSelection: vi.fn().mockReturnValue(false),
     getSelection: vi.fn().mockReturnValue(""),
+    options: { fontFamily: "", fontSize: 14, cursorStyle: "bar", theme: {} },
   }));
   return { Terminal };
 });

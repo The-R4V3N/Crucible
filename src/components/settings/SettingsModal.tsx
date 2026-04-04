@@ -1,5 +1,7 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useUiStore } from "@/stores/uiStore";
+import { useConfigStore, type WarpConfig } from "@/stores/configStore";
+import { configSave } from "@/lib/ipc";
 import SettingsGeneral from "./SettingsGeneral";
 import SettingsAppearance from "./SettingsAppearance";
 import SettingsTerminal from "./SettingsTerminal";
@@ -17,18 +19,44 @@ const NAV_ITEMS: { id: Page; label: string }[] = [
 function SettingsModal() {
   const settingsOpen = useUiStore((s) => s.settingsOpen);
   const closeSettings = useUiStore((s) => s.closeSettings);
+  const config = useConfigStore((s) => s.config);
+  const updateConfig = useConfigStore((s) => s.updateConfig);
+
   const [activePage, setActivePage] = useState<Page>("general");
+  const [pending, setPending] = useState<WarpConfig | null>(null);
+
+  // Snapshot config into pending state when the modal opens
+  useEffect(() => {
+    if (settingsOpen && config) {
+      setPending({ ...config });
+    }
+  }, [settingsOpen]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handleChange = useCallback((patch: Partial<WarpConfig>) => {
+    setPending((prev) => (prev ? { ...prev, ...patch } : prev));
+  }, []);
+
+  const handleSave = useCallback(async () => {
+    if (!pending) return;
+    updateConfig(pending);
+    await configSave(pending);
+    closeSettings();
+  }, [pending, updateConfig, closeSettings]);
+
+  const handleCancel = useCallback(() => {
+    closeSettings();
+  }, [closeSettings]);
 
   useEffect(() => {
     if (!settingsOpen) return;
-    function handleKeyDown(e: KeyboardEvent) {
-      if (e.key === "Escape") closeSettings();
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape") handleCancel();
     }
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [settingsOpen, closeSettings]);
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [settingsOpen, handleCancel]);
 
-  if (!settingsOpen) return null;
+  if (!settingsOpen || !pending) return null;
 
   return (
     <div data-testid="settings-modal" className="fixed inset-0 z-50 flex bg-black/60">
@@ -52,18 +80,44 @@ function SettingsModal() {
           ))}
         </nav>
 
-        {/* Content */}
-        <div className="flex-1 overflow-y-auto p-8">
-          {activePage === "general" && <SettingsGeneral />}
-          {activePage === "appearance" && <SettingsAppearance />}
-          {activePage === "terminal" && <SettingsTerminal />}
-          {activePage === "keyboard" && <SettingsKeyboard />}
+        {/* Content + footer */}
+        <div className="flex flex-1 flex-col min-w-0">
+          <div className="flex-1 overflow-y-auto p-8">
+            {activePage === "general" && (
+              <SettingsGeneral config={pending} onChange={handleChange} />
+            )}
+            {activePage === "appearance" && (
+              <SettingsAppearance config={pending} onChange={handleChange} />
+            )}
+            {activePage === "terminal" && (
+              <SettingsTerminal config={pending} onChange={handleChange} />
+            )}
+            {activePage === "keyboard" && <SettingsKeyboard />}
+          </div>
+
+          {/* Save / Cancel footer */}
+          <div className="flex justify-end gap-3 px-8 py-4 border-t border-warp-border flex-shrink-0">
+            <button
+              data-testid="settings-cancel"
+              onClick={handleCancel}
+              className="px-4 py-1.5 text-sm text-warp-text-dim border border-warp-border hover:text-warp-text hover:border-warp-text transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              data-testid="settings-save"
+              onClick={handleSave}
+              className="px-4 py-1.5 text-sm bg-warp-accent text-warp-bg hover:opacity-90 transition-opacity font-semibold"
+            >
+              Save
+            </button>
+          </div>
         </div>
 
         {/* Close button */}
         <button
           data-testid="settings-close"
-          onClick={closeSettings}
+          onClick={handleCancel}
           className="absolute right-4 top-4 text-warp-text-dim hover:text-warp-text transition-colors"
           aria-label="Close settings"
         >

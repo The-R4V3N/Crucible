@@ -29,6 +29,19 @@ function App() {
   const isLoaded = useConfigStore((s) => s.isLoaded);
   const setConfig = useConfigStore((s) => s.setConfig);
 
+  // Apply config side-effects: CSS variables + zoom
+  const accentColor = config?.accent_color;
+  const uiZoom = config?.ui_zoom;
+  useEffect(() => {
+    if (!accentColor) return;
+    document.documentElement.style.setProperty("--warp-accent", accentColor);
+  }, [accentColor]);
+  useEffect(() => {
+    if (uiZoom == null) return;
+    (document.documentElement.style as CSSStyleDeclaration & { zoom: string }).zoom =
+      String(uiZoom);
+  }, [uiZoom]);
+
   const projects = useMemo(() => config?.projects ?? [], [config?.projects]);
   const activeSessionId = useSessionStore((s) => s.activeSessionId);
   const sessions = useSessionStore((s) => s.sessions);
@@ -64,6 +77,8 @@ function App() {
         });
       });
   }, [setConfig]);
+
+  const sidebarPosition = config?.sidebar_position ?? "left";
 
   const activeView = useUiStore((s) => s.activeView);
   const activePanel = useUiStore((s) => s.activePanel);
@@ -174,41 +189,43 @@ function App() {
             </div>
           )}
 
-          {/* Activity Bar */}
-          <ActivityBar changedFiles={gitStatus?.changed_files ?? 0} />
-
-          {/* Unified sidebar panel — content driven by Activity Bar */}
-          {activePanel && (
-            <div className="w-60 flex-shrink-0 border-r border-warp-border flex flex-col h-full">
-              {activePanel === "explorer" && <FileExplorer />}
-              {activePanel === "search" && (
-                <SearchPanel
-                  projectPath={activeProject?.path ?? "."}
-                  onResultClick={(filePath) => {
-                    useFileStore
-                      .getState()
-                      .openFile(filePath, filePath.split("/").pop() ?? filePath);
-                    if (useUiStore.getState().splitMode) {
-                      useUiStore.getState().closeSplit();
-                    }
-                    useUiStore.getState().setActiveView("editor");
-                  }}
-                />
+          {/* Left sidebar (default) */}
+          {sidebarPosition !== "right" && (
+            <>
+              <ActivityBar changedFiles={gitStatus?.changed_files ?? 0} />
+              {activePanel && (
+                <div className="w-60 flex-shrink-0 border-r border-warp-border flex flex-col h-full">
+                  {activePanel === "explorer" && <FileExplorer />}
+                  {activePanel === "search" && (
+                    <SearchPanel
+                      projectPath={activeProject?.path ?? "."}
+                      onResultClick={(filePath) => {
+                        useFileStore
+                          .getState()
+                          .openFile(filePath, filePath.split("/").pop() ?? filePath);
+                        if (useUiStore.getState().splitMode) {
+                          useUiStore.getState().closeSplit();
+                        }
+                        useUiStore.getState().setActiveView("editor");
+                      }}
+                    />
+                  )}
+                  {activePanel === "source-control" && (
+                    <Sidebar
+                      projects={projects}
+                      gitStatus={gitStatus}
+                      projectPath={activeProject?.path}
+                      onStage={handleStage}
+                      onUnstage={handleUnstage}
+                      onDiscard={handleDiscard}
+                      onCommit={handleCommit}
+                      onStageAll={handleStageAll}
+                      onUnstageAll={handleUnstageAll}
+                    />
+                  )}
+                </div>
               )}
-              {activePanel === "source-control" && (
-                <Sidebar
-                  projects={projects}
-                  gitStatus={gitStatus}
-                  projectPath={activeProject?.path}
-                  onStage={handleStage}
-                  onUnstage={handleUnstage}
-                  onDiscard={handleDiscard}
-                  onCommit={handleCommit}
-                  onStageAll={handleStageAll}
-                  onUnstageAll={handleUnstageAll}
-                />
-              )}
-            </div>
+            </>
           )}
 
           {/* Main content area */}
@@ -260,6 +277,45 @@ function App() {
             />
             <StatusBar gitStatus={gitStatus} />
           </main>
+
+          {/* Right sidebar */}
+          {sidebarPosition === "right" && (
+            <>
+              {activePanel && (
+                <div className="w-60 flex-shrink-0 border-l border-warp-border flex flex-col h-full">
+                  {activePanel === "explorer" && <FileExplorer />}
+                  {activePanel === "search" && (
+                    <SearchPanel
+                      projectPath={activeProject?.path ?? "."}
+                      onResultClick={(filePath) => {
+                        useFileStore
+                          .getState()
+                          .openFile(filePath, filePath.split("/").pop() ?? filePath);
+                        if (useUiStore.getState().splitMode) {
+                          useUiStore.getState().closeSplit();
+                        }
+                        useUiStore.getState().setActiveView("editor");
+                      }}
+                    />
+                  )}
+                  {activePanel === "source-control" && (
+                    <Sidebar
+                      projects={projects}
+                      gitStatus={gitStatus}
+                      projectPath={activeProject?.path}
+                      onStage={handleStage}
+                      onUnstage={handleUnstage}
+                      onDiscard={handleDiscard}
+                      onCommit={handleCommit}
+                      onStageAll={handleStageAll}
+                      onUnstageAll={handleUnstageAll}
+                    />
+                  )}
+                </div>
+              )}
+              <ActivityBar changedFiles={gitStatus?.changed_files ?? 0} />
+            </>
+          )}
         </div>
         <CommandPalette />
         <SettingsModal />

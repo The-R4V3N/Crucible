@@ -1,12 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import { useConfigStore } from "@/stores/configStore";
+import { render, screen, fireEvent } from "@testing-library/react";
 import SettingsGeneral from "@/components/settings/SettingsGeneral";
+import type { WarpConfig } from "@/stores/configStore";
 
-const mockConfigSave = vi.hoisted(() => vi.fn().mockResolvedValue(undefined));
-vi.mock("@/lib/ipc", () => ({ configSave: mockConfigSave }));
-
-const MOCK_CONFIG = {
+const MOCK_CONFIG: WarpConfig = {
   projects: [],
   theme: "dark",
   accent_color: "#00E5FF",
@@ -26,52 +23,53 @@ const MOCK_CONFIG = {
 };
 
 describe("SettingsGeneral", () => {
+  let mockOnChange: ReturnType<typeof vi.fn>;
+
   beforeEach(() => {
-    vi.clearAllMocks();
-    useConfigStore.setState({ config: MOCK_CONFIG, isLoaded: true });
+    mockOnChange = vi.fn();
   });
 
   it("renders default project path input", () => {
-    render(<SettingsGeneral />);
+    render(<SettingsGeneral config={MOCK_CONFIG} onChange={mockOnChange} />);
     expect(screen.getByTestId("setting-default-project-path")).toBeInTheDocument();
   });
 
   it("renders shell command input", () => {
-    render(<SettingsGeneral />);
+    render(<SettingsGeneral config={MOCK_CONFIG} onChange={mockOnChange} />);
     expect(screen.getByTestId("setting-shell-command")).toBeInTheDocument();
   });
 
   it("renders branch prefix input", () => {
-    render(<SettingsGeneral />);
+    render(<SettingsGeneral config={MOCK_CONFIG} onChange={mockOnChange} />);
     expect(screen.getByTestId("setting-branch-prefix")).toBeInTheDocument();
   });
 
   it("shows current branch prefix value", () => {
-    render(<SettingsGeneral />);
+    render(<SettingsGeneral config={MOCK_CONFIG} onChange={mockOnChange} />);
     expect(screen.getByTestId("setting-branch-prefix")).toHaveValue("feature/");
   });
 
-  it("changing branch prefix calls configSave", async () => {
-    render(<SettingsGeneral />);
-    const input = screen.getByTestId("setting-branch-prefix");
-    fireEvent.change(input, { target: { value: "fix/" } });
-    fireEvent.blur(input);
-    await waitFor(() => {
-      expect(mockConfigSave).toHaveBeenCalledWith(
-        expect.objectContaining({ branch_prefix: "fix/" }),
-      );
+  it("calls onChange when branch prefix changes", () => {
+    render(<SettingsGeneral config={MOCK_CONFIG} onChange={mockOnChange} />);
+    fireEvent.change(screen.getByTestId("setting-branch-prefix"), {
+      target: { value: "fix/" },
     });
+    expect(mockOnChange).toHaveBeenCalledWith({ branch_prefix: "fix/" });
   });
 
-  it("changing shell command calls configSave", async () => {
-    render(<SettingsGeneral />);
-    const input = screen.getByTestId("setting-shell-command");
-    fireEvent.change(input, { target: { value: "bash.exe" } });
-    fireEvent.blur(input);
-    await waitFor(() => {
-      expect(mockConfigSave).toHaveBeenCalledWith(
-        expect.objectContaining({ shell_command: "bash.exe" }),
-      );
+  it("calls onChange when shell command changes", () => {
+    render(<SettingsGeneral config={MOCK_CONFIG} onChange={mockOnChange} />);
+    fireEvent.change(screen.getByTestId("setting-shell-command"), {
+      target: { value: "bash.exe" },
     });
+    expect(mockOnChange).toHaveBeenCalledWith({ shell_command: "bash.exe" });
+  });
+
+  it("calls onChange when default project path changes", () => {
+    render(<SettingsGeneral config={MOCK_CONFIG} onChange={mockOnChange} />);
+    fireEvent.change(screen.getByTestId("setting-default-project-path"), {
+      target: { value: "C:\\Projects" },
+    });
+    expect(mockOnChange).toHaveBeenCalledWith({ default_project_path: "C:\\Projects" });
   });
 });

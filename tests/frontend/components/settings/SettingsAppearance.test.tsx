@@ -1,12 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import { useConfigStore } from "@/stores/configStore";
+import { render, screen, fireEvent } from "@testing-library/react";
 import SettingsAppearance from "@/components/settings/SettingsAppearance";
+import type { WarpConfig } from "@/stores/configStore";
 
-const mockConfigSave = vi.hoisted(() => vi.fn().mockResolvedValue(undefined));
-vi.mock("@/lib/ipc", () => ({ configSave: mockConfigSave }));
-
-const MOCK_CONFIG = {
+const MOCK_CONFIG: WarpConfig = {
   projects: [],
   theme: "dark",
   accent_color: "#00E5FF",
@@ -26,68 +23,63 @@ const MOCK_CONFIG = {
 };
 
 describe("SettingsAppearance", () => {
+  let mockOnChange: ReturnType<typeof vi.fn>;
+
   beforeEach(() => {
-    vi.clearAllMocks();
-    useConfigStore.setState({ config: MOCK_CONFIG, isLoaded: true });
+    mockOnChange = vi.fn();
   });
 
   it("renders accent color input", () => {
-    render(<SettingsAppearance />);
+    render(<SettingsAppearance config={MOCK_CONFIG} onChange={mockOnChange} />);
     expect(screen.getByTestId("setting-accent-color")).toBeInTheDocument();
   });
 
   it("shows current accent color", () => {
-    render(<SettingsAppearance />);
-    // color inputs normalize hex to lowercase
+    render(<SettingsAppearance config={MOCK_CONFIG} onChange={mockOnChange} />);
     expect(screen.getByTestId("setting-accent-color")).toHaveValue("#00e5ff");
   });
 
   it("renders UI zoom select", () => {
-    render(<SettingsAppearance />);
+    render(<SettingsAppearance config={MOCK_CONFIG} onChange={mockOnChange} />);
     expect(screen.getByTestId("setting-ui-zoom")).toBeInTheDocument();
   });
 
+  it("shows current UI zoom value", () => {
+    render(<SettingsAppearance config={MOCK_CONFIG} onChange={mockOnChange} />);
+    expect(screen.getByTestId("setting-ui-zoom")).toHaveValue("1");
+  });
+
   it("renders sidebar position select", () => {
-    render(<SettingsAppearance />);
+    render(<SettingsAppearance config={MOCK_CONFIG} onChange={mockOnChange} />);
     expect(screen.getByTestId("setting-sidebar-position")).toBeInTheDocument();
   });
 
   it("shows current sidebar position", () => {
-    render(<SettingsAppearance />);
+    render(<SettingsAppearance config={MOCK_CONFIG} onChange={mockOnChange} />);
     expect(screen.getByTestId("setting-sidebar-position")).toHaveValue("left");
   });
 
-  it("changing accent color calls configSave", async () => {
-    render(<SettingsAppearance />);
-    const input = screen.getByTestId("setting-accent-color");
-    fireEvent.change(input, { target: { value: "#ff0000" } });
-    fireEvent.blur(input);
-    await waitFor(() => {
-      expect(mockConfigSave).toHaveBeenCalledWith(
-        expect.objectContaining({ accent_color: "#ff0000" }),
-      );
+  it("calls onChange when accent color changes", () => {
+    render(<SettingsAppearance config={MOCK_CONFIG} onChange={mockOnChange} />);
+    fireEvent.change(screen.getByTestId("setting-accent-color"), {
+      target: { value: "#ff0000" },
     });
+    expect(mockOnChange).toHaveBeenCalledWith({ accent_color: "#ff0000" });
   });
 
-  it("changing ui zoom calls configSave", async () => {
-    render(<SettingsAppearance />);
-    const select = screen.getByTestId("setting-ui-zoom");
-    fireEvent.change(select, { target: { value: "1.25" } });
-    await waitFor(() => {
-      expect(mockConfigSave).toHaveBeenCalledWith(
-        expect.objectContaining({ ui_zoom: 1.25 }),
-      );
+  it("calls onChange when UI zoom changes", () => {
+    render(<SettingsAppearance config={MOCK_CONFIG} onChange={mockOnChange} />);
+    fireEvent.change(screen.getByTestId("setting-ui-zoom"), {
+      target: { value: "1.25" },
     });
+    expect(mockOnChange).toHaveBeenCalledWith({ ui_zoom: 1.25 });
   });
 
-  it("changing sidebar position calls configSave", async () => {
-    render(<SettingsAppearance />);
-    const select = screen.getByTestId("setting-sidebar-position");
-    fireEvent.change(select, { target: { value: "right" } });
-    await waitFor(() => {
-      expect(mockConfigSave).toHaveBeenCalledWith(
-        expect.objectContaining({ sidebar_position: "right" }),
-      );
+  it("calls onChange when sidebar position changes", () => {
+    render(<SettingsAppearance config={MOCK_CONFIG} onChange={mockOnChange} />);
+    fireEvent.change(screen.getByTestId("setting-sidebar-position"), {
+      target: { value: "right" },
     });
+    expect(mockOnChange).toHaveBeenCalledWith({ sidebar_position: "right" });
   });
 });
