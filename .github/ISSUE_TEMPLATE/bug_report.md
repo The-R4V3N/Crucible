@@ -26,7 +26,7 @@ assignees: ""
 
 ## Environment
 
-- WARP version: <!-- e.g. 0.3.1 — visible in Help → About -->
+- Crucible version: <!-- e.g. 0.3.1 — visible in Help → About -->
 - OS: Windows 11
 - Build: <!-- dev / release -->
 
