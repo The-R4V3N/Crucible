@@ -17,7 +17,7 @@ function StatusBar({ gitStatus }: StatusBarProps) {
   return (
     <div
       data-testid="status-bar"
-      className="flex h-6 items-center justify-between bg-warp-accent px-3 text-xs text-warp-bg font-mono select-none"
+      className="flex h-6 items-center justify-between bg-crucible-accent px-3 text-xs text-crucible-bg font-mono select-none"
     >
       {/* Left: git branch */}
       <div className="flex items-center gap-2">

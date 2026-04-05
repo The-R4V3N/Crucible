@@ -1,3 +1,3 @@
 pub mod schema;
 
-pub use schema::{NotificationConfig, ProjectConfig, WarpConfig};
+pub use schema::{NotificationConfig, ProjectConfig, CrucibleConfig};

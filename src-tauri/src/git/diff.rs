@@ -80,7 +80,7 @@ mod tests {
 
     #[test]
     fn test_get_file_diff_not_a_repo() {
-        let dir = std::env::temp_dir().join("warp_diff_not_repo");
+        let dir = std::env::temp_dir().join("crucible_diff_not_repo");
         std::fs::create_dir_all(&dir).unwrap();
 
         let result = get_file_diff(dir.to_str().unwrap(), "test.txt");

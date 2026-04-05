@@ -12,7 +12,7 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178c6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![xterm.js](https://img.shields.io/badge/terminal-xterm.js-000000?logo=windowsterminal&logoColor=white)](#tech-stack)
 [![Monaco](https://img.shields.io/badge/editor-Monaco-007ACC?logo=visualstudiocode&logoColor=white)](#tech-stack)
-[![last commit](https://img.shields.io/github/last-commit/The-R4V3N/WARP)](https://github.com/The-R4V3N/WARP/commits/master)
+[![last commit](https://img.shields.io/github/last-commit/The-R4V3N/Crucible)](https://github.com/The-R4V3N/Crucible/commits/master)
 
 <br/>
 

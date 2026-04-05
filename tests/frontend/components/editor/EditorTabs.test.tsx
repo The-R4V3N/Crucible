@@ -31,7 +31,7 @@ describe("EditorTabs", () => {
     useFileStore.getState().openFile("/tmp/b.ts", "b.ts");
     render(<EditorTabs />);
     const activeTab = screen.getByTestId("tab-/tmp/b.ts");
-    expect(activeTab.className).toContain("border-warp-accent");
+    expect(activeTab.className).toContain("border-crucible-accent");
   });
 
   it("clicking tab switches active file", () => {

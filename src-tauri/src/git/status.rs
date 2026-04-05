@@ -121,7 +121,7 @@ mod tests {
 
     #[test]
     fn test_git_status_on_current_repo() {
-        // The WARP repo itself is a git repo, so this should work
+        // The Crucible repo itself is a git repo, so this should work
         let result = get_git_status(".");
         assert!(result.is_ok(), "git status failed: {:?}", result.err());
         let status = result.unwrap();
@@ -130,7 +130,7 @@ mod tests {
 
     #[test]
     fn test_git_status_not_a_repo() {
-        let dir = std::env::temp_dir().join("warp_test_not_git");
+        let dir = std::env::temp_dir().join("crucible_test_not_git");
         fs::create_dir_all(&dir).unwrap();
 
         let result = get_git_status(dir.to_str().unwrap());

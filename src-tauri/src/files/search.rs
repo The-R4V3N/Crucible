@@ -144,7 +144,7 @@ mod tests {
     use super::*;
 
     fn create_search_dir(suffix: &str) -> std::path::PathBuf {
-        let dir = std::env::temp_dir().join(format!("warp_search_{suffix}"));
+        let dir = std::env::temp_dir().join(format!("crucible_search_{suffix}"));
         let _ = fs::remove_dir_all(&dir);
         fs::create_dir_all(dir.join("src")).unwrap();
         fs::write(dir.join("src/main.rs"), "fn main() {\n    println!(\"hello world\");\n}\n").unwrap();

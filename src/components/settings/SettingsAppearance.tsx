@@ -1,18 +1,18 @@
-import type { WarpConfig } from "@/stores/configStore";
+import type { CrucibleConfig } from "@/stores/configStore";
 
 interface Props {
-  config: WarpConfig;
-  onChange: (patch: Partial<WarpConfig>) => void;
+  config: CrucibleConfig;
+  onChange: (patch: Partial<CrucibleConfig>) => void;
 }
 
-const LABEL_CLASS = "block text-xs uppercase tracking-wider text-warp-text-dim mb-1";
+const LABEL_CLASS = "block text-xs uppercase tracking-wider text-crucible-text-dim mb-1";
 const SELECT_CLASS =
-  "w-full bg-warp-bg border border-warp-border px-3 py-1.5 text-sm text-warp-text outline-none focus:border-warp-accent";
+  "w-full bg-crucible-bg border border-crucible-border px-3 py-1.5 text-sm text-crucible-text outline-none focus:border-crucible-accent";
 
 function SettingsAppearance({ config, onChange }: Props) {
   return (
     <div data-testid="settings-page-appearance" className="space-y-6">
-      <h2 className="text-base font-semibold text-warp-text">Appearance</h2>
+      <h2 className="text-base font-semibold text-crucible-text">Appearance</h2>
 
       <div>
         <label className={LABEL_CLASS}>Accent Color</label>
@@ -21,13 +21,13 @@ function SettingsAppearance({ config, onChange }: Props) {
             data-testid="setting-accent-color"
             type="color"
             value={config.accent_color}
-            className="h-8 w-12 cursor-pointer border border-warp-border bg-warp-bg p-0.5"
+            className="h-8 w-12 cursor-pointer border border-crucible-border bg-crucible-bg p-0.5"
             onChange={(e) => onChange({ accent_color: e.target.value })}
           />
           <input
             type="text"
             value={config.accent_color}
-            className="w-28 bg-warp-bg border border-warp-border px-3 py-1.5 text-sm text-warp-text outline-none focus:border-warp-accent font-mono"
+            className="w-28 bg-crucible-bg border border-crucible-border px-3 py-1.5 text-sm text-crucible-text outline-none focus:border-crucible-accent font-mono"
             onChange={(e) => onChange({ accent_color: e.target.value })}
           />
         </div>

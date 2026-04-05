@@ -33,7 +33,7 @@ const TerminalPane = memo(function TerminalPane({
 
   return (
     <div
-      className={`absolute inset-0 bg-warp-bg ${isActive ? "visible" : "invisible"}`}
+      className={`absolute inset-0 bg-crucible-bg ${isActive ? "visible" : "invisible"}`}
       style={{ contain: "strict" }}
       data-testid={`terminal-pane-${tab.tabKey}`}
     >
@@ -115,7 +115,7 @@ function TerminalManager({ onError }: TerminalManagerProps) {
   }, [setTerminalActions, handleAddTab, handleCloseActiveTab]);
 
   return (
-    <div className="flex flex-col h-full w-full bg-warp-bg" data-testid="terminal-manager">
+    <div className="flex flex-col h-full w-full bg-crucible-bg" data-testid="terminal-manager">
       <TerminalTabBar tabs={tabs} onAdd={handleAddTab} onClose={handleCloseTab} />
       <div className="relative flex-1">
         {tabs.map((tab) => (

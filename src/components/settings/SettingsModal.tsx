@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useUiStore } from "@/stores/uiStore";
-import { useConfigStore, type WarpConfig } from "@/stores/configStore";
+import { useConfigStore, type CrucibleConfig } from "@/stores/configStore";
 import { configSave } from "@/lib/ipc";
 import SettingsGeneral from "./SettingsGeneral";
 import SettingsAppearance from "./SettingsAppearance";
@@ -23,7 +23,7 @@ function SettingsModal() {
   const updateConfig = useConfigStore((s) => s.updateConfig);
 
   const [activePage, setActivePage] = useState<Page>("general");
-  const [pending, setPending] = useState<WarpConfig | null>(null);
+  const [pending, setPending] = useState<CrucibleConfig | null>(null);
 
   // Snapshot config into pending state when the modal opens
   useEffect(() => {
@@ -32,7 +32,7 @@ function SettingsModal() {
     }
   }, [settingsOpen]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const handleChange = useCallback((patch: Partial<WarpConfig>) => {
+  const handleChange = useCallback((patch: Partial<CrucibleConfig>) => {
     setPending((prev) => (prev ? { ...prev, ...patch } : prev));
   }, []);
 
@@ -60,10 +60,12 @@ function SettingsModal() {
 
   return (
     <div data-testid="settings-modal" className="fixed inset-0 z-50 flex bg-black/60">
-      <div className="relative flex w-full max-w-4xl m-auto h-[80vh] bg-warp-sidebar border border-warp-border shadow-2xl">
+      <div className="relative flex w-full max-w-4xl m-auto h-[80vh] bg-crucible-sidebar border border-crucible-border shadow-2xl">
         {/* Left nav */}
-        <nav className="w-48 flex-shrink-0 border-r border-warp-border bg-warp-bg py-4">
-          <p className="px-4 pb-3 text-xs uppercase tracking-wider text-warp-text-dim">Settings</p>
+        <nav className="w-48 flex-shrink-0 border-r border-crucible-border bg-crucible-bg py-4">
+          <p className="px-4 pb-3 text-xs uppercase tracking-wider text-crucible-text-dim">
+            Settings
+          </p>
           {NAV_ITEMS.map((item) => (
             <button
               key={item.id}
@@ -71,8 +73,8 @@ function SettingsModal() {
               onClick={() => setActivePage(item.id)}
               className={`flex w-full items-center px-4 py-2 text-sm transition-colors ${
                 activePage === item.id
-                  ? "bg-warp-sidebar text-warp-accent"
-                  : "text-warp-text-dim hover:text-warp-text hover:bg-warp-sidebar/60"
+                  ? "bg-crucible-sidebar text-crucible-accent"
+                  : "text-crucible-text-dim hover:text-crucible-text hover:bg-crucible-sidebar/60"
               }`}
             >
               {item.label}
@@ -96,18 +98,18 @@ function SettingsModal() {
           </div>
 
           {/* Save / Cancel footer */}
-          <div className="flex justify-end gap-3 px-8 py-4 border-t border-warp-border flex-shrink-0">
+          <div className="flex justify-end gap-3 px-8 py-4 border-t border-crucible-border flex-shrink-0">
             <button
               data-testid="settings-cancel"
               onClick={handleCancel}
-              className="px-4 py-1.5 text-sm text-warp-text-dim border border-warp-border hover:text-warp-text hover:border-warp-text transition-colors"
+              className="px-4 py-1.5 text-sm text-crucible-text-dim border border-crucible-border hover:text-crucible-text hover:border-crucible-text transition-colors"
             >
               Cancel
             </button>
             <button
               data-testid="settings-save"
               onClick={handleSave}
-              className="px-4 py-1.5 text-sm bg-warp-accent text-warp-bg hover:opacity-90 transition-opacity font-semibold"
+              className="px-4 py-1.5 text-sm bg-crucible-accent text-crucible-bg hover:opacity-90 transition-opacity font-semibold"
             >
               Save
             </button>
@@ -118,7 +120,7 @@ function SettingsModal() {
         <button
           data-testid="settings-close"
           onClick={handleCancel}
-          className="absolute right-4 top-4 text-warp-text-dim hover:text-warp-text transition-colors"
+          className="absolute right-4 top-4 text-crucible-text-dim hover:text-crucible-text transition-colors"
           aria-label="Close settings"
         >
           <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">

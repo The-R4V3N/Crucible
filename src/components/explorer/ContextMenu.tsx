@@ -11,7 +11,7 @@ interface ContextMenuProps {
 }
 
 const ITEM_CLASS =
-  "flex w-full items-center px-3 py-1 text-left text-sm text-warp-text-dim hover:text-warp-text hover:bg-warp-sidebar transition-colors";
+  "flex w-full items-center px-3 py-1 text-left text-sm text-crucible-text-dim hover:text-crucible-text hover:bg-crucible-sidebar transition-colors";
 
 function ContextMenu({ x, y, targetPath, isDir, projectRoot, onClose }: ContextMenuProps) {
   const ref = useRef<HTMLDivElement>(null);
@@ -47,7 +47,7 @@ function ContextMenu({ x, y, targetPath, isDir, projectRoot, onClose }: ContextM
     <div
       ref={ref}
       data-testid="context-menu"
-      className="fixed z-50 min-w-[160px] border border-warp-border bg-warp-bg py-1 shadow-lg"
+      className="fixed z-50 min-w-[160px] border border-crucible-border bg-crucible-bg py-1 shadow-lg"
       style={{ left: x, top: y }}
     >
       {isDir && (
@@ -70,7 +70,7 @@ function ContextMenu({ x, y, targetPath, isDir, projectRoot, onClose }: ContextM
           >
             New Folder
           </button>
-          <div className="my-1 border-t border-warp-border/60" />
+          <div className="my-1 border-t border-crucible-border/60" />
         </>
       )}
       <button
@@ -91,7 +91,7 @@ function ContextMenu({ x, y, targetPath, isDir, projectRoot, onClose }: ContextM
       >
         Delete
       </button>
-      <div className="my-1 border-t border-warp-border/60" />
+      <div className="my-1 border-t border-crucible-border/60" />
       <button className={ITEM_CLASS} onClick={copyPath}>
         Copy Path
       </button>

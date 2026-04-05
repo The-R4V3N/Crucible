@@ -146,7 +146,7 @@ describe("MenuBar — Help dropdown", () => {
     expect(screen.getByTestId("help-item-shortcuts")).toBeInTheDocument();
   });
 
-  it("dropdown shows About WARP item", () => {
+  it("dropdown shows About Crucible item", () => {
     render(<MenuBar />);
     fireEvent.click(screen.getByTestId("menu-help"));
     expect(screen.getByTestId("help-item-about")).toBeInTheDocument();
@@ -221,7 +221,7 @@ describe("MenuBar — modals", () => {
     expect(screen.queryByTestId("about-modal")).not.toBeInTheDocument();
   });
 
-  it("clicking About WARP opens AboutModal", () => {
+  it("clicking About Crucible opens AboutModal", () => {
     render(<MenuBar />);
     fireEvent.click(screen.getByTestId("menu-help"));
     fireEvent.click(screen.getByTestId("help-item-about"));

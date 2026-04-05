@@ -181,7 +181,7 @@ function EditorView({ repoPath = null }: EditorViewProps) {
     return (
       <div
         data-testid="editor-placeholder"
-        className="flex h-full items-center justify-center text-warp-text-dim"
+        className="flex h-full items-center justify-center text-crucible-text-dim"
       >
         <span>Open a file from the explorer</span>
       </div>
@@ -195,7 +195,7 @@ function EditorView({ repoPath = null }: EditorViewProps) {
       <EditorTabs />
       <div ref={editorContainerRef} className="flex-1">
         {loading ? (
-          <div className="flex h-full items-center justify-center text-warp-text-dim">
+          <div className="flex h-full items-center justify-center text-crucible-text-dim">
             Loading...
           </div>
         ) : (

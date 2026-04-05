@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import SettingsAppearance from "@/components/settings/SettingsAppearance";
-import type { WarpConfig } from "@/stores/configStore";
+import type { CrucibleConfig } from "@/stores/configStore";
 
-const MOCK_CONFIG: WarpConfig = {
+const MOCK_CONFIG: CrucibleConfig = {
   projects: [],
   theme: "dark",
   accent_color: "#00E5FF",

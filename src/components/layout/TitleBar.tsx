@@ -1,25 +1,25 @@
 import { getCurrentWindow } from "@tauri-apps/api/window";
 
-/** Minimal custom title bar with WARP branding and window controls. */
+/** Minimal custom title bar with Crucible branding and window controls. */
 function TitleBar() {
   const appWindow = getCurrentWindow();
 
   return (
-    <div className="flex h-8 items-center bg-warp-surface select-none">
+    <div className="flex h-8 items-center bg-crucible-surface select-none">
       {/* Drag region with branding */}
       <div
         className="flex-1 flex items-center px-3 h-full"
         data-tauri-drag-region
         data-testid="titlebar-drag-region"
       >
-        <span className="text-warp-accent text-sm font-bold tracking-wider">WARP</span>
+        <span className="text-crucible-accent text-sm font-bold tracking-wider">Crucible</span>
       </div>
 
       {/* Window controls */}
       <div className="flex h-full">
         <button
           aria-label="Minimize"
-          className="w-12 h-full flex items-center justify-center text-warp-muted hover:bg-warp-hover transition-colors"
+          className="w-12 h-full flex items-center justify-center text-crucible-muted hover:bg-crucible-hover transition-colors"
           onClick={() => appWindow.minimize()}
         >
           <svg width="10" height="1" viewBox="0 0 10 1" fill="currentColor">
@@ -28,7 +28,7 @@ function TitleBar() {
         </button>
         <button
           aria-label="Maximize"
-          className="w-12 h-full flex items-center justify-center text-warp-muted hover:bg-warp-hover transition-colors"
+          className="w-12 h-full flex items-center justify-center text-crucible-muted hover:bg-crucible-hover transition-colors"
           onClick={() => appWindow.toggleMaximize()}
         >
           <svg
@@ -44,7 +44,7 @@ function TitleBar() {
         </button>
         <button
           aria-label="Close"
-          className="w-12 h-full flex items-center justify-center text-warp-muted hover:bg-red-600 hover:text-white transition-colors"
+          className="w-12 h-full flex items-center justify-center text-crucible-muted hover:bg-red-600 hover:text-white transition-colors"
           onClick={() => appWindow.close()}
         >
           <svg

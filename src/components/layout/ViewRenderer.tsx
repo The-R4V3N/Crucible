@@ -23,16 +23,18 @@ const ViewRenderer = memo(function ViewRenderer({
   onError,
 }: ViewRendererProps) {
   return (
-    <div className="relative h-full w-full bg-warp-bg">
+    <div className="relative h-full w-full bg-crucible-bg">
       <div
-        className={`absolute inset-0 bg-warp-bg ${view === "terminal" ? "visible" : "invisible"}`}
+        className={`absolute inset-0 bg-crucible-bg ${view === "terminal" ? "visible" : "invisible"}`}
       >
         <TerminalManager onError={onError} />
       </div>
-      <div className={`absolute inset-0 bg-warp-bg ${view === "editor" ? "visible" : "invisible"}`}>
+      <div
+        className={`absolute inset-0 bg-crucible-bg ${view === "editor" ? "visible" : "invisible"}`}
+      >
         <EditorView repoPath={repoPath} />
       </div>
-      <div className={`absolute inset-0 bg-warp-bg ${view === "diff" ? "block" : "hidden"}`}>
+      <div className={`absolute inset-0 bg-crucible-bg ${view === "diff" ? "block" : "hidden"}`}>
         <DiffView repoPath={repoPath} filePath={view === "diff" ? diffFilePath : null} />
       </div>
     </div>

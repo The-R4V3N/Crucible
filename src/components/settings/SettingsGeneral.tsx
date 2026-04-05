@@ -1,18 +1,18 @@
-import type { WarpConfig } from "@/stores/configStore";
+import type { CrucibleConfig } from "@/stores/configStore";
 
 interface Props {
-  config: WarpConfig;
-  onChange: (patch: Partial<WarpConfig>) => void;
+  config: CrucibleConfig;
+  onChange: (patch: Partial<CrucibleConfig>) => void;
 }
 
-const LABEL_CLASS = "block text-xs uppercase tracking-wider text-warp-text-dim mb-1";
+const LABEL_CLASS = "block text-xs uppercase tracking-wider text-crucible-text-dim mb-1";
 const INPUT_CLASS =
-  "w-full bg-warp-bg border border-warp-border px-3 py-1.5 text-sm text-warp-text outline-none focus:border-warp-accent";
+  "w-full bg-crucible-bg border border-crucible-border px-3 py-1.5 text-sm text-crucible-text outline-none focus:border-crucible-accent";
 
 function SettingsGeneral({ config, onChange }: Props) {
   return (
     <div data-testid="settings-page-general" className="space-y-6">
-      <h2 className="text-base font-semibold text-warp-text">General</h2>
+      <h2 className="text-base font-semibold text-crucible-text">General</h2>
 
       <div>
         <label className={LABEL_CLASS}>Default Project Path</label>
@@ -48,7 +48,7 @@ function SettingsGeneral({ config, onChange }: Props) {
           placeholder="feature/"
           onChange={(e) => onChange({ branch_prefix: e.target.value })}
         />
-        <p className="mt-1 text-xs text-warp-text-dim">
+        <p className="mt-1 text-xs text-crucible-text-dim">
           Prefix applied to new git branches (e.g. feature/, fix/)
         </p>
       </div>

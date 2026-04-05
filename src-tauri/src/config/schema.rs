@@ -27,9 +27,9 @@ pub struct NotificationConfig {
     pub sound: bool,
 }
 
-/// Root WARP configuration.
+/// Root Crucible configuration.
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct WarpConfig {
+pub struct CrucibleConfig {
     /// List of projects to manage.
     pub projects: Vec<ProjectConfig>,
     /// Theme name (currently only "dark").
@@ -90,7 +90,7 @@ impl Default for NotificationConfig {
 }
 
 /// Load configuration from a JSON file at the given path.
-pub fn load_config(path: &Path) -> Result<WarpConfig, String> {
+pub fn load_config(path: &Path) -> Result<CrucibleConfig, String> {
     let content = std::fs::read_to_string(path)
         .map_err(|e| format!("failed to read config file: {e}"))?;
 
@@ -99,7 +99,7 @@ pub fn load_config(path: &Path) -> Result<WarpConfig, String> {
 }
 
 /// Save configuration to a JSON file at the given path.
-pub fn save_config(config: &WarpConfig, path: &Path) -> Result<(), String> {
+pub fn save_config(config: &CrucibleConfig, path: &Path) -> Result<(), String> {
     let content = serde_json::to_string_pretty(config)
         .map_err(|e| format!("failed to serialize config: {e}"))?;
 
@@ -171,7 +171,7 @@ mod tests {
                 { "name": "test", "path": "/tmp/test", "command": "bash" }
             ]
         }"#;
-        let config: WarpConfig = serde_json::from_str(json).unwrap();
+        let config: CrucibleConfig = serde_json::from_str(json).unwrap();
         assert_eq!(config.projects.len(), 1);
         assert_eq!(config.projects[0].name, "test");
         assert_eq!(config.projects[0].command, "bash");
@@ -184,14 +184,14 @@ mod tests {
                 { "name": "test", "path": "/tmp/test" }
             ]
         }"#;
-        let config: WarpConfig = serde_json::from_str(json).unwrap();
+        let config: CrucibleConfig = serde_json::from_str(json).unwrap();
         assert_eq!(config.projects[0].command, "powershell.exe");
     }
 
     #[test]
     fn test_default_values() {
         let json = r#"{ "projects": [] }"#;
-        let config: WarpConfig = serde_json::from_str(json).unwrap();
+        let config: CrucibleConfig = serde_json::from_str(json).unwrap();
         assert_eq!(config.theme, "dark");
         assert_eq!(config.accent_color, "#00E5FF");
         assert_eq!(config.font_size, 14);
@@ -203,7 +203,7 @@ mod tests {
     #[test]
     fn test_load_config_from_file() {
         let dir = std::env::temp_dir();
-        let path = dir.join("warp_test_config.json");
+        let path = dir.join("crucible_test_config.json");
         let mut file = std::fs::File::create(&path).unwrap();
         file.write_all(br#"{ "projects": [{ "name": "p1", "path": "." }] }"#)
             .unwrap();
@@ -225,7 +225,7 @@ mod tests {
     #[test]
     fn test_load_config_invalid_json() {
         let dir = std::env::temp_dir();
-        let path = dir.join("warp_test_bad_config.json");
+        let path = dir.join("crucible_test_bad_config.json");
         std::fs::write(&path, "not json").unwrap();
 
         let result = load_config(&path);
@@ -237,7 +237,7 @@ mod tests {
 
     #[test]
     fn test_save_and_load_roundtrip() {
-        let config = WarpConfig {
+        let config = CrucibleConfig {
             projects: vec![ProjectConfig {
                 name: "roundtrip".to_string(),
                 path: "/tmp".to_string(),
@@ -261,7 +261,7 @@ mod tests {
         };
 
         let dir = std::env::temp_dir();
-        let path = dir.join("warp_test_roundtrip.json");
+        let path = dir.join("crucible_test_roundtrip.json");
 
         save_config(&config, &path).unwrap();
         let loaded = load_config(&path).unwrap();
@@ -276,14 +276,14 @@ mod tests {
     #[test]
     fn test_active_project_defaults_to_none() {
         let json = r#"{ "projects": [] }"#;
-        let config: WarpConfig = serde_json::from_str(json).unwrap();
+        let config: CrucibleConfig = serde_json::from_str(json).unwrap();
         assert_eq!(config.active_project, None);
     }
 
     #[test]
     fn test_new_config_fields_have_defaults() {
         let json = r#"{ "projects": [] }"#;
-        let config: WarpConfig = serde_json::from_str(json).unwrap();
+        let config: CrucibleConfig = serde_json::from_str(json).unwrap();
         assert_eq!(config.branch_prefix, "feature/");
         assert!((config.ui_zoom - 1.0_f32).abs() < f32::EPSILON);
         assert_eq!(config.sidebar_position, "left");
@@ -307,7 +307,7 @@ mod tests {
             "default_project_path": "C:/Projects",
             "shell_command": "bash.exe"
         }"##;
-        let config: WarpConfig = serde_json::from_str(json).unwrap();
+        let config: CrucibleConfig = serde_json::from_str(json).unwrap();
         assert_eq!(config.branch_prefix, "fix/");
         assert!((config.ui_zoom - 1.25_f32).abs() < 0.001);
         assert_eq!(config.sidebar_position, "right");
@@ -329,7 +329,7 @@ mod tests {
             "font_size": 14,
             "sidebar_width": 240
         }"##;
-        let config: WarpConfig = serde_json::from_str(json).unwrap();
+        let config: CrucibleConfig = serde_json::from_str(json).unwrap();
         // Should load without error and use defaults for new fields
         assert_eq!(config.branch_prefix, "feature/");
         assert_eq!(config.cursor_style, "bar");
@@ -338,7 +338,7 @@ mod tests {
 
     #[test]
     fn test_active_project_omitted_from_json_when_none() {
-        let config = WarpConfig {
+        let config = CrucibleConfig {
             projects: vec![],
             theme: "dark".to_string(),
             accent_color: "#00E5FF".to_string(),

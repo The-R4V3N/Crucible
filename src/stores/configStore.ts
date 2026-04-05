@@ -14,8 +14,8 @@ export interface NotificationConfig {
   sound: boolean;
 }
 
-/** Root WARP configuration. */
-export interface WarpConfig {
+/** Root Crucible configuration. */
+export interface CrucibleConfig {
   projects: ProjectConfig[];
   theme: string;
   accent_color: string;
@@ -36,16 +36,16 @@ export interface WarpConfig {
 
 /** Config store state and actions. */
 interface ConfigState {
-  config: WarpConfig | null;
+  config: CrucibleConfig | null;
   isLoaded: boolean;
-  setConfig: (config: WarpConfig) => void;
+  setConfig: (config: CrucibleConfig) => void;
   addProject: (name: string, path: string, command?: string) => void;
   removeProject: (name: string) => void;
   setActiveProject: (name: string | null) => void;
-  updateConfig: (patch: Partial<WarpConfig>) => void;
+  updateConfig: (patch: Partial<CrucibleConfig>) => void;
 }
 
-const defaultConfig: WarpConfig = {
+const defaultConfig: CrucibleConfig = {
   projects: [],
   theme: "dark",
   accent_color: "#00E5FF",

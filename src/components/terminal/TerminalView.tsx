@@ -5,8 +5,8 @@ import { useSession } from "@/hooks/useSession";
 import { useSessionStore } from "@/stores/sessionStore";
 import "@xterm/xterm/css/xterm.css";
 
-/** WARP terminal color theme — dark. */
-const WARP_THEME_DARK = {
+/** Crucible terminal color theme — dark. */
+const CRUCIBLE_THEME_DARK = {
   background: "#1E1E1E",
   foreground: "#CCCCCC",
   cursor: "#00E5FF",
@@ -31,8 +31,8 @@ const WARP_THEME_DARK = {
   brightWhite: "#FFFFFF",
 };
 
-/** WARP terminal color theme — light. */
-const WARP_THEME_LIGHT = {
+/** Crucible terminal color theme — light. */
+const CRUCIBLE_THEME_LIGHT = {
   background: "#FFFFFF",
   foreground: "#1E1E1E",
   cursor: "#007ACC",
@@ -58,7 +58,7 @@ const WARP_THEME_LIGHT = {
 };
 
 function resolveTheme(terminalTheme?: string) {
-  return terminalTheme === "light" ? WARP_THEME_LIGHT : WARP_THEME_DARK;
+  return terminalTheme === "light" ? CRUCIBLE_THEME_LIGHT : CRUCIBLE_THEME_DARK;
 }
 
 interface TerminalViewProps {
@@ -281,8 +281,8 @@ function TerminalView({
     <div
       ref={containerRef}
       data-testid="terminal-container"
-      className={`h-full w-full bg-warp-bg ${
-        needsAttention ? "ring-2 ring-warp-accent ring-inset" : ""
+      className={`h-full w-full bg-crucible-bg ${
+        needsAttention ? "ring-2 ring-crucible-accent ring-inset" : ""
       }`}
     />
   );

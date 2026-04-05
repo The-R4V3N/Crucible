@@ -4,7 +4,7 @@ use std::sync::Mutex;
 use tauri::{AppHandle, Emitter, State};
 use uuid::Uuid;
 
-use crate::config::WarpConfig;
+use crate::config::CrucibleConfig;
 use crate::files::{self, FileNode, SearchMatch};
 use crate::git::{git_commit, git_discard, git_stage, git_unstage, FileDiff, GitStatus};
 use crate::pty::PtyManager;
@@ -98,13 +98,13 @@ fn resolve_config_path() -> Result<std::path::PathBuf, String> {
         .parent()
         .ok_or("cannot determine exe directory")?
         .to_path_buf();
-    // In dev mode, exe is at src-tauri/target/debug/warp.exe
+    // In dev mode, exe is at src-tauri/target/debug/crucible.exe
     // Prefer the project root (3 levels up) to avoid writing inside src-tauri/
     // which triggers the tauri dev watcher and restarts the app.
     let candidates = [
-        exe_dir.join("../../../warp_config.json"),
-        exe_dir.join("warp_config.json"),
-        std::path::PathBuf::from("warp_config.json"),
+        exe_dir.join("../../../crucible_config.json"),
+        exe_dir.join("crucible_config.json"),
+        std::path::PathBuf::from("crucible_config.json"),
     ];
     // Return existing file if found
     if let Some(path) = candidates.iter().find(|p| p.exists()) {
@@ -114,17 +114,17 @@ fn resolve_config_path() -> Result<std::path::PathBuf, String> {
     Ok(candidates[0].clone())
 }
 
-/// Load the WARP configuration from the given path, or the default location.
+/// Load the Crucible configuration from the given path, or the default location.
 /// Creates a default config file if none exists.
 #[tauri::command]
-pub fn config_load(path: Option<String>) -> Result<WarpConfig, String> {
+pub fn config_load(path: Option<String>) -> Result<CrucibleConfig, String> {
     let config_path = match path {
         Some(p) => std::path::PathBuf::from(p),
         None => resolve_config_path()?,
     };
     if !config_path.exists() {
         // Create a default config so first-run works out of the box
-        let default_config = WarpConfig {
+        let default_config = CrucibleConfig {
             projects: vec![],
             theme: "dark".to_string(),
             accent_color: "#00E5FF".to_string(),
@@ -148,9 +148,9 @@ pub fn config_load(path: Option<String>) -> Result<WarpConfig, String> {
     crate::config::schema::load_config(&config_path)
 }
 
-/// Save the WARP configuration to the given path, or the resolved default.
+/// Save the Crucible configuration to the given path, or the resolved default.
 #[tauri::command]
-pub fn config_save(config: WarpConfig, path: Option<String>) -> Result<(), String> {
+pub fn config_save(config: CrucibleConfig, path: Option<String>) -> Result<(), String> {
     let config_path = match path {
         Some(p) => std::path::PathBuf::from(p),
         None => resolve_config_path()?,

@@ -12,9 +12,9 @@ vi.mock("@tauri-apps/api/window", () => ({
 }));
 
 describe("TitleBar", () => {
-  it("renders WARP branding", () => {
+  it("renders Crucible branding", () => {
     render(<TitleBar />);
-    expect(screen.getByText("WARP")).toBeInTheDocument();
+    expect(screen.getByText("Crucible")).toBeInTheDocument();
   });
 
   it("renders window control buttons", () => {

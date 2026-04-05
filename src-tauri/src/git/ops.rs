@@ -77,10 +77,10 @@ pub fn git_commit(repo_path: &str, message: &str) -> Result<(), String> {
     let config = repo.config().map_err(|e| e.to_string())?;
     let name = config
         .get_string("user.name")
-        .unwrap_or_else(|_| "WARP User".to_string());
+        .unwrap_or_else(|_| "Crucible User".to_string());
     let email = config
         .get_string("user.email")
-        .unwrap_or_else(|_| "warp@example.com".to_string());
+        .unwrap_or_else(|_| "crucible@example.com".to_string());
     let sig = git2::Signature::now(&name, &email).map_err(|e| e.to_string())?;
 
     let mut index = repo.index().map_err(|e| e.to_string())?;
@@ -109,7 +109,7 @@ mod tests {
 
     /// Initialise a fresh git repo in a unique temp directory.
     fn setup_test_repo(suffix: &str) -> (PathBuf, Repository) {
-        let dir = std::env::temp_dir().join(format!("warp_ops_test_{suffix}"));
+        let dir = std::env::temp_dir().join(format!("crucible_ops_test_{suffix}"));
         let _ = fs::remove_dir_all(&dir);
         fs::create_dir_all(&dir).unwrap();
 
@@ -162,7 +162,7 @@ mod tests {
 
     #[test]
     fn test_git_stage_returns_error_for_invalid_repo() {
-        let dir = std::env::temp_dir().join("warp_not_repo_stage");
+        let dir = std::env::temp_dir().join("crucible_not_repo_stage");
         fs::create_dir_all(&dir).unwrap();
 
         let result = git_stage(dir.to_str().unwrap(), "file.txt");
@@ -246,7 +246,7 @@ mod tests {
 
     #[test]
     fn test_git_unstage_returns_error_for_invalid_repo() {
-        let dir = std::env::temp_dir().join("warp_not_repo_unstage");
+        let dir = std::env::temp_dir().join("crucible_not_repo_unstage");
         fs::create_dir_all(&dir).unwrap();
 
         let result = git_unstage(dir.to_str().unwrap(), "file.txt");
@@ -296,7 +296,7 @@ mod tests {
 
     #[test]
     fn test_git_discard_returns_error_for_invalid_repo() {
-        let dir = std::env::temp_dir().join("warp_not_repo_discard");
+        let dir = std::env::temp_dir().join("crucible_not_repo_discard");
         fs::create_dir_all(&dir).unwrap();
 
         let result = git_discard(dir.to_str().unwrap(), "file.txt");
@@ -353,7 +353,7 @@ mod tests {
 
     #[test]
     fn test_git_commit_returns_error_for_invalid_repo() {
-        let dir = std::env::temp_dir().join("warp_not_repo_commit");
+        let dir = std::env::temp_dir().join("crucible_not_repo_commit");
         fs::create_dir_all(&dir).unwrap();
 
         let result = git_commit(dir.to_str().unwrap(), "valid message");

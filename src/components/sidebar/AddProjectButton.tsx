@@ -33,7 +33,7 @@ function AddProjectButton() {
     <button
       data-testid="add-project-btn"
       onClick={handleClick}
-      className="flex w-full items-center justify-center gap-1 rounded px-3 py-1.5 text-sm text-warp-text-dim hover:bg-warp-bg/50 hover:text-warp-accent transition-colors"
+      className="flex w-full items-center justify-center gap-1 rounded px-3 py-1.5 text-sm text-crucible-text-dim hover:bg-crucible-bg/50 hover:text-crucible-accent transition-colors"
       title="Add project"
     >
       <span className="text-lg leading-none">+</span>

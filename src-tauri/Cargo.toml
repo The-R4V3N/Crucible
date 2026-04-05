@@ -1,12 +1,12 @@
 [package]
-name = "warp"
+name = "crucible"
 version = "0.1.0"
 edition = "2021"
 description = "AI agent IDE for Windows"
 license = "MIT"
 
 [lib]
-name = "warp_lib"
+name = "crucible_lib"
 crate-type = ["lib", "cdylib", "staticlib"]
 
 [build-dependencies]

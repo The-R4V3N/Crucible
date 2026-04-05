@@ -64,25 +64,25 @@ describe("ActivityBar", () => {
   it("Explorer icon has accent class when activePanel is explorer", () => {
     useUiStore.setState({ activePanel: "explorer" });
     render(<ActivityBar />);
-    expect(screen.getByTestId("activity-explorer")).toHaveClass("text-warp-accent");
+    expect(screen.getByTestId("activity-explorer")).toHaveClass("text-crucible-accent");
   });
 
   it("Explorer icon has dim class when activePanel is not explorer", () => {
     useUiStore.setState({ activePanel: null });
     render(<ActivityBar />);
-    expect(screen.getByTestId("activity-explorer")).toHaveClass("text-warp-text-dim");
+    expect(screen.getByTestId("activity-explorer")).toHaveClass("text-crucible-text-dim");
   });
 
   it("Search icon has accent class when activePanel is search", () => {
     useUiStore.setState({ activePanel: "search" });
     render(<ActivityBar />);
-    expect(screen.getByTestId("activity-search")).toHaveClass("text-warp-accent");
+    expect(screen.getByTestId("activity-search")).toHaveClass("text-crucible-accent");
   });
 
   it("Source Control icon has accent class when activePanel is source-control", () => {
     useUiStore.setState({ activePanel: "source-control" });
     render(<ActivityBar />);
-    expect(screen.getByTestId("activity-source-control")).toHaveClass("text-warp-accent");
+    expect(screen.getByTestId("activity-source-control")).toHaveClass("text-crucible-accent");
   });
 
   it("no badge shown when changedFiles is 0", () => {

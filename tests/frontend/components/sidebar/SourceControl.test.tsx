@@ -311,9 +311,9 @@ describe("SourceControl — file click opens editor", () => {
     });
 
     it("prepends projectPath to git-relative path on click", () => {
-      render(<SourceControl gitStatus={mixed()} projectPath="D:/Development/WARP" />);
+      render(<SourceControl gitStatus={mixed()} projectPath="D:/Development/Crucible" />);
       fireEvent.click(screen.getByTestId("untracked-file-src/new.ts"));
-      expect(useFileStore.getState().activeFilePath).toBe("D:/Development/WARP/src/new.ts");
+      expect(useFileStore.getState().activeFilePath).toBe("D:/Development/Crucible/src/new.ts");
     });
   });
 });

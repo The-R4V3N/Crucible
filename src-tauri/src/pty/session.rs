@@ -9,7 +9,7 @@ use super::error::PtyError;
 ///
 /// Combines (in priority order):
 ///   1. `%USERPROFILE%\.local\bin`  — Claude Code CLI install location
-///   2. The current process PATH     — tools available to WARP itself
+///   2. The current process PATH     — tools available to Crucible itself
 ///   3. Machine + User registry PATH — system and user-installed tools
 ///      (read via .NET API which natively expands `REG_EXPAND_SZ` values)
 ///

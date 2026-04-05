@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { useConfigStore, type WarpConfig } from "@/stores/configStore";
+import { useConfigStore, type CrucibleConfig } from "@/stores/configStore";
 
-const baseConfig: WarpConfig = {
+const baseConfig: CrucibleConfig = {
   projects: [
     { name: "existing", path: "/tmp/existing", command: "powershell.exe" },
   ],

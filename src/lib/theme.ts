@@ -1,4 +1,4 @@
-/** WARP color tokens — matches CSS variables in globals.css and tailwind.config.js */
+/** Crucible color tokens — matches CSS variables in globals.css and tailwind.config.js */
 export const colors = {
   bg: "#1E1E1E",
   sidebar: "#252526",
@@ -12,7 +12,7 @@ export const colors = {
   attention: "#007ACC",
 } as const;
 
-/** WARP font settings */
+/** Crucible font settings */
 export const fonts = {
   mono: '"Cascadia Code", Consolas, monospace',
   size: 14,

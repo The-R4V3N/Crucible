@@ -80,7 +80,7 @@ function SplitPane({ orientation, initialRatio = 0.5, minRatio = 0.1, children }
       <div
         data-testid="split-divider"
         onMouseDown={handleMouseDown}
-        className={`flex-shrink-0 bg-warp-border hover:bg-warp-accent transition-colors ${
+        className={`flex-shrink-0 bg-crucible-border hover:bg-crucible-accent transition-colors ${
           isVertical ? "w-1 cursor-col-resize" : "h-1 cursor-row-resize"
         }`}
       />

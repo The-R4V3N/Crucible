@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import SettingsTerminal from "@/components/settings/SettingsTerminal";
-import type { WarpConfig } from "@/stores/configStore";
+import type { CrucibleConfig } from "@/stores/configStore";
 
 const mockListFonts = vi.hoisted(() =>
   vi.fn().mockResolvedValue(["Cascadia Code", "Consolas", "Fira Code"]),
@@ -10,7 +10,7 @@ vi.mock("@/lib/ipc", () => ({
   listFonts: mockListFonts,
 }));
 
-const MOCK_CONFIG: WarpConfig = {
+const MOCK_CONFIG: CrucibleConfig = {
   projects: [],
   theme: "dark",
   accent_color: "#00E5FF",

@@ -73,7 +73,7 @@ function TabBar({ onSearchToggle }: TabBarProps) {
   return (
     <div
       data-testid="tab-bar"
-      className="flex h-9 items-stretch border-b border-warp-border bg-warp-sidebar"
+      className="flex h-9 items-stretch border-b border-crucible-border bg-crucible-sidebar"
     >
       {/* Tabs */}
       <div className="flex flex-1 items-stretch">
@@ -96,9 +96,9 @@ function TabBar({ onSearchToggle }: TabBarProps) {
                 isDragging ? "opacity-50 cursor-grabbing" : "cursor-grab"
               } ${
                 isActive
-                  ? "border-warp-accent text-warp-text"
-                  : "border-transparent text-warp-text-dim hover:text-warp-text"
-              } ${isDropTarget ? "bg-warp-accent/20 border-l-2 border-l-warp-accent" : ""}`}
+                  ? "border-crucible-accent text-crucible-text"
+                  : "border-transparent text-crucible-text-dim hover:text-crucible-text"
+              } ${isDropTarget ? "bg-crucible-accent/20 border-l-2 border-l-crucible-accent" : ""}`}
             >
               {tabLabels[viewId]}
             </div>
@@ -119,7 +119,7 @@ function TabBar({ onSearchToggle }: TabBarProps) {
               store.splitVertical();
             }
           }}
-          className="flex items-center px-3 text-warp-text-dim hover:text-warp-accent transition-colors"
+          className="flex items-center px-3 text-crucible-text-dim hover:text-crucible-accent transition-colors"
           title="Split Editor (Ctrl+\)"
         >
           <svg
@@ -142,7 +142,7 @@ function TabBar({ onSearchToggle }: TabBarProps) {
         <button
           data-testid="search-toggle"
           onClick={onSearchToggle}
-          className="flex items-center px-3 text-warp-text-dim hover:text-warp-accent transition-colors"
+          className="flex items-center px-3 text-crucible-text-dim hover:text-crucible-accent transition-colors"
           title="Search (Ctrl+Shift+F)"
         >
           <svg

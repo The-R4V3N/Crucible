@@ -10,7 +10,7 @@ function EditorTabs() {
   return (
     <div
       data-testid="editor-tabs"
-      className="flex h-9 items-stretch overflow-x-auto border-b border-warp-border bg-warp-sidebar"
+      className="flex h-9 items-stretch overflow-x-auto border-b border-crucible-border bg-crucible-sidebar"
     >
       {openFiles.map((file) => {
         const isActive = file.path === activeFilePath;
@@ -20,14 +20,14 @@ function EditorTabs() {
             data-testid={`tab-${file.path}`}
             className={`group flex items-center gap-1 px-3 text-sm cursor-pointer border-b-2 ${
               isActive
-                ? "border-warp-accent text-warp-text bg-warp-bg"
-                : "border-transparent text-warp-text-dim hover:text-warp-text"
+                ? "border-crucible-accent text-crucible-text bg-crucible-bg"
+                : "border-transparent text-crucible-text-dim hover:text-crucible-text"
             }`}
             onClick={() => setActiveFile(file.path)}
           >
             <span>{file.name}</span>
             {file.isDirty && (
-              <span data-testid={`dirty-${file.path}`} className="text-warp-accent text-xs">
+              <span data-testid={`dirty-${file.path}`} className="text-crucible-accent text-xs">
                 •
               </span>
             )}
@@ -37,7 +37,7 @@ function EditorTabs() {
                 e.stopPropagation();
                 closeFile(file.path);
               }}
-              className="ml-1 text-xs text-warp-text-dim hover:text-warp-error opacity-0 group-hover:opacity-100"
+              className="ml-1 text-xs text-crucible-text-dim hover:text-crucible-error opacity-0 group-hover:opacity-100"
             >
               ×
             </button>
