@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**WARP** is an AI agent IDE for Windows — a project-centric workspace combining terminal multiplexing, a code editor, git integration, and smart notifications. Built with Tauri v2 (Rust backend) + React (frontend) + xterm.js (terminal) + Monaco (editor).
+**Crucible** is an AI agent IDE for Windows — a project-centric workspace combining terminal multiplexing, a code editor, git integration, and smart notifications. Built with Tauri v2 (Rust backend) + React (frontend) + xterm.js (terminal) + Monaco (editor).
 
 See `ARCHITECTURE.md` for the full blueprint: layout, IPC API, milestones, and project structure.
 
@@ -100,7 +100,7 @@ cargo build                  # Build backend only
 ## Project Structure
 
 ```
-warp/
+Crucible/
 ├── src-tauri/               # Rust backend (Tauri)
 │   └── src/
 │       ├── main.rs          # Tauri entry point
