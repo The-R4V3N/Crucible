@@ -1,6 +1,6 @@
 <div align="center">
 
-# WARP
+# Crucible
 
 **An AI agent IDE for Windows — project-centric workspace combining terminal multiplexing, a code editor, git integration, and smart notifications.**
 
@@ -22,7 +22,7 @@
 
 ---
 
-WARP is a desktop IDE built for developers who live in the terminal. It wraps multiple PTY sessions, a Monaco code editor, git tooling, and smart notifications into a single Tauri-powered window — native performance, no Electron, no browser tab.
+Crucible is a desktop IDE built for developers who live in the terminal. It wraps multiple PTY sessions, a Monaco code editor, git tooling, and smart notifications into a single Tauri-powered window — native performance, no Electron, no browser tab.
 
 > **One workspace. Every project. Zero context switching.**
 
@@ -95,8 +95,8 @@ WARP is a desktop IDE built for developers who live in the terminal. It wraps mu
 ### Install & Run
 
 ```bash
-git clone https://github.com/The-R4V3N/WARP.git
-cd WARP
+git clone https://github.com/The-R4V3N/Crucible.git
+cd Crucible
 npm install
 npm run dev
 ```
@@ -123,7 +123,7 @@ Produces a Windows installer (`.msi`/`.exe`) in `src-tauri/target/release/bundle
 ## Architecture
 
 ```text
-warp/
+Crucible/
 ├── src-tauri/               Rust backend (Tauri v2)
 │   └── src/
 │       ├── main.rs          Tauri entry point
@@ -192,7 +192,7 @@ Commands defined in `src-tauri/src/commands.rs`, called via `@tauri-apps/api`:
 
 ## Configuration
 
-WARP stores its config in `warp_config.json` (auto-created on first run, never committed):
+Crucible stores its config in `Crucible_config.json` (auto-created on first run, never committed):
 
 ```json
 {
