@@ -46,10 +46,10 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tagName: ${{ github.ref_name }}
-          releaseName: "WARP ${{ github.ref_name }}"
+          releaseName: "Crucible ${{ github.ref_name }}"
           releaseBody: |
             ## What's new
-            See [CHANGELOG](https://github.com/The-R4V3N/WARP/commits/master) for details.
+            See [CHANGELOG](https://github.com/The-R4V3N/Crucible/commits/master) for details.
 
             ## Installation
             Download the `.msi` installer (recommended) or the standalone `.exe` below.
