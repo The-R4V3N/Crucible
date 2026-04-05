@@ -12,15 +12,15 @@ interface ProjectListProps {
 function statusColor(status: SessionStatus | undefined): string {
   switch (status) {
     case "running":
-      return "bg-warp-success";
+      return "bg-crucible-success";
     case "stopped":
-      return "bg-warp-error";
+      return "bg-crucible-error";
     case "error":
-      return "bg-warp-error";
+      return "bg-crucible-error";
     case "starting":
-      return "bg-warp-warning";
+      return "bg-crucible-warning";
     default:
-      return "bg-warp-text-dim";
+      return "bg-crucible-text-dim";
   }
 }
 
@@ -58,20 +58,20 @@ function ProjectList({ projects }: ProjectListProps) {
             }}
             className={`group relative flex items-center gap-2 rounded px-3 py-2 text-left text-sm transition-colors ${
               isActive
-                ? "bg-warp-bg text-warp-text"
-                : "text-warp-text-dim hover:bg-warp-bg/50 hover:text-warp-text"
+                ? "bg-crucible-bg text-crucible-text"
+                : "text-crucible-text-dim hover:bg-crucible-bg/50 hover:text-crucible-text"
             }`}
           >
             {/* Accent bar for active project */}
             {isActive && (
-              <div className="absolute left-0 top-1 bottom-1 w-0.5 rounded-full bg-warp-accent" />
+              <div className="absolute left-0 top-1 bottom-1 w-0.5 rounded-full bg-crucible-accent" />
             )}
 
             {/* Status dot */}
             <div
               className={`h-2 w-2 rounded-full ${
                 session?.needsAttention
-                  ? "bg-warp-attention animate-pulse"
+                  ? "bg-crucible-attention animate-pulse"
                   : statusColor(session?.status)
               }`}
               data-testid={`status-dot-${project.name}`}
@@ -82,7 +82,7 @@ function ProjectList({ projects }: ProjectListProps) {
 
             {/* F-key badge */}
             {index < 12 && (
-              <span className="text-xs text-warp-text-dim opacity-0 group-hover:opacity-100">
+              <span className="text-xs text-crucible-text-dim opacity-0 group-hover:opacity-100">
                 F{index + 1}
               </span>
             )}
@@ -91,7 +91,7 @@ function ProjectList({ projects }: ProjectListProps) {
             <span
               data-testid={`remove-project-${project.name}`}
               onClick={(e) => handleRemove(e, project.name)}
-              className="text-xs text-warp-text-dim opacity-0 group-hover:opacity-100 hover:text-warp-error cursor-pointer ml-1"
+              className="text-xs text-crucible-text-dim opacity-0 group-hover:opacity-100 hover:text-crucible-error cursor-pointer ml-1"
               title="Remove project"
             >
               ×

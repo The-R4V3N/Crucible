@@ -21,10 +21,10 @@ describe("AboutModal — open", () => {
     expect(screen.getByTestId("about-modal")).toBeInTheDocument();
   });
 
-  it("renders the WARP name", () => {
+  it("renders the Crucible name", () => {
     render(<AboutModal open={true} onClose={onClose} />);
     expect(screen.getByTestId("about-app-name")).toBeInTheDocument();
-    expect(screen.getByTestId("about-app-name")).toHaveTextContent("WARP");
+    expect(screen.getByTestId("about-app-name")).toHaveTextContent("Crucible");
   });
 
   it("renders the app version", () => {

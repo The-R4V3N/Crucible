@@ -41,7 +41,7 @@ describe("ProjectList", () => {
     });
     render(<ProjectList projects={mockProjects} />);
     const item = screen.getByTestId("project-item-alpha");
-    expect(item.className).toContain("bg-warp-bg");
+    expect(item.className).toContain("bg-crucible-bg");
   });
 
   it("clicking project switches active session", () => {
@@ -87,7 +87,7 @@ describe("ProjectList", () => {
     });
     render(<ProjectList projects={mockProjects} />);
     const dot = screen.getByTestId("status-dot-alpha");
-    expect(dot.className).toContain("bg-warp-success");
+    expect(dot.className).toContain("bg-crucible-success");
   });
 
   it("shows red dot for stopped session", () => {
@@ -106,6 +106,6 @@ describe("ProjectList", () => {
     });
     render(<ProjectList projects={mockProjects} />);
     const dot = screen.getByTestId("status-dot-alpha");
-    expect(dot.className).toContain("bg-warp-error");
+    expect(dot.className).toContain("bg-crucible-error");
   });
 });

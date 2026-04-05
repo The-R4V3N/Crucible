@@ -96,7 +96,7 @@ function FileTreeNode({ node, depth }: FileTreeNodeProps) {
               if (e.key === "Enter") commitRename();
               else if (e.key === "Escape") clearRenameTarget();
             }}
-            className="w-full border border-warp-accent bg-warp-bg px-2 py-0.5 text-sm text-warp-text outline-none"
+            className="w-full border border-crucible-accent bg-crucible-bg px-2 py-0.5 text-sm text-crucible-text outline-none"
           />
         </div>
       </div>
@@ -108,13 +108,13 @@ function FileTreeNode({ node, depth }: FileTreeNodeProps) {
       <button
         onClick={handleClick}
         onContextMenu={handleContextMenu}
-        className={`flex w-full items-center gap-1 px-2 py-0.5 text-left text-sm hover:bg-warp-bg/50 ${
-          isActive ? "bg-warp-bg text-warp-accent" : "text-warp-text"
+        className={`flex w-full items-center gap-1 px-2 py-0.5 text-left text-sm hover:bg-crucible-bg/50 ${
+          isActive ? "bg-crucible-bg text-crucible-accent" : "text-crucible-text"
         }`}
         style={{ paddingLeft: `${depth * 16 + 8}px` }}
       >
         {node.is_dir && (
-          <span className="text-xs text-warp-text-dim">{isExpanded ? "▼" : "▶"}</span>
+          <span className="text-xs text-crucible-text-dim">{isExpanded ? "▼" : "▶"}</span>
         )}
         {!node.is_dir && <span className="w-3" />}
         <span className="truncate">{node.name}</span>

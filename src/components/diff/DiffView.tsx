@@ -41,7 +41,7 @@ function DiffView({ repoPath, filePath }: DiffViewProps) {
     return (
       <div
         data-testid="diff-placeholder"
-        className="flex h-full items-center justify-center text-warp-text-dim"
+        className="flex h-full items-center justify-center text-crucible-text-dim"
       >
         <span>Select a file to view diff</span>
       </div>
@@ -50,7 +50,7 @@ function DiffView({ repoPath, filePath }: DiffViewProps) {
 
   if (loading) {
     return (
-      <div className="flex h-full items-center justify-center text-warp-text-dim">
+      <div className="flex h-full items-center justify-center text-crucible-text-dim">
         Loading diff...
       </div>
     );

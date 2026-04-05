@@ -81,7 +81,7 @@ export default function CommandPalette() {
     >
       <div
         data-testid="palette-container"
-        className="w-[600px] max-h-[480px] flex flex-col rounded-lg border border-warp-border bg-warp-bg shadow-2xl overflow-hidden"
+        className="w-[600px] max-h-[480px] flex flex-col rounded-lg border border-crucible-border bg-crucible-bg shadow-2xl overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
         <input
@@ -92,12 +92,12 @@ export default function CommandPalette() {
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder={mode === "command" ? "Type a command…" : "Search open files…"}
-          className="w-full bg-transparent px-4 py-3 text-sm text-warp-text placeholder-warp-text-dim outline-none border-b border-warp-border"
+          className="w-full bg-transparent px-4 py-3 text-sm text-crucible-text placeholder-crucible-text-dim outline-none border-b border-crucible-border"
         />
         {items.length === 0 ? (
           <div
             data-testid="palette-empty"
-            className="px-4 py-6 text-sm text-warp-text-dim text-center"
+            className="px-4 py-6 text-sm text-crucible-text-dim text-center"
           >
             No results
           </div>

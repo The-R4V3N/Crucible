@@ -81,17 +81,17 @@ function SourceControl({
   return (
     <div
       data-testid="source-control"
-      className="border-t border-warp-border px-3 py-3 flex flex-col gap-2"
+      className="border-t border-crucible-border px-3 py-3 flex flex-col gap-2"
     >
       {/* Header */}
-      <div className="text-xs uppercase tracking-wider text-warp-text-dim">Source Control</div>
+      <div className="text-xs uppercase tracking-wider text-crucible-text-dim">Source Control</div>
 
       {/* Branch */}
-      <div className="flex items-center gap-1.5 text-sm text-warp-text">
-        <span className="text-warp-accent">⎇</span>
+      <div className="flex items-center gap-1.5 text-sm text-crucible-text">
+        <span className="text-crucible-accent">⎇</span>
         <span data-testid="git-branch">{gitStatus.branch}</span>
         {gitStatus.dirty && (
-          <span className="text-warp-warning" data-testid="git-dirty">
+          <span className="text-crucible-warning" data-testid="git-dirty">
             •
           </span>
         )}
@@ -104,7 +104,7 @@ function SourceControl({
             <button
               data-testid="staged-section-header"
               onClick={() => setStagedOpen((o) => !o)}
-              className="flex items-center gap-1 text-xs font-medium text-warp-text-dim uppercase tracking-wide hover:text-warp-text"
+              className="flex items-center gap-1 text-xs font-medium text-crucible-text-dim uppercase tracking-wide hover:text-crucible-text"
             >
               <span>{stagedOpen ? "▾" : "▸"}</span>
               <span>Staged Changes ({staged_files.length})</span>
@@ -114,7 +114,7 @@ function SourceControl({
                 data-testid="unstage-all-btn"
                 onClick={onUnstageAll}
                 title="Unstage All"
-                className="text-xs text-warp-text-dim hover:text-warp-text px-1"
+                className="text-xs text-crucible-text-dim hover:text-crucible-text px-1"
               >
                 −
               </button>
@@ -128,7 +128,7 @@ function SourceControl({
                   data-testid={`staged-file-${filePath}`}
                   onClick={() => handleFileClick(filePath)}
                   title={filePath}
-                  className="flex-1 truncate text-xs text-left text-warp-text-dim hover:text-warp-text"
+                  className="flex-1 truncate text-xs text-left text-crucible-text-dim hover:text-crucible-text"
                 >
                   {filePath.split("/").pop()}
                 </button>
@@ -136,7 +136,7 @@ function SourceControl({
                   data-testid={`unstage-btn-${filePath}`}
                   onClick={() => onUnstage?.(filePath)}
                   title={`Unstage ${filePath}`}
-                  className="hidden group-hover:flex text-xs text-warp-text-dim hover:text-warp-accent px-0.5"
+                  className="hidden group-hover:flex text-xs text-crucible-text-dim hover:text-crucible-accent px-0.5"
                 >
                   −
                 </button>
@@ -152,7 +152,7 @@ function SourceControl({
             <button
               data-testid="unstaged-section-header"
               onClick={() => setUnstagedOpen((o) => !o)}
-              className="flex items-center gap-1 text-xs font-medium text-warp-text-dim uppercase tracking-wide hover:text-warp-text"
+              className="flex items-center gap-1 text-xs font-medium text-crucible-text-dim uppercase tracking-wide hover:text-crucible-text"
             >
               <span>{unstagedOpen ? "▾" : "▸"}</span>
               <span>Unstaged Changes ({unstaged_files.length})</span>
@@ -162,7 +162,7 @@ function SourceControl({
                 data-testid="stage-all-btn"
                 onClick={onStageAll}
                 title="Stage All"
-                className="text-xs text-warp-text-dim hover:text-warp-text px-1"
+                className="text-xs text-crucible-text-dim hover:text-crucible-text px-1"
               >
                 +
               </button>
@@ -176,7 +176,7 @@ function SourceControl({
                   data-testid={`unstaged-file-${filePath}`}
                   onClick={() => handleFileClick(filePath)}
                   title={filePath}
-                  className="flex-1 truncate text-xs text-left text-warp-text-dim hover:text-warp-text"
+                  className="flex-1 truncate text-xs text-left text-crucible-text-dim hover:text-crucible-text"
                 >
                   {filePath.split("/").pop()}
                 </button>
@@ -184,7 +184,7 @@ function SourceControl({
                   data-testid={`stage-btn-${filePath}`}
                   onClick={() => onStage?.(filePath)}
                   title={`Stage ${filePath}`}
-                  className="hidden group-hover:flex text-xs text-warp-text-dim hover:text-warp-accent px-0.5"
+                  className="hidden group-hover:flex text-xs text-crucible-text-dim hover:text-crucible-accent px-0.5"
                 >
                   +
                 </button>
@@ -192,7 +192,7 @@ function SourceControl({
                   data-testid={`discard-btn-${filePath}`}
                   onClick={() => onDiscard?.(filePath)}
                   title={`Discard changes to ${filePath}`}
-                  className="hidden group-hover:flex text-xs text-warp-text-dim hover:text-red-400 px-0.5"
+                  className="hidden group-hover:flex text-xs text-crucible-text-dim hover:text-red-400 px-0.5"
                 >
                   ↺
                 </button>
@@ -208,7 +208,7 @@ function SourceControl({
             <button
               data-testid="untracked-section-header"
               onClick={() => setUntrackedOpen((o) => !o)}
-              className="flex items-center gap-1 text-xs font-medium text-warp-text-dim uppercase tracking-wide hover:text-warp-text"
+              className="flex items-center gap-1 text-xs font-medium text-crucible-text-dim uppercase tracking-wide hover:text-crucible-text"
             >
               <span>{untrackedOpen ? "▾" : "▸"}</span>
               <span>Untracked Files ({untracked_files.length})</span>
@@ -218,7 +218,7 @@ function SourceControl({
                 data-testid="stage-all-btn"
                 onClick={onStageAll}
                 title="Stage All"
-                className="text-xs text-warp-text-dim hover:text-warp-text px-1"
+                className="text-xs text-crucible-text-dim hover:text-crucible-text px-1"
               >
                 +
               </button>
@@ -232,7 +232,7 @@ function SourceControl({
                   data-testid={`untracked-file-${filePath}`}
                   onClick={() => handleFileClick(filePath)}
                   title={filePath}
-                  className="flex-1 truncate text-xs text-left text-warp-text-dim hover:text-warp-text"
+                  className="flex-1 truncate text-xs text-left text-crucible-text-dim hover:text-crucible-text"
                 >
                   {filePath.split("/").pop()}
                 </button>
@@ -240,7 +240,7 @@ function SourceControl({
                   data-testid={`stage-btn-${filePath}`}
                   onClick={() => onStage?.(filePath)}
                   title={`Stage ${filePath}`}
-                  className="hidden group-hover:flex text-xs text-warp-text-dim hover:text-warp-accent px-0.5"
+                  className="hidden group-hover:flex text-xs text-crucible-text-dim hover:text-crucible-accent px-0.5"
                 >
                   +
                 </button>
@@ -257,13 +257,13 @@ function SourceControl({
           onChange={(e) => setCommitMsg(e.target.value)}
           placeholder="Commit message"
           rows={2}
-          className="w-full resize-none rounded border border-warp-border bg-warp-bg px-2 py-1 text-xs text-warp-text placeholder-warp-text-dim focus:outline-none focus:border-warp-accent"
+          className="w-full resize-none rounded border border-crucible-border bg-crucible-bg px-2 py-1 text-xs text-crucible-text placeholder-crucible-text-dim focus:outline-none focus:border-crucible-accent"
         />
         <button
           data-testid="commit-btn"
           onClick={handleCommit}
           disabled={!commitMsg.trim()}
-          className="w-full rounded bg-warp-accent px-2 py-1 text-xs font-medium text-black disabled:opacity-40 disabled:cursor-not-allowed hover:opacity-90"
+          className="w-full rounded bg-crucible-accent px-2 py-1 text-xs font-medium text-black disabled:opacity-40 disabled:cursor-not-allowed hover:opacity-90"
         >
           Commit
         </button>

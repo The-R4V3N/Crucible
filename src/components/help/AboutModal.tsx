@@ -29,15 +29,15 @@ function AboutModal({ open, onClose }: AboutModalProps) {
       <div
         data-testid="about-modal"
         tabIndex={-1}
-        className="w-[400px] flex flex-col rounded-lg border border-warp-border bg-warp-bg shadow-2xl overflow-hidden"
+        className="w-[400px] flex flex-col rounded-lg border border-crucible-border bg-crucible-bg shadow-2xl overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-warp-border">
-          <h2 className="text-sm font-semibold text-warp-text">About WARP</h2>
+        <div className="flex items-center justify-between px-5 py-4 border-b border-crucible-border">
+          <h2 className="text-sm font-semibold text-crucible-text">About Crucible</h2>
           <button
             onClick={onClose}
-            className="text-warp-text-dim hover:text-warp-text transition-colors"
+            className="text-crucible-text-dim hover:text-crucible-text transition-colors"
             aria-label="Close"
           >
             ×
@@ -49,29 +49,29 @@ function AboutModal({ open, onClose }: AboutModalProps) {
           <div className="text-center space-y-1">
             <p
               data-testid="about-app-name"
-              className="text-2xl font-bold tracking-widest text-warp-accent"
+              className="text-2xl font-bold tracking-widest text-crucible-accent"
             >
-              WARP
+              Crucible
             </p>
-            <p className="text-warp-text-dim text-xs">AI agent IDE for Windows</p>
+            <p className="text-crucible-text-dim text-xs">AI agent IDE for Windows</p>
           </div>
 
-          <div className="space-y-2 pt-2 border-t border-warp-border">
+          <div className="space-y-2 pt-2 border-t border-crucible-border">
             <div className="flex justify-between">
-              <span className="text-warp-text-dim">Version</span>
-              <span data-testid="about-version" className="text-warp-text font-mono">
+              <span className="text-crucible-text-dim">Version</span>
+              <span data-testid="about-version" className="text-crucible-text font-mono">
                 {APP_VERSION}
               </span>
             </div>
             <div className="flex justify-between">
-              <span className="text-warp-text-dim">License</span>
-              <span data-testid="about-license" className="text-warp-text">
+              <span className="text-crucible-text-dim">License</span>
+              <span data-testid="about-license" className="text-crucible-text">
                 {APP_LICENSE}
               </span>
             </div>
           </div>
 
-          <p className="text-center text-warp-text-dim text-xs pt-2 italic">
+          <p className="text-center text-crucible-text-dim text-xs pt-2 italic">
             built with Rust, driven by agents
           </p>
         </div>

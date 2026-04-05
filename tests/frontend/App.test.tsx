@@ -118,7 +118,7 @@ describe("App", () => {
 
   it("shows loading state initially", () => {
     render(<App />);
-    expect(screen.getByText("WARP")).toBeInTheDocument();
+    expect(screen.getByText("Crucible")).toBeInTheDocument();
   });
 
   it("renders sidebar and terminal after config loads", async () => {

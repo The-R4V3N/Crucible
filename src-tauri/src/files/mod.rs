@@ -68,7 +68,7 @@ mod tests {
 
     #[test]
     fn test_read_file_returns_content() {
-        let dir = std::env::temp_dir().join("warp_files_test_read");
+        let dir = std::env::temp_dir().join("crucible_files_test_read");
         fs::create_dir_all(&dir).unwrap();
         let file = dir.join("test.txt");
         fs::write(&file, "hello world").unwrap();
@@ -88,7 +88,7 @@ mod tests {
 
     #[test]
     fn test_read_file_on_directory() {
-        let dir = std::env::temp_dir().join("warp_files_test_dir");
+        let dir = std::env::temp_dir().join("crucible_files_test_dir");
         fs::create_dir_all(&dir).unwrap();
 
         let result = read_file(&dir);
@@ -100,7 +100,7 @@ mod tests {
 
     #[test]
     fn test_write_file_creates_file() {
-        let dir = std::env::temp_dir().join("warp_files_test_write");
+        let dir = std::env::temp_dir().join("crucible_files_test_write");
         let _ = fs::remove_dir_all(&dir);
         let file = dir.join("output.txt");
 
@@ -114,7 +114,7 @@ mod tests {
 
     #[test]
     fn test_write_file_overwrites_existing() {
-        let dir = std::env::temp_dir().join("warp_files_test_overwrite");
+        let dir = std::env::temp_dir().join("crucible_files_test_overwrite");
         fs::create_dir_all(&dir).unwrap();
         let file = dir.join("existing.txt");
         fs::write(&file, "old content").unwrap();
@@ -129,7 +129,7 @@ mod tests {
 
     #[test]
     fn test_create_dir_creates_directory() {
-        let dir = std::env::temp_dir().join("warp_files_test_create_dir");
+        let dir = std::env::temp_dir().join("crucible_files_test_create_dir");
         let _ = fs::remove_dir_all(&dir);
 
         create_dir(&dir).unwrap();
@@ -142,20 +142,20 @@ mod tests {
 
     #[test]
     fn test_create_dir_creates_nested_directories() {
-        let dir = std::env::temp_dir().join("warp_files_test_create_dir_nested/a/b/c");
-        let _ = fs::remove_dir_all(std::env::temp_dir().join("warp_files_test_create_dir_nested"));
+        let dir = std::env::temp_dir().join("crucible_files_test_create_dir_nested/a/b/c");
+        let _ = fs::remove_dir_all(std::env::temp_dir().join("crucible_files_test_create_dir_nested"));
 
         create_dir(&dir).unwrap();
 
         assert!(dir.exists());
         assert!(dir.is_dir());
 
-        let _ = fs::remove_dir_all(std::env::temp_dir().join("warp_files_test_create_dir_nested"));
+        let _ = fs::remove_dir_all(std::env::temp_dir().join("crucible_files_test_create_dir_nested"));
     }
 
     #[test]
     fn test_create_dir_is_idempotent() {
-        let dir = std::env::temp_dir().join("warp_files_test_create_dir_idem");
+        let dir = std::env::temp_dir().join("crucible_files_test_create_dir_idem");
         fs::create_dir_all(&dir).unwrap();
 
         // calling again on an existing dir should succeed
@@ -166,7 +166,7 @@ mod tests {
 
     #[test]
     fn test_write_file_creates_parent_dirs() {
-        let dir = std::env::temp_dir().join("warp_files_test_nested");
+        let dir = std::env::temp_dir().join("crucible_files_test_nested");
         let _ = fs::remove_dir_all(&dir);
         let file = dir.join("deep/nested/file.txt");
 
@@ -180,7 +180,7 @@ mod tests {
 
     #[test]
     fn test_rename_path_renames_file() {
-        let dir = std::env::temp_dir().join("warp_files_test_rename_file");
+        let dir = std::env::temp_dir().join("crucible_files_test_rename_file");
         let _ = fs::remove_dir_all(&dir);
         fs::create_dir_all(&dir).unwrap();
         let old = dir.join("old.txt");
@@ -197,7 +197,7 @@ mod tests {
 
     #[test]
     fn test_rename_path_renames_directory() {
-        let dir = std::env::temp_dir().join("warp_files_test_rename_dir");
+        let dir = std::env::temp_dir().join("crucible_files_test_rename_dir");
         let _ = fs::remove_dir_all(&dir);
         fs::create_dir_all(&dir).unwrap();
         let old = dir.join("old_dir");
@@ -216,15 +216,15 @@ mod tests {
     #[test]
     fn test_rename_path_source_not_found() {
         let result = rename_path(
-            Path::new("/nonexistent_warp_test/old.txt"),
-            Path::new("/nonexistent_warp_test/new.txt"),
+            Path::new("/nonexistent_crucible_test/old.txt"),
+            Path::new("/nonexistent_crucible_test/new.txt"),
         );
         assert!(result.is_err());
     }
 
     #[test]
     fn test_delete_path_removes_file() {
-        let dir = std::env::temp_dir().join("warp_files_test_delete_file");
+        let dir = std::env::temp_dir().join("crucible_files_test_delete_file");
         let _ = fs::remove_dir_all(&dir);
         fs::create_dir_all(&dir).unwrap();
         let file = dir.join("to_delete.txt");
@@ -238,7 +238,7 @@ mod tests {
 
     #[test]
     fn test_delete_path_removes_directory_recursively() {
-        let dir = std::env::temp_dir().join("warp_files_test_delete_dir");
+        let dir = std::env::temp_dir().join("crucible_files_test_delete_dir");
         let _ = fs::remove_dir_all(&dir);
         let target = dir.join("to_delete");
         fs::create_dir_all(target.join("nested")).unwrap();
@@ -252,7 +252,7 @@ mod tests {
 
     #[test]
     fn test_delete_path_not_found() {
-        let result = delete_path(Path::new("/nonexistent_warp_test/path.txt"));
+        let result = delete_path(Path::new("/nonexistent_crucible_test/path.txt"));
         assert!(result.is_err());
         assert!(result.unwrap_err().contains("not found"));
     }

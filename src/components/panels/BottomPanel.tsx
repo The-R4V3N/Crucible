@@ -16,22 +16,24 @@ function BottomPanel({ changedFiles, onFileClick }: BottomPanelProps) {
   return (
     <div
       data-testid="bottom-panel"
-      className="border-t border-warp-border bg-warp-sidebar"
+      className="border-t border-crucible-border bg-crucible-sidebar"
       style={{ height: "200px" }}
     >
       <div className="flex items-center justify-between px-4 py-2">
-        <span className="text-xs uppercase tracking-wider text-warp-text-dim">Changed Files</span>
-        <span className="text-xs text-warp-text-dim">{changedFiles.length}</span>
+        <span className="text-xs uppercase tracking-wider text-crucible-text-dim">
+          Changed Files
+        </span>
+        <span className="text-xs text-crucible-text-dim">{changedFiles.length}</span>
       </div>
       <div className="overflow-y-auto px-2" style={{ maxHeight: "168px" }}>
         {changedFiles.length === 0 ? (
-          <div className="px-2 py-1 text-xs text-warp-text-dim">No changed files</div>
+          <div className="px-2 py-1 text-xs text-crucible-text-dim">No changed files</div>
         ) : (
           changedFiles.map((filePath) => (
             <button
               key={filePath}
               onClick={() => onFileClick(filePath)}
-              className="flex w-full items-center gap-2 rounded px-2 py-1 text-left text-xs text-warp-text-dim hover:bg-warp-bg/50 hover:text-warp-text"
+              className="flex w-full items-center gap-2 rounded px-2 py-1 text-left text-xs text-crucible-text-dim hover:bg-crucible-bg/50 hover:text-crucible-text"
             >
               <span className="truncate">{filePath}</span>
             </button>

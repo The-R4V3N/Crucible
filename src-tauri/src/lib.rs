@@ -1,4 +1,4 @@
-// WARP — AI agent IDE for Windows
+// Crucible — AI agent IDE for Windows
 // Module root. Registers Tauri plugins and IPC commands.
 
 pub mod commands;

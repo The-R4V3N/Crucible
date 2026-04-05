@@ -26,9 +26,9 @@ describe("Sidebar", () => {
     expect(screen.queryByTestId("sidebar")).not.toBeInTheDocument();
   });
 
-  it("shows WARP logo", () => {
+  it("shows Crucible logo", () => {
     render(<Sidebar projects={mockProjects} />);
-    expect(screen.getByText("WARP")).toBeInTheDocument();
+    expect(screen.getByText("Crucible")).toBeInTheDocument();
   });
 
   it("renders project list", () => {

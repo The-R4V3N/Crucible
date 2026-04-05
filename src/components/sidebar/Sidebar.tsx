@@ -37,11 +37,11 @@ function Sidebar({
   return (
     <aside
       data-testid="sidebar"
-      className="flex h-full w-60 flex-shrink-0 flex-col border-r border-warp-border bg-warp-sidebar"
+      className="flex h-full w-60 flex-shrink-0 flex-col border-r border-crucible-border bg-crucible-sidebar"
     >
       {/* Logo */}
       <div className="flex items-center px-4 py-3">
-        <span className="text-warp-accent text-sm font-bold tracking-wider">WARP</span>
+        <span className="text-crucible-accent text-sm font-bold tracking-wider">Crucible</span>
       </div>
 
       {/* Project list */}

@@ -82,7 +82,7 @@ Crucible is an AI agent IDE for Windows — a project-centric workspace that com
 
 ## Brand Identity
 
-- **Name:** WARP
+- **Name:** Crucible
 - **Accent color:** Neon Cyan `#00E5FF`
 - **Theme:** Dark (VS Code dark base), with cyan accents
 - **Font:** System monospace (Cascadia Code on Windows)
@@ -90,16 +90,16 @@ Crucible is an AI agent IDE for Windows — a project-centric workspace that com
 ### Color Tokens
 
 ```
---warp-bg:          #1E1E1E
---warp-sidebar:     #252526
---warp-border:      #3E3E3E
---warp-text:        #CCCCCC
---warp-text-dim:    #808080
---warp-accent:      #00E5FF  (neon cyan)
---warp-success:     #4EC9B0
---warp-warning:     #E5C07B
---warp-error:       #F44747
---warp-attention:   #007ACC  (blue ring)
+--crucible-bg:          #1E1E1E
+--crucible-sidebar:     #252526
+--crucible-border:      #3E3E3E
+--crucible-text:        #CCCCCC
+--crucible-text-dim:    #808080
+--crucible-accent:      #00E5FF  (neon cyan)
+--crucible-success:     #4EC9B0
+--crucible-warning:     #E5C07B
+--crucible-error:       #F44747
+--crucible-attention:   #007ACC  (blue ring)
 ```
 
 ---
@@ -277,7 +277,7 @@ Crucible/
 
 ```
 User launches Crucible
-  → Load warp_config.json
+  → Load crucible_config.json
   → For each project:
       → Create Session { name, path, status: "starting" }
       → Spawn PTY: cmd.exe /C claude (inherit env)
@@ -347,7 +347,7 @@ starting → running → idle → needs_attention
 
 ### M5 — Polish + Release
 
-- WARP branding (neon cyan theme, custom title bar)
+- Crucible branding (neon cyan theme, custom title bar)
 - Windows installer (Tauri bundler)
 - Config system (JSON, validated)
 - README + documentation

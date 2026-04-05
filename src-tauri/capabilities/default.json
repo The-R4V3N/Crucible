@@ -1,6 +1,6 @@
 {
   "identifier": "default",
-  "description": "Default capabilities for WARP",
+  "description": "Default capabilities for Crucible",
   "windows": ["main"],
   "permissions": [
     "core:default",

@@ -4,13 +4,13 @@ export default {
   theme: {
     extend: {
       colors: {
-        warp: {
+        crucible: {
           bg: "#1E1E1E",
           sidebar: "#252526",
           border: "#3E3E3E",
           text: "#CCCCCC",
           "text-dim": "#808080",
-          accent: "var(--warp-accent)",
+          accent: "var(--crucible-accent)",
           success: "#4EC9B0",
           warning: "#E5C07B",
           error: "#F44747",

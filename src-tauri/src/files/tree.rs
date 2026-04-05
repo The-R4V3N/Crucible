@@ -108,7 +108,7 @@ mod tests {
     use std::fs;
 
     fn create_test_dir(suffix: &str) -> std::path::PathBuf {
-        let dir = std::env::temp_dir().join(format!("warp_tree_{suffix}"));
+        let dir = std::env::temp_dir().join(format!("crucible_tree_{suffix}"));
         let _ = fs::remove_dir_all(&dir);
         fs::create_dir_all(dir.join("src")).unwrap();
         fs::write(dir.join("README.md"), "hello").unwrap();
@@ -179,7 +179,7 @@ mod tests {
 
     #[test]
     fn test_build_tree_nonexistent_path() {
-        let result = build_tree(Path::new("/nonexistent/warp_path_xyz"), 3);
+        let result = build_tree(Path::new("/nonexistent/crucible_path_xyz"), 3);
         assert!(result.is_err());
         assert!(result.unwrap_err().contains("does not exist"));
     }

@@ -129,14 +129,14 @@ mod tests {
     #[test]
     fn test_detect_powershell_prompt() {
         let mut detector = AttentionDetector::new();
-        let changed = detector.process_output("PS D:\\Development\\WARP> ");
+        let changed = detector.process_output("PS D:\\Development\\Crucible> ");
         assert!(changed, "should detect PS prompt");
     }
 
     #[test]
     fn test_no_detection_on_regular_output() {
         let mut detector = AttentionDetector::new();
-        let changed = detector.process_output("Compiling warp v0.1.0");
+        let changed = detector.process_output("Compiling crucible v0.1.0");
         assert!(!changed);
         assert!(!detector.needs_attention());
     }

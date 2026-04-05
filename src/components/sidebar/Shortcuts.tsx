@@ -8,13 +8,13 @@ function Shortcuts() {
   );
 
   return (
-    <div data-testid="shortcuts-panel" className="border-t border-warp-border px-4 py-3">
-      <div className="mb-1 text-xs uppercase tracking-wider text-warp-text-dim">Shortcuts</div>
+    <div data-testid="shortcuts-panel" className="border-t border-crucible-border px-4 py-3">
+      <div className="mb-1 text-xs uppercase tracking-wider text-crucible-text-dim">Shortcuts</div>
       <div className="flex flex-col gap-1">
         {displayBindings.map((kb) => (
           <div key={kb.key} className="flex items-center justify-between text-xs">
-            <span className="text-warp-text-dim">{kb.key}</span>
-            <span className="text-warp-text-dim">{kb.description}</span>
+            <span className="text-crucible-text-dim">{kb.key}</span>
+            <span className="text-crucible-text-dim">{kb.description}</span>
           </div>
         ))}
       </div>

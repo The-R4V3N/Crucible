@@ -22,7 +22,7 @@ describe("TabBar", () => {
   it("highlights active tab", () => {
     render(<TabBar onSearchToggle={() => {}} />);
     const terminalTab = screen.getByTestId("tab-terminal");
-    expect(terminalTab.className).toContain("border-warp-accent");
+    expect(terminalTab.className).toContain("border-crucible-accent");
   });
 
   it("clicking Editor tab switches active view", () => {

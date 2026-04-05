@@ -75,7 +75,7 @@ mod tests {
         let (tx, _rx) = mpsc::channel();
         let mut watcher = RecommendedWatcher::new(tx, Config::default()).unwrap();
         let result = watcher.watch(
-            Path::new("/nonexistent/warp/path"),
+            Path::new("/nonexistent/crucible/path"),
             RecursiveMode::Recursive,
         );
         assert!(result.is_err());
@@ -83,7 +83,7 @@ mod tests {
 
     #[test]
     fn test_watcher_watches_valid_directory() {
-        let dir = std::env::temp_dir().join("warp_watcher_test");
+        let dir = std::env::temp_dir().join("crucible_watcher_test");
         fs::create_dir_all(&dir).unwrap();
 
         let (tx, _rx) = mpsc::channel();

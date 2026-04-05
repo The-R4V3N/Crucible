@@ -10,8 +10,8 @@ import { useConfigStore } from "@/stores/configStore";
 import { usePaletteStore } from "@/stores/paletteStore";
 import { fileWrite, configSave } from "@/lib/ipc";
 
-const DOCS_URL = "https://github.com/The-R4V3N/WARP#readme";
-const ISSUES_URL = "https://github.com/The-R4V3N/WARP/issues";
+const DOCS_URL = "https://github.com/The-R4V3N/Crucible#readme";
+const ISSUES_URL = "https://github.com/The-R4V3N/Crucible/issues";
 
 type OpenMenu = "file" | "edit" | "help" | null;
 
@@ -166,7 +166,7 @@ function MenuBar() {
     <>
       <div
         data-testid="menu-bar"
-        className="flex items-center h-6 px-1 bg-warp-sidebar border-b border-warp-border text-xs select-none"
+        className="flex items-center h-6 px-1 bg-crucible-sidebar border-b border-crucible-border text-xs select-none"
       >
         {/* File */}
         <div ref={fileRef} className="relative">
@@ -175,8 +175,8 @@ function MenuBar() {
             onClick={() => toggle("file")}
             className={`px-2 py-0.5 transition-colors ${
               openMenu === "file"
-                ? "bg-warp-accent/20 text-warp-accent"
-                : "text-warp-text-dim hover:text-warp-text hover:bg-warp-bg/50"
+                ? "bg-crucible-accent/20 text-crucible-accent"
+                : "text-crucible-text-dim hover:text-crucible-text hover:bg-crucible-bg/50"
             }`}
           >
             File
@@ -185,35 +185,35 @@ function MenuBar() {
           {openMenu === "file" && (
             <div
               data-testid="file-dropdown"
-              className="absolute left-0 top-full mt-0.5 w-56 rounded border border-warp-border bg-warp-bg shadow-xl z-50 py-1"
+              className="absolute left-0 top-full mt-0.5 w-56 rounded border border-crucible-border bg-crucible-bg shadow-xl z-50 py-1"
             >
               <button
                 data-testid="file-item-new-file"
                 onClick={handleNewFile}
-                className="menu-item w-full text-left px-4 py-1.5 text-warp-text-dim hover:text-warp-text hover:bg-warp-sidebar transition-colors"
+                className="menu-item w-full text-left px-4 py-1.5 text-crucible-text-dim hover:text-crucible-text hover:bg-crucible-sidebar transition-colors"
               >
                 New File…
               </button>
               <button
                 data-testid="file-item-open-file"
                 onClick={handleOpenFile}
-                className="menu-item w-full text-left px-4 py-1.5 text-warp-text-dim hover:text-warp-text hover:bg-warp-sidebar transition-colors"
+                className="menu-item w-full text-left px-4 py-1.5 text-crucible-text-dim hover:text-crucible-text hover:bg-crucible-sidebar transition-colors"
               >
                 Open File…
               </button>
               <button
                 data-testid="file-item-open-folder"
                 onClick={handleOpenFolder}
-                className="menu-item w-full text-left px-4 py-1.5 text-warp-text-dim hover:text-warp-text hover:bg-warp-sidebar transition-colors"
+                className="menu-item w-full text-left px-4 py-1.5 text-crucible-text-dim hover:text-crucible-text hover:bg-crucible-sidebar transition-colors"
               >
                 Open Folder…
               </button>
-              <div className="my-1 border-t border-warp-border/60" />
+              <div className="my-1 border-t border-crucible-border/60" />
               <button
                 data-testid="file-item-save"
                 onClick={handleSave}
                 disabled={!hasFile}
-                className="menu-item w-full text-left px-4 py-1.5 text-warp-text-dim hover:text-warp-text hover:bg-warp-sidebar transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                className="menu-item w-full text-left px-4 py-1.5 text-crucible-text-dim hover:text-crucible-text hover:bg-crucible-sidebar transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 Save
               </button>
@@ -221,7 +221,7 @@ function MenuBar() {
                 data-testid="file-item-save-as"
                 onClick={handleSaveAs}
                 disabled={!hasFile}
-                className="menu-item w-full text-left px-4 py-1.5 text-warp-text-dim hover:text-warp-text hover:bg-warp-sidebar transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                className="menu-item w-full text-left px-4 py-1.5 text-crucible-text-dim hover:text-crucible-text hover:bg-crucible-sidebar transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 Save As…
               </button>
@@ -229,7 +229,7 @@ function MenuBar() {
                 data-testid="file-item-revert"
                 onClick={handleRevert}
                 disabled={!hasFile}
-                className="menu-item w-full text-left px-4 py-1.5 text-warp-text-dim hover:text-warp-text hover:bg-warp-sidebar transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                className="menu-item w-full text-left px-4 py-1.5 text-crucible-text-dim hover:text-crucible-text hover:bg-crucible-sidebar transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 Revert File
               </button>
@@ -237,30 +237,30 @@ function MenuBar() {
                 data-testid="file-item-close-editor"
                 onClick={handleCloseEditor}
                 disabled={!hasFile}
-                className="menu-item w-full text-left px-4 py-1.5 text-warp-text-dim hover:text-warp-text hover:bg-warp-sidebar transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                className="menu-item w-full text-left px-4 py-1.5 text-crucible-text-dim hover:text-crucible-text hover:bg-crucible-sidebar transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 Close Editor Tab
               </button>
-              <div className="my-1 border-t border-warp-border/60" />
+              <div className="my-1 border-t border-crucible-border/60" />
               <button
                 data-testid="file-item-new-terminal"
                 onClick={handleNewTerminal}
-                className="menu-item w-full text-left px-4 py-1.5 text-warp-text-dim hover:text-warp-text hover:bg-warp-sidebar transition-colors"
+                className="menu-item w-full text-left px-4 py-1.5 text-crucible-text-dim hover:text-crucible-text hover:bg-crucible-sidebar transition-colors"
               >
                 New Terminal
               </button>
               <button
                 data-testid="file-item-close-terminal"
                 onClick={handleCloseTerminal}
-                className="menu-item w-full text-left px-4 py-1.5 text-warp-text-dim hover:text-warp-text hover:bg-warp-sidebar transition-colors"
+                className="menu-item w-full text-left px-4 py-1.5 text-crucible-text-dim hover:text-crucible-text hover:bg-crucible-sidebar transition-colors"
               >
                 Close Terminal Tab
               </button>
-              <div className="my-1 border-t border-warp-border/60" />
+              <div className="my-1 border-t border-crucible-border/60" />
               <button
                 data-testid="file-item-exit"
                 onClick={handleExit}
-                className="menu-item w-full text-left px-4 py-1.5 text-warp-text-dim hover:text-warp-text hover:bg-warp-sidebar transition-colors"
+                className="menu-item w-full text-left px-4 py-1.5 text-crucible-text-dim hover:text-crucible-text hover:bg-crucible-sidebar transition-colors"
               >
                 Exit
               </button>
@@ -275,8 +275,8 @@ function MenuBar() {
             onClick={() => toggle("edit")}
             className={`px-2 py-0.5 transition-colors ${
               openMenu === "edit"
-                ? "bg-warp-accent/20 text-warp-accent"
-                : "text-warp-text-dim hover:text-warp-text hover:bg-warp-bg/50"
+                ? "bg-crucible-accent/20 text-crucible-accent"
+                : "text-crucible-text-dim hover:text-crucible-text hover:bg-crucible-bg/50"
             }`}
           >
             Edit
@@ -285,33 +285,33 @@ function MenuBar() {
           {openMenu === "edit" && (
             <div
               data-testid="edit-dropdown"
-              className="absolute left-0 top-full mt-0.5 w-64 rounded border border-warp-border bg-warp-bg shadow-xl z-50 py-1"
+              className="absolute left-0 top-full mt-0.5 w-64 rounded border border-crucible-border bg-crucible-bg shadow-xl z-50 py-1"
             >
               <button
                 data-testid="edit-item-find-in-file"
                 onClick={handleFindInFile}
                 disabled={!hasFile}
-                className="menu-item w-full text-left px-4 py-1.5 flex items-center justify-between text-warp-text-dim hover:text-warp-text hover:bg-warp-sidebar transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                className="menu-item w-full text-left px-4 py-1.5 flex items-center justify-between text-crucible-text-dim hover:text-crucible-text hover:bg-crucible-sidebar transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 <span>Find in File</span>
-                <span className="text-warp-text-dim/60 text-[10px]">Ctrl+F</span>
+                <span className="text-crucible-text-dim/60 text-[10px]">Ctrl+F</span>
               </button>
               <button
                 data-testid="edit-item-find-in-project"
                 onClick={handleFindInProject}
-                className="menu-item w-full text-left px-4 py-1.5 flex items-center justify-between text-warp-text-dim hover:text-warp-text hover:bg-warp-sidebar transition-colors"
+                className="menu-item w-full text-left px-4 py-1.5 flex items-center justify-between text-crucible-text-dim hover:text-crucible-text hover:bg-crucible-sidebar transition-colors"
               >
                 <span>Find in Project</span>
-                <span className="text-warp-text-dim/60 text-[10px]">Ctrl+Shift+F</span>
+                <span className="text-crucible-text-dim/60 text-[10px]">Ctrl+Shift+F</span>
               </button>
-              <div className="my-1 border-t border-warp-border/60" />
+              <div className="my-1 border-t border-crucible-border/60" />
               <button
                 data-testid="edit-item-command-palette"
                 onClick={handleCommandPalette}
-                className="menu-item w-full text-left px-4 py-1.5 flex items-center justify-between text-warp-text-dim hover:text-warp-text hover:bg-warp-sidebar transition-colors"
+                className="menu-item w-full text-left px-4 py-1.5 flex items-center justify-between text-crucible-text-dim hover:text-crucible-text hover:bg-crucible-sidebar transition-colors"
               >
                 <span>Command Palette</span>
-                <span className="text-warp-text-dim/60 text-[10px]">Ctrl+Shift+P</span>
+                <span className="text-crucible-text-dim/60 text-[10px]">Ctrl+Shift+P</span>
               </button>
             </div>
           )}
@@ -324,8 +324,8 @@ function MenuBar() {
             onClick={() => toggle("help")}
             className={`px-2 py-0.5 transition-colors ${
               openMenu === "help"
-                ? "bg-warp-accent/20 text-warp-accent"
-                : "text-warp-text-dim hover:text-warp-text hover:bg-warp-bg/50"
+                ? "bg-crucible-accent/20 text-crucible-accent"
+                : "text-crucible-text-dim hover:text-crucible-text hover:bg-crucible-bg/50"
             }`}
           >
             Help
@@ -334,37 +334,37 @@ function MenuBar() {
           {openMenu === "help" && (
             <div
               data-testid="help-dropdown"
-              className="absolute left-0 top-full mt-0.5 w-52 rounded border border-warp-border bg-warp-bg shadow-xl z-50 py-1"
+              className="absolute left-0 top-full mt-0.5 w-52 rounded border border-crucible-border bg-crucible-bg shadow-xl z-50 py-1"
             >
               <button
                 data-testid="help-item-shortcuts"
                 onClick={handleShortcuts}
-                className="w-full text-left px-4 py-1.5 text-warp-text-dim hover:text-warp-text hover:bg-warp-sidebar transition-colors"
+                className="w-full text-left px-4 py-1.5 text-crucible-text-dim hover:text-crucible-text hover:bg-crucible-sidebar transition-colors"
               >
                 Keyboard Shortcuts
               </button>
-              <div className="my-1 border-t border-warp-border/60" />
+              <div className="my-1 border-t border-crucible-border/60" />
               <button
                 data-testid="help-item-docs"
                 onClick={handleDocs}
-                className="w-full text-left px-4 py-1.5 text-warp-text-dim hover:text-warp-text hover:bg-warp-sidebar transition-colors"
+                className="w-full text-left px-4 py-1.5 text-crucible-text-dim hover:text-crucible-text hover:bg-crucible-sidebar transition-colors"
               >
                 View Documentation
               </button>
               <button
                 data-testid="help-item-issue"
                 onClick={handleIssue}
-                className="w-full text-left px-4 py-1.5 text-warp-text-dim hover:text-warp-text hover:bg-warp-sidebar transition-colors"
+                className="w-full text-left px-4 py-1.5 text-crucible-text-dim hover:text-crucible-text hover:bg-crucible-sidebar transition-colors"
               >
                 Report an Issue
               </button>
-              <div className="my-1 border-t border-warp-border/60" />
+              <div className="my-1 border-t border-crucible-border/60" />
               <button
                 data-testid="help-item-about"
                 onClick={handleAbout}
-                className="w-full text-left px-4 py-1.5 text-warp-text-dim hover:text-warp-text hover:bg-warp-sidebar transition-colors"
+                className="w-full text-left px-4 py-1.5 text-crucible-text-dim hover:text-crucible-text hover:bg-crucible-sidebar transition-colors"
               >
-                About WARP
+                About Crucible
               </button>
             </div>
           )}

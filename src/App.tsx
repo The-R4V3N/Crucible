@@ -34,7 +34,7 @@ function App() {
   const uiZoom = config?.ui_zoom;
   useEffect(() => {
     if (!accentColor) return;
-    document.documentElement.style.setProperty("--warp-accent", accentColor);
+    document.documentElement.style.setProperty("--crucible-accent", accentColor);
   }, [accentColor]);
   useEffect(() => {
     if (uiZoom == null) return;
@@ -58,7 +58,7 @@ function App() {
         setError(`Failed to load config: ${err}`);
         // Fall back to a default single project
         setConfig({
-          projects: [{ name: "warp", path: ".", command: "powershell.exe" }],
+          projects: [{ name: "crucible", path: ".", command: "powershell.exe" }],
           theme: "dark",
           accent_color: "#00E5FF",
           font_family: "Cascadia Code",
@@ -164,21 +164,21 @@ function App() {
 
   if (!isLoaded) {
     return (
-      <div className="flex h-screen w-screen items-center justify-center bg-warp-bg">
-        <span className="text-warp-accent text-xl">WARP</span>
+      <div className="flex h-screen w-screen items-center justify-center bg-crucible-bg">
+        <span className="text-crucible-accent text-xl">Crucible</span>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col h-screen w-screen bg-warp-bg text-warp-text font-mono overflow-hidden">
+    <div className="flex flex-col h-screen w-screen bg-crucible-bg text-crucible-text font-mono overflow-hidden">
       <TitleBar />
       <MenuBar />
       <ErrorBoundary>
         <div className="flex flex-1 min-h-0">
           {/* Error banner */}
           {error && (
-            <div className="absolute top-0 left-0 right-0 bg-warp-error/90 text-white p-2 text-sm z-50">
+            <div className="absolute top-0 left-0 right-0 bg-crucible-error/90 text-white p-2 text-sm z-50">
               {error}
               <button
                 onClick={() => setError(null)}
@@ -194,7 +194,7 @@ function App() {
             <>
               <ActivityBar changedFiles={gitStatus?.changed_files ?? 0} />
               {activePanel && (
-                <div className="w-60 flex-shrink-0 border-r border-warp-border flex flex-col h-full">
+                <div className="w-60 flex-shrink-0 border-r border-crucible-border flex flex-col h-full">
                   {activePanel === "explorer" && <FileExplorer />}
                   {activePanel === "search" && (
                     <SearchPanel
@@ -229,7 +229,7 @@ function App() {
           )}
 
           {/* Main content area */}
-          <main className="flex-1 min-w-0 flex flex-col bg-warp-bg">
+          <main className="flex-1 min-w-0 flex flex-col bg-crucible-bg">
             <TabBar onSearchToggle={toggleSearch} />
             <div className="flex-1 min-h-0">
               {splitMode ? (
@@ -282,7 +282,7 @@ function App() {
           {sidebarPosition === "right" && (
             <>
               {activePanel && (
-                <div className="w-60 flex-shrink-0 border-l border-warp-border flex flex-col h-full">
+                <div className="w-60 flex-shrink-0 border-l border-crucible-border flex flex-col h-full">
                   {activePanel === "explorer" && <FileExplorer />}
                   {activePanel === "search" && (
                     <SearchPanel

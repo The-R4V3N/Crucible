@@ -31,21 +31,21 @@ class ErrorBoundary extends Component<Props, State> {
   render() {
     if (this.state.hasError) {
       return (
-        <div className="flex h-full w-full flex-col items-center justify-center gap-4 bg-warp-bg p-8">
-          <h1 className="text-warp-accent text-xl font-bold">Something went wrong</h1>
-          <p className="text-warp-text text-sm max-w-lg text-center">
+        <div className="flex h-full w-full flex-col items-center justify-center gap-4 bg-crucible-bg p-8">
+          <h1 className="text-crucible-accent text-xl font-bold">Something went wrong</h1>
+          <p className="text-crucible-text text-sm max-w-lg text-center">
             {this.state.error?.message ?? "Unknown error"}
           </p>
           <div className="flex gap-3">
             <button
               onClick={this.handleReload}
-              className="px-4 py-2 text-sm bg-warp-accent text-warp-bg rounded hover:opacity-80 transition-opacity"
+              className="px-4 py-2 text-sm bg-crucible-accent text-crucible-bg rounded hover:opacity-80 transition-opacity"
             >
               Reload
             </button>
             <button
               onClick={this.handleDismiss}
-              className="px-4 py-2 text-sm border border-warp-border text-warp-text rounded hover:bg-warp-hover transition-colors"
+              className="px-4 py-2 text-sm border border-crucible-border text-crucible-text rounded hover:bg-crucible-hover transition-colors"
             >
               Dismiss
             </button>

@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
 import { listFonts } from "@/lib/ipc";
-import type { WarpConfig } from "@/stores/configStore";
+import type { CrucibleConfig } from "@/stores/configStore";
 
 interface Props {
-  config: WarpConfig;
-  onChange: (patch: Partial<WarpConfig>) => void;
+  config: CrucibleConfig;
+  onChange: (patch: Partial<CrucibleConfig>) => void;
 }
 
-const LABEL_CLASS = "block text-xs uppercase tracking-wider text-warp-text-dim mb-1";
+const LABEL_CLASS = "block text-xs uppercase tracking-wider text-crucible-text-dim mb-1";
 const SELECT_CLASS =
-  "w-full bg-warp-bg border border-warp-border px-3 py-1.5 text-sm text-warp-text outline-none focus:border-warp-accent";
+  "w-full bg-crucible-bg border border-crucible-border px-3 py-1.5 text-sm text-crucible-text outline-none focus:border-crucible-accent";
 
 function SettingsTerminal({ config, onChange }: Props) {
   const [fonts, setFonts] = useState<string[]>([]);
@@ -25,7 +25,7 @@ function SettingsTerminal({ config, onChange }: Props) {
 
   return (
     <div data-testid="settings-page-terminal" className="space-y-6">
-      <h2 className="text-base font-semibold text-warp-text">Terminal</h2>
+      <h2 className="text-base font-semibold text-crucible-text">Terminal</h2>
 
       <div>
         <label className={LABEL_CLASS}>Font Family</label>
@@ -65,7 +65,7 @@ function SettingsTerminal({ config, onChange }: Props) {
           {(["bar", "block", "underline"] as const).map((style) => (
             <label
               key={style}
-              className="flex items-center gap-2 cursor-pointer text-sm text-warp-text"
+              className="flex items-center gap-2 cursor-pointer text-sm text-crucible-text"
             >
               <input
                 data-testid={`setting-cursor-${style}`}
@@ -74,7 +74,7 @@ function SettingsTerminal({ config, onChange }: Props) {
                 value={style}
                 checked={config.cursor_style === style}
                 onChange={() => onChange({ cursor_style: style })}
-                className="accent-warp-accent"
+                className="accent-crucible-accent"
               />
               {style.charAt(0).toUpperCase() + style.slice(1)}
             </label>
@@ -102,7 +102,7 @@ function SettingsTerminal({ config, onChange }: Props) {
             data-testid="setting-divider-color"
             type="color"
             value={config.divider_color}
-            className="h-8 w-12 cursor-pointer border border-warp-border bg-warp-bg p-0.5"
+            className="h-8 w-12 cursor-pointer border border-crucible-border bg-crucible-bg p-0.5"
             onChange={(e) => onChange({ divider_color: e.target.value })}
           />
         </div>

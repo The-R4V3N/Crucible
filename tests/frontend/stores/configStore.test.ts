@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { useConfigStore } from "@/stores/configStore";
-import type { WarpConfig } from "@/stores/configStore";
+import type { CrucibleConfig } from "@/stores/configStore";
 
 describe("configStore", () => {
   beforeEach(() => {
@@ -14,7 +14,7 @@ describe("configStore", () => {
   });
 
   it("setConfig stores config and marks loaded", () => {
-    const config: WarpConfig = {
+    const config: CrucibleConfig = {
       projects: [{ name: "test", path: "/tmp", command: "bash" }],
       theme: "dark",
       accent_color: "#00E5FF",
@@ -42,7 +42,7 @@ describe("configStore", () => {
   it("setConfig applies defaults for missing fields", () => {
     const partial = {
       projects: [],
-    } as unknown as WarpConfig;
+    } as unknown as CrucibleConfig;
     useConfigStore.getState().setConfig(partial);
     const state = useConfigStore.getState();
     expect(state.config?.theme).toBe("dark");

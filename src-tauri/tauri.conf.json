@@ -6,17 +6,17 @@
     "icon": ["icons/icon.ico"],
     "category": "DeveloperTool",
     "shortDescription": "AI agent IDE for Windows",
-    "longDescription": "WARP is a project-centric workspace combining terminal multiplexing, a code editor, git integration, and smart notifications.",
-    "copyright": "2026 WARP Contributors",
+    "longDescription": "Crucible is a project-centric workspace combining terminal multiplexing, a code editor, git integration, and smart notifications.",
+    "copyright": "2026 Crucible Contributors",
     "windows": {
       "nsis": {
         "displayLanguageSelector": false
       }
     }
   },
-  "productName": "WARP",
+  "productName": "Crucible",
   "version": "0.1.0",
-  "identifier": "com.warp.app",
+  "identifier": "com.crucible.app",
   "build": {
     "frontendDist": "../dist",
     "devUrl": "http://localhost:1420",
@@ -26,7 +26,7 @@
   "app": {
     "windows": [
       {
-        "title": "WARP",
+        "title": "Crucible",
         "width": 1200,
         "height": 800,
         "minWidth": 800,
