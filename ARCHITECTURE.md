@@ -1,8 +1,8 @@
-# WARP — Architecture & Requirements
+# Crucible — Architecture & Requirements
 
 ## Vision
 
-WARP is an AI agent IDE for Windows — a project-centric workspace that combines terminal multiplexing, a code editor, git integration, and smart notifications into one native application. Think "VS Code meets cmux, built for AI coding agents."
+Crucible is an AI agent IDE for Windows — a project-centric workspace that combines terminal multiplexing, a code editor, git integration, and smart notifications into one native application. Think "VS Code meets cmux, built for AI coding agents."
 
 ## Target Users
 
@@ -37,17 +37,17 @@ WARP is an AI agent IDE for Windows — a project-centric workspace that combine
 
 ```
 ┌──────────────────────────────────────────────────────┐
-│  WARP                                    ─  □  ✕    │
+│  Crucible                                    ─  □  ✕    │
 ├────────┬─────────────────────────────────────────────┤
 │        │ [Terminal]  [Editor]  [Diff]                 │
-│  WARP  │┌───────────────────────────────────────────┐│
+│  Crucible  │┌───────────────────────────────────────────┐│
 │  logo  ││                                           ││
 │        ││                                           ││
 │ ▌proj1 ││         Active tab content                ││
 │  proj2 ││     (xterm.js / Monaco / Diff view)       ││
 │  proj3 ││                                           ││
 │  proj4 ││                                           ││
-│  warp  ││                                           ││
+│  Crucible  ││                                           ││
 │        │├───────────────────────────────────────────┤│
 │ ────── ││  Bottom Panel (collapsible)               ││
 │ SOURCE ││  Changed files / Output log / Problems    ││
@@ -107,7 +107,7 @@ WARP is an AI agent IDE for Windows — a project-centric workspace that combine
 ## Project Structure
 
 ```
-warp/
+Crucible/
 ├── src-tauri/                    # Rust backend
 │   ├── src/
 │   │   ├── main.rs              # Tauri entry point
@@ -202,7 +202,7 @@ warp/
 │   ├── icons/
 │   └── fonts/
 │
-├── warp_config.json              # User config (projects)
+├── Crucible_config.json              # User config (projects)
 ├── package.json                  # Frontend dependencies
 ├── tailwind.config.js
 ├── tsconfig.json
@@ -226,7 +226,7 @@ warp/
 | `Ctrl+N`       | Next project                      | Global     |
 | `Ctrl+P`       | Previous project                  | Global     |
 | `Ctrl+R`       | Restart active session            | Terminal   |
-| `Ctrl+Q`       | Quit WARP                         | Global     |
+| `Ctrl+Q`       | Quit Crucible                         | Global     |
 | `Ctrl+\` `     | Toggle bottom panel               | Global     |
 | `Ctrl+1/2/3`   | Switch tab (Terminal/Editor/Diff) | Center     |
 | `Ctrl+O`       | Open file in editor               | Editor     |
@@ -276,7 +276,7 @@ warp/
 ## Session Lifecycle
 
 ```
-User launches WARP
+User launches Crucible
   → Load warp_config.json
   → For each project:
       → Create Session { name, path, status: "starting" }
@@ -323,7 +323,7 @@ starting → running → idle → needs_attention
 
 ### M2 — Multi-session + Sidebar
 
-- Project list from warp_config.json
+- Project list from Crucible_config.json
 - Sidebar with project switching (F-keys)
 - Git branch + dirty status per project
 - Session status indicators (running/idle/stopped)
