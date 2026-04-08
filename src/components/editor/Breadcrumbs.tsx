@@ -65,10 +65,7 @@ function Breadcrumbs() {
           <span key={index} className="flex items-center gap-0.5">
             {index > 0 && <span className="px-0.5 text-crucible-text-dim/50">›</span>}
             {isLast ? (
-              <span
-                data-testid="breadcrumb-filename"
-                className="text-crucible-text"
-              >
+              <span data-testid="breadcrumb-filename" className="text-crucible-text">
                 {segment}
               </span>
             ) : (
