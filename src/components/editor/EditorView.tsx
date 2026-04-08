@@ -7,6 +7,7 @@ import { useEditorCursor } from "@/hooks/useEditorCursor";
 import { useGitDecorations } from "@/hooks/useGitDecorations";
 import { fileRead, fileWrite } from "@/lib/ipc";
 import EditorTabs from "./EditorTabs";
+import Breadcrumbs from "./Breadcrumbs";
 
 /** Detect language from file extension. */
 function detectLanguage(path: string): string {
@@ -193,6 +194,7 @@ function EditorView({ repoPath = null }: EditorViewProps) {
   return (
     <div className="flex h-full flex-col" data-testid="editor-view">
       <EditorTabs />
+      <Breadcrumbs />
       <div ref={editorContainerRef} className="flex-1">
         {loading ? (
           <div className="flex h-full items-center justify-center text-crucible-text-dim">
