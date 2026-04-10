@@ -3,6 +3,7 @@ import { render, screen } from "@testing-library/react";
 import StatusBar from "@/components/layout/StatusBar";
 import { useEditorStore } from "@/stores/editorStore";
 import { useUiStore } from "@/stores/uiStore";
+import { useProblemsStore } from "@/stores/problemsStore";
 import type { GitStatusInfo } from "@/lib/ipc";
 
 const gitStatus: GitStatusInfo = {
@@ -19,6 +20,7 @@ describe("StatusBar", () => {
   beforeEach(() => {
     useEditorStore.setState({ cursorLine: 1, cursorCol: 1, language: "plaintext" });
     useUiStore.setState({ activeView: "editor" });
+    useProblemsStore.setState({ problems: [], activeBottomTab: "changes" });
   });
 
   it("renders the status bar", () => {
@@ -102,6 +104,41 @@ describe("StatusBar", () => {
       useUiStore.setState({ activeView: "editor" });
       render(<StatusBar />);
       expect(screen.getByTestId("language-mode")).toBeInTheDocument();
+    });
+  });
+
+  describe("problem count badge", () => {
+    it("does not show problem count when there are no problems", () => {
+      render(<StatusBar />);
+      expect(screen.queryByTestId("problem-count")).not.toBeInTheDocument();
+    });
+
+    it("shows error count when there are errors", () => {
+      useProblemsStore.getState().setProblems([
+        { filePath: "/a.ts", line: 1, col: 1, message: "err", severity: "error" },
+      ]);
+      render(<StatusBar />);
+      expect(screen.getByTestId("problem-count")).toBeInTheDocument();
+      expect(screen.getByTestId("problem-count")).toHaveTextContent("1");
+    });
+
+    it("shows warning count when there are warnings but no errors", () => {
+      useProblemsStore.getState().setProblems([
+        { filePath: "/a.ts", line: 1, col: 1, message: "warn", severity: "warning" },
+      ]);
+      render(<StatusBar />);
+      expect(screen.getByTestId("warning-count")).toBeInTheDocument();
+      expect(screen.queryByTestId("problem-count")).not.toBeInTheDocument();
+    });
+
+    it("shows combined error and warning count", () => {
+      useProblemsStore.getState().setProblems([
+        { filePath: "/a.ts", line: 1, col: 1, message: "e", severity: "error" },
+        { filePath: "/a.ts", line: 2, col: 1, message: "w", severity: "warning" },
+      ]);
+      render(<StatusBar />);
+      expect(screen.getByTestId("problem-count")).toHaveTextContent("1");
+      expect(screen.getByTestId("warning-count")).toHaveTextContent("1");
     });
   });
 });

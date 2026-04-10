@@ -5,6 +5,7 @@ import { useFileStore } from "@/stores/fileStore";
 import { useEditorStore } from "@/stores/editorStore";
 import { useEditorCursor } from "@/hooks/useEditorCursor";
 import { useGitDecorations } from "@/hooks/useGitDecorations";
+import { useProblems } from "@/hooks/useProblems";
 import { fileRead, fileWrite } from "@/lib/ipc";
 import EditorTabs from "./EditorTabs";
 import Breadcrumbs from "./Breadcrumbs";
@@ -51,9 +52,14 @@ function EditorView({ repoPath = null }: EditorViewProps) {
   // Ref tracks the live editor for synchronous disposal in useLayoutEffect.
   // State updates (setEditorInstance) are async; this ref is available immediately.
   const editorRef = useRef<Monaco.editor.IStandaloneCodeEditor | null>(null);
+  // Ref to the Monaco namespace, captured in onMount and used by useProblems.
+  const [monacoInstance, setMonacoInstance] = useState<typeof Monaco | null>(null);
 
   // Sync cursor position to editorStore via the hook
   useEditorCursor(editorInstance);
+
+  // Sync Monaco markers → problems store
+  useProblems(monacoInstance);
 
   // Git gutter decorations — show added/modified/deleted lines vs HEAD
   useGitDecorations({ editor: editorInstance, filePath: activeFilePath ?? null, repoPath });
@@ -205,7 +211,7 @@ function EditorView({ repoPath = null }: EditorViewProps) {
             value={content}
             language={language}
             theme="vs-dark"
-            onMount={(editor) => {
+            onMount={(editor, monaco) => {
               // Monaco's dispose() is NOT idempotent — calling it a second time
               // crashes with "_isDisposed" on already-torn-down internals.
               // Our useLayoutEffect disposes synchronously (first call), but
@@ -221,6 +227,7 @@ function EditorView({ repoPath = null }: EditorViewProps) {
               };
               editorRef.current = editor;
               setEditorInstance(editor);
+              setMonacoInstance(monaco);
             }}
             onChange={(value) => {
               if (value !== undefined) {

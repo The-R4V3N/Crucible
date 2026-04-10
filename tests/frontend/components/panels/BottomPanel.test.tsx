@@ -1,11 +1,13 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { useUiStore } from "@/stores/uiStore";
+import { useProblemsStore } from "@/stores/problemsStore";
 import BottomPanel from "@/components/panels/BottomPanel";
 
 describe("BottomPanel", () => {
   beforeEach(() => {
     useUiStore.setState({ bottomPanelVisible: false });
+    useProblemsStore.setState({ problems: [], activeBottomTab: "changes" });
   });
 
   it("does not render when hidden", () => {
@@ -56,5 +58,34 @@ describe("BottomPanel", () => {
     useUiStore.setState({ bottomPanelVisible: true });
     render(<BottomPanel changedFiles={[]} onFileClick={() => {}} />);
     expect(screen.getByText("No changed files")).toBeInTheDocument();
+  });
+
+  it("renders both Changes and Problems tabs", () => {
+    useUiStore.setState({ bottomPanelVisible: true });
+    render(<BottomPanel changedFiles={[]} onFileClick={() => {}} />);
+    expect(screen.getByTestId("tab-changes")).toBeInTheDocument();
+    expect(screen.getByTestId("tab-problems")).toBeInTheDocument();
+  });
+
+  it("clicking Problems tab switches to problems view", () => {
+    useUiStore.setState({ bottomPanelVisible: true });
+    render(<BottomPanel changedFiles={[]} onFileClick={() => {}} />);
+    fireEvent.click(screen.getByTestId("tab-problems"));
+    expect(useProblemsStore.getState().activeBottomTab).toBe("problems");
+  });
+
+  it("clicking Changes tab switches back to changes view", () => {
+    useUiStore.setState({ bottomPanelVisible: true });
+    useProblemsStore.setState({ activeBottomTab: "problems" });
+    render(<BottomPanel changedFiles={[]} onFileClick={() => {}} />);
+    fireEvent.click(screen.getByTestId("tab-changes"));
+    expect(useProblemsStore.getState().activeBottomTab).toBe("changes");
+  });
+
+  it("shows ProblemsPanel content when problems tab is active", () => {
+    useUiStore.setState({ bottomPanelVisible: true });
+    useProblemsStore.setState({ activeBottomTab: "problems" });
+    render(<BottomPanel changedFiles={[]} onFileClick={() => {}} />);
+    expect(screen.getByText("No problems detected")).toBeInTheDocument();
   });
 });
