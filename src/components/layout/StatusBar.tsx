@@ -1,18 +1,22 @@
 import { useEditorStore } from "@/stores/editorStore";
 import { useUiStore } from "@/stores/uiStore";
+import { useProblemsStore } from "@/stores/problemsStore";
 import type { GitStatusInfo } from "@/lib/ipc";
 
 interface StatusBarProps {
   gitStatus?: GitStatusInfo | null;
 }
 
-/** VS Code-style status bar showing git branch, language, and cursor position. */
+/** VS Code-style status bar showing git branch, language, cursor position, and problem count. */
 function StatusBar({ gitStatus }: StatusBarProps) {
   const cursorLine = useEditorStore((s) => s.cursorLine);
   const cursorCol = useEditorStore((s) => s.cursorCol);
   const language = useEditorStore((s) => s.language);
   const activeView = useUiStore((s) => s.activeView);
   const isEditorActive = activeView === "editor";
+  const errorCount = useProblemsStore((s) => s.errorCount());
+  const warningCount = useProblemsStore((s) => s.warningCount());
+  const hasProblems = errorCount > 0 || warningCount > 0;
 
   return (
     <div
@@ -30,8 +34,24 @@ function StatusBar({ gitStatus }: StatusBarProps) {
         )}
       </div>
 
-      {/* Right: language + cursor position (editor only) */}
+      {/* Right: problem count + language + cursor position (editor only) */}
       <div className="flex items-center gap-4">
+        {hasProblems && (
+          <span className="flex items-center gap-1.5">
+            {errorCount > 0 && (
+              <span data-testid="problem-count" className="flex items-center gap-0.5">
+                <span>✕</span>
+                {errorCount}
+              </span>
+            )}
+            {warningCount > 0 && (
+              <span data-testid="warning-count" className="flex items-center gap-0.5">
+                <span>⚠</span>
+                {warningCount}
+              </span>
+            )}
+          </span>
+        )}
         {isEditorActive && (
           <>
             <span data-testid="language-mode">{language}</span>
