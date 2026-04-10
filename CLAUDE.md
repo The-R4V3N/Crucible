@@ -29,7 +29,7 @@ See `ARCHITECTURE.md` for the full blueprint: layout, IPC API, milestones, and p
 ### Rules
 
 - Never write production code without a failing test first.
-- Never skip tests "to save time." Tests ARE the work.
+- Never skip tests "to save time." Tests ARE the work. This applies to small fixes too — no exceptions.
 - Rust tests go in `src-tauri/src/` (unit) and `tests/rust/` (integration).
 - Frontend tests go in `tests/frontend/` using Vitest + React Testing Library.
 - Run tests before every commit. Broken tests block commits.
@@ -145,6 +145,7 @@ Crucible/
 
 ### Git
 
+- Always `git pull` from remote before analyzing issues, sessions, or editing docs to ensure you have the latest state.
 - Commit messages: imperative mood, lowercase. Example: `add PTY session spawn logic`
 - One logical change per commit. Don't bundle unrelated changes.
 - Branch naming: `feature/<issue-number>-short-description` (e.g. `feature/66-settings-ui`)
@@ -157,6 +158,10 @@ Crucible/
 - Keep dependencies minimal. Justify every new crate/package.
 - Prefer composition over inheritance. Small functions over large ones.
 - When in doubt, refer to `ARCHITECTURE.md`.
+
+## Skills / Tool Usage
+
+- Do not auto-invoke autopilot or planning skills for simple copywriting, doc edits, or planning tasks. Handle those directly.
 
 ## IPC Contract (Rust ↔ React)
 
