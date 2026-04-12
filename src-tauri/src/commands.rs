@@ -268,6 +268,34 @@ struct PtyAttentionPayload {
     needs_attention: bool,
 }
 
+/// Payload for turn-start events sent to the frontend.
+#[derive(Clone, serde::Serialize)]
+struct PtyTurnStartPayload {
+    session_id: String,
+    turn_id: u32,
+    timestamp_ms: u64,
+}
+
+/// Format a visual turn separator line to inject into the xterm.js output stream.
+///
+/// Renders as a dim grey rule with the turn number, e.g.:
+/// `────── turn 3 · 14:22:05 ──────────────────`
+fn format_turn_separator(turn_id: u32, timestamp_ms: u64) -> String {
+    // Convert timestamp_ms to HH:MM:SS
+    let total_secs = (timestamp_ms / 1000) % 86400;
+    let h = total_secs / 3600;
+    let m = (total_secs % 3600) / 60;
+    let s = total_secs % 60;
+    let time_str = format!("{h:02}:{m:02}:{s:02}");
+
+    // Dim grey ANSI color (256-color code 240)
+    let dim = "\x1b[38;5;240m";
+    let reset = "\x1b[0m";
+    let rule = "──────────────────────";
+
+    format!("\r\n{dim}{rule} turn {turn_id} · {time_str} {rule}{reset}\r\n")
+}
+
 /// Enumerate installed font family names from the Windows registry.
 fn list_system_fonts() -> Result<Vec<String>, String> {
     #[cfg(target_os = "windows")]
@@ -345,6 +373,7 @@ pub fn list_fonts() -> Result<Vec<String>, String> {
 fn read_pty_output(mut reader: Box<dyn Read + Send>, session_id: &str, app: &AppHandle) {
     let mut buf = [0u8; 4096];
     let mut attention = crate::pty::AttentionDetector::new();
+    let mut turns = crate::pty::TurnDetector::new();
     loop {
         match reader.read(&mut buf) {
             Ok(0) => {
@@ -361,6 +390,28 @@ fn read_pty_output(mut reader: Box<dyn Read + Send>, session_id: &str, app: &App
             Ok(n) => {
                 // Convert to string, replacing invalid UTF-8
                 let data = String::from_utf8_lossy(&buf[..n]).to_string();
+
+                // Check for a new agent turn boundary before emitting output.
+                // If detected, inject a visual separator into the output stream first.
+                if let Some(boundary) = turns.process_output(&data) {
+                    let separator = format_turn_separator(boundary.turn_id, boundary.timestamp_ms);
+                    let _ = app.emit(
+                        "pty:output",
+                        PtyOutputPayload {
+                            session_id: session_id.to_string(),
+                            data: separator,
+                        },
+                    );
+                    let _ = app.emit(
+                        "pty:turn_start",
+                        PtyTurnStartPayload {
+                            session_id: session_id.to_string(),
+                            turn_id: boundary.turn_id,
+                            timestamp_ms: boundary.timestamp_ms,
+                        },
+                    );
+                }
+
                 let _ = app.emit(
                     "pty:output",
                     PtyOutputPayload {
@@ -397,6 +448,56 @@ fn read_pty_output(mut reader: Box<dyn Read + Send>, session_id: &str, app: &App
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_format_turn_separator_contains_turn_number() {
+        let sep = format_turn_separator(3, 0);
+        assert!(sep.contains("turn 3"), "separator should contain 'turn 3', got: {sep:?}");
+    }
+
+    #[test]
+    fn test_format_turn_separator_contains_ansi_reset() {
+        let sep = format_turn_separator(1, 0);
+        assert!(sep.contains("\x1b[0m"), "separator should contain ANSI reset code");
+    }
+
+    #[test]
+    fn test_format_turn_separator_starts_with_crlf() {
+        let sep = format_turn_separator(1, 0);
+        assert!(sep.starts_with("\r\n"), "separator should start with \\r\\n for proper terminal newline");
+    }
+
+    #[test]
+    fn test_format_turn_separator_ends_with_crlf() {
+        let sep = format_turn_separator(1, 0);
+        assert!(sep.ends_with("\r\n"), "separator should end with \\r\\n");
+    }
+
+    #[test]
+    fn test_format_turn_separator_formats_timestamp() {
+        // 3661000 ms = 1h 1m 1s
+        let sep = format_turn_separator(1, 3661000);
+        assert!(sep.contains("01:01:01"), "separator should show HH:MM:SS time, got: {sep:?}");
+    }
+
+    #[test]
+    fn test_format_turn_separator_midnight_timestamp() {
+        // 0 ms = 00:00:00
+        let sep = format_turn_separator(1, 0);
+        assert!(sep.contains("00:00:00"), "zero timestamp should show 00:00:00");
+    }
+
+    #[test]
+    fn test_pty_turn_start_payload_fields() {
+        let payload = PtyTurnStartPayload {
+            session_id: "abc".to_string(),
+            turn_id: 2,
+            timestamp_ms: 1000,
+        };
+        assert_eq!(payload.session_id, "abc");
+        assert_eq!(payload.turn_id, 2);
+        assert_eq!(payload.timestamp_ms, 1000);
+    }
 
     #[test]
     #[cfg(target_os = "windows")]

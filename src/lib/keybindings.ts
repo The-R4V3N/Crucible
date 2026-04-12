@@ -30,6 +30,8 @@ export const keybindings: Keybinding[] = [
   { key: "Ctrl+Shift+\\", description: "Split horizontal", scope: "terminal" },
   { key: "Ctrl+W", description: "Close split / close tab", scope: "terminal" },
   { key: "Ctrl+R", description: "Restart active session", scope: "terminal" },
+  { key: "Alt+↑", description: "Previous agent turn", scope: "terminal" },
+  { key: "Alt+↓", description: "Next agent turn", scope: "terminal" },
   // Editor
   { key: "Ctrl+S", description: "Save file", scope: "editor" },
   { key: "Ctrl+F", description: "Find in file", scope: "editor" },

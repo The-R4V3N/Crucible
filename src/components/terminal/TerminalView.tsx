@@ -1,8 +1,10 @@
 import { useEffect, useRef } from "react";
 import { Terminal } from "@xterm/xterm";
+import type { IMarker } from "@xterm/xterm";
 import { FitAddon } from "@xterm/addon-fit";
 import { useSession } from "@/hooks/useSession";
 import { useSessionStore } from "@/stores/sessionStore";
+import { findPrevTurnLine, findNextTurnLine } from "@/lib/turnNavigation";
 import "@xterm/xterm/css/xterm.css";
 
 /** Crucible terminal color theme — dark. */
@@ -100,6 +102,8 @@ function TerminalView({
   const containerRef = useRef<HTMLDivElement>(null);
   const terminalRef = useRef<Terminal | null>(null);
   const fitAddonRef = useRef<FitAddon | null>(null);
+  /** xterm IMarker objects for each detected agent turn boundary. */
+  const turnMarkersRef = useRef<IMarker[]>([]);
 
   // Keep refs in sync so init effect can read latest values without re-running
   const fontFamilyRef = useRef(fontFamily);
@@ -162,6 +166,17 @@ function TerminalView({
         resize(terminal.rows, terminal.cols);
       }
     },
+    onTurnStart: (_turnId, _timestampMs) => {
+      const terminal = terminalRef.current;
+      if (!terminal) return;
+      // Register a marker at the current cursor line so we can navigate to it later.
+      const marker = terminal.registerMarker(0);
+      if (marker) {
+        turnMarkersRef.current.push(marker);
+        // Clean up disposed markers to avoid memory growth
+        turnMarkersRef.current = turnMarkersRef.current.filter((m) => !m.isDisposed);
+      }
+    },
   });
 
   // Initialize xterm.js — deferred until container is visible to avoid crashes
@@ -222,6 +237,26 @@ function TerminalView({
           }
           return true;
         }
+        // Alt+ArrowUp — scroll to previous agent turn
+        if (e.altKey && e.key === "ArrowUp" && e.type === "keydown") {
+          const lines = turnMarkersRef.current
+            .filter((m) => !m.isDisposed)
+            .map((m) => m.line);
+          const currentLine = terminal.buffer.active.viewportY + terminal.rows - 1;
+          const target = findPrevTurnLine(lines, currentLine);
+          if (target !== null) terminal.scrollToLine(target);
+          return false;
+        }
+        // Alt+ArrowDown — scroll to next agent turn
+        if (e.altKey && e.key === "ArrowDown" && e.type === "keydown") {
+          const lines = turnMarkersRef.current
+            .filter((m) => !m.isDisposed)
+            .map((m) => m.line);
+          const currentLine = terminal.buffer.active.viewportY + terminal.rows - 1;
+          const target = findNextTurnLine(lines, currentLine);
+          if (target !== null) terminal.scrollToLine(target);
+          return false;
+        }
         // F1-F12: project switching
         if (/^F\d+$/.test(e.key)) return false;
         // Ctrl+B, Ctrl+E, Ctrl+Shift+D, Ctrl+Shift+F, Ctrl+1/2/3, Ctrl+`, Ctrl+W
@@ -242,6 +277,23 @@ function TerminalView({
 
     initTerminal();
 
+    const handleNavigateTurn = (e: Event) => {
+      const terminal = terminalRef.current;
+      if (!terminal) return;
+      const direction = (e as CustomEvent<{ direction: string }>).detail.direction;
+      const lines = turnMarkersRef.current
+        .filter((m) => !m.isDisposed)
+        .map((m) => m.line);
+      const currentLine = terminal.buffer.active.viewportY + terminal.rows - 1;
+      const target =
+        direction === "prev"
+          ? findPrevTurnLine(lines, currentLine)
+          : findNextTurnLine(lines, currentLine);
+      if (target !== null) terminal.scrollToLine(target);
+    };
+
+    window.addEventListener("terminal:navigate-turn", handleNavigateTurn);
+
     const handleResize = () => safeFit();
     window.addEventListener("resize", handleResize);
 
@@ -255,6 +307,7 @@ function TerminalView({
     resizeObserver.observe(container);
 
     return () => {
+      window.removeEventListener("terminal:navigate-turn", handleNavigateTurn);
       window.removeEventListener("resize", handleResize);
       resizeObserver?.disconnect();
       terminal?.dispose();
