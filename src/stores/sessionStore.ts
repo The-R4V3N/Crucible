@@ -47,7 +47,15 @@ export const useSessionStore = create<SessionState>((set, get) => ({
     set((state) => ({
       sessions: {
         ...state.sessions,
-        [id]: { id, projectName, tabKey, label, status: "starting", needsAttention: false, turns: [] },
+        [id]: {
+          id,
+          projectName,
+          tabKey,
+          label,
+          status: "starting",
+          needsAttention: false,
+          turns: [],
+        },
       },
       activeSessionId: state.activeSessionId ?? id,
     })),

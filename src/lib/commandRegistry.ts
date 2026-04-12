@@ -73,13 +73,19 @@ export function getCommands(): Command[] {
       id: "terminal.prevTurn",
       label: "Previous Agent Turn",
       keybinding: "Alt+↑",
-      execute: () => window.dispatchEvent(new CustomEvent("terminal:navigate-turn", { detail: { direction: "prev" } })),
+      execute: () =>
+        window.dispatchEvent(
+          new CustomEvent("terminal:navigate-turn", { detail: { direction: "prev" } }),
+        ),
     },
     {
       id: "terminal.nextTurn",
       label: "Next Agent Turn",
       keybinding: "Alt+↓",
-      execute: () => window.dispatchEvent(new CustomEvent("terminal:navigate-turn", { detail: { direction: "next" } })),
+      execute: () =>
+        window.dispatchEvent(
+          new CustomEvent("terminal:navigate-turn", { detail: { direction: "next" } }),
+        ),
     },
   ];
 }

@@ -239,9 +239,7 @@ function TerminalView({
         }
         // Alt+ArrowUp — scroll to previous agent turn
         if (e.altKey && e.key === "ArrowUp" && e.type === "keydown") {
-          const lines = turnMarkersRef.current
-            .filter((m) => !m.isDisposed)
-            .map((m) => m.line);
+          const lines = turnMarkersRef.current.filter((m) => !m.isDisposed).map((m) => m.line);
           const currentLine = terminal.buffer.active.viewportY + terminal.rows - 1;
           const target = findPrevTurnLine(lines, currentLine);
           if (target !== null) terminal.scrollToLine(target);
@@ -249,9 +247,7 @@ function TerminalView({
         }
         // Alt+ArrowDown — scroll to next agent turn
         if (e.altKey && e.key === "ArrowDown" && e.type === "keydown") {
-          const lines = turnMarkersRef.current
-            .filter((m) => !m.isDisposed)
-            .map((m) => m.line);
+          const lines = turnMarkersRef.current.filter((m) => !m.isDisposed).map((m) => m.line);
           const currentLine = terminal.buffer.active.viewportY + terminal.rows - 1;
           const target = findNextTurnLine(lines, currentLine);
           if (target !== null) terminal.scrollToLine(target);
@@ -281,9 +277,7 @@ function TerminalView({
       const terminal = terminalRef.current;
       if (!terminal) return;
       const direction = (e as CustomEvent<{ direction: string }>).detail.direction;
-      const lines = turnMarkersRef.current
-        .filter((m) => !m.isDisposed)
-        .map((m) => m.line);
+      const lines = turnMarkersRef.current.filter((m) => !m.isDisposed).map((m) => m.line);
       const currentLine = terminal.buffer.active.viewportY + terminal.rows - 1;
       const target =
         direction === "prev"
