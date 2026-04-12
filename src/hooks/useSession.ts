@@ -8,9 +8,11 @@ import {
   onPtyOutput,
   onPtyExit,
   onPtyAttention,
+  onPtyTurnStart,
   type PtyOutputPayload,
   type PtyExitPayload,
   type PtyAttentionPayload,
+  type PtyTurnStartPayload,
 } from "@/lib/ipc";
 
 interface UseSessionOptions {
@@ -32,6 +34,8 @@ interface UseSessionOptions {
   onError?: (error: string) => void;
   /** Callback when PTY session is ready (connected and listeners attached). */
   onReady?: () => void;
+  /** Callback when a new agent turn boundary is detected. */
+  onTurnStart?: (turnId: number, timestampMs: number) => void;
 }
 
 interface UseSessionReturn {
@@ -56,9 +60,10 @@ export function useSession({
   onExit,
   onError,
   onReady,
+  onTurnStart,
 }: UseSessionOptions): UseSessionReturn {
   const sessionIdRef = useRef<string | null>(null);
-  const { addSession, updateStatus, removeSession, setAttention } = useSessionStore();
+  const { addSession, updateStatus, removeSession, setAttention, addTurn } = useSessionStore();
 
   // Store callbacks in refs to avoid effect re-runs
   const onOutputRef = useRef(onOutput);
@@ -69,12 +74,15 @@ export function useSession({
   onErrorRef.current = onError;
   const onReadyRef = useRef(onReady);
   onReadyRef.current = onReady;
+  const onTurnStartRef = useRef(onTurnStart);
+  onTurnStartRef.current = onTurnStart;
 
   useEffect(() => {
     let cancelled = false;
     let unlistenOutput: (() => void) | undefined;
     let unlistenExit: (() => void) | undefined;
     let unlistenAttention: (() => void) | undefined;
+    let unlistenTurnStart: (() => void) | undefined;
 
     const setup = async () => {
       try {
@@ -111,6 +119,14 @@ export function useSession({
           }
         });
 
+        // Listen for agent turn boundaries
+        unlistenTurnStart = await onPtyTurnStart((payload: PtyTurnStartPayload) => {
+          if (payload.session_id === id) {
+            addTurn(id, payload.turn_id, payload.timestamp_ms);
+            onTurnStartRef.current?.(payload.turn_id, payload.timestamp_ms);
+          }
+        });
+
         // Notify that the session is fully ready
         onReadyRef.current?.();
       } catch (err) {
@@ -129,6 +145,7 @@ export function useSession({
       unlistenOutput?.();
       unlistenExit?.();
       unlistenAttention?.();
+      unlistenTurnStart?.();
       const id = sessionIdRef.current;
       if (id) {
         ptyKill(id).catch(() => {});

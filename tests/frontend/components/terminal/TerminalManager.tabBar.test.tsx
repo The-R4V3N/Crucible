@@ -62,6 +62,7 @@ describe("TerminalManager terminal tabs", () => {
           label: "bash",
           status: "running",
           needsAttention: false,
+          turns: [],
         },
       },
       activeSessionId: "s1",
@@ -85,6 +86,7 @@ describe("TerminalManager terminal tabs", () => {
           label: "bash",
           status: "running",
           needsAttention: false,
+          turns: [],
         },
         s2: {
           id: "s2",
@@ -93,6 +95,7 @@ describe("TerminalManager terminal tabs", () => {
           label: "bash",
           status: "running",
           needsAttention: false,
+          turns: [],
         },
       },
       activeSessionId: "s1",

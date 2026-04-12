@@ -64,6 +64,22 @@ export async function onPtyExit(callback: (payload: PtyExitPayload) => void): Pr
   });
 }
 
+/** Payload emitted by the pty:turn_start event. */
+export interface PtyTurnStartPayload {
+  session_id: string;
+  turn_id: number;
+  timestamp_ms: number;
+}
+
+/** Listen for PTY turn-start events. Returns an unlisten function. */
+export async function onPtyTurnStart(
+  callback: (payload: PtyTurnStartPayload) => void,
+): Promise<UnlistenFn> {
+  return listen<PtyTurnStartPayload>("pty:turn_start", (event) => {
+    callback(event.payload);
+  });
+}
+
 // --- Config IPC ---
 
 import type { CrucibleConfig } from "@/stores/configStore";

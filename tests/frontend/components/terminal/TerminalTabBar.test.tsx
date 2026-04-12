@@ -21,6 +21,7 @@ describe("TerminalTabBar", () => {
           label: "bash",
           status: "running",
           needsAttention: false,
+          turns: [],
         },
         "sess-2": {
           id: "sess-2",
@@ -29,6 +30,7 @@ describe("TerminalTabBar", () => {
           label: "bash",
           status: "running",
           needsAttention: false,
+          turns: [],
         },
         "sess-3": {
           id: "sess-3",
@@ -37,6 +39,7 @@ describe("TerminalTabBar", () => {
           label: "powershell",
           status: "running",
           needsAttention: false,
+          turns: [],
         },
       },
       activeSessionId: "sess-1",
@@ -99,6 +102,7 @@ describe("TerminalTabBar", () => {
           label: "cmd",
           status: "running",
           needsAttention: false,
+          turns: [],
         },
       },
       activeSessionId: "sess-only",

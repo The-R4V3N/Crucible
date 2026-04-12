@@ -414,6 +414,25 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d0a5c400df2834b80a4c3327b3aad3a4c4cd4de0629063962b03235697506a28"
 
 [[package]]
+name = "crucible"
+version = "0.1.0"
+dependencies = [
+ "git2",
+ "notify",
+ "portable-pty",
+ "serde",
+ "serde_json",
+ "tauri",
+ "tauri-build",
+ "tauri-plugin-dialog",
+ "tauri-plugin-global-shortcut",
+ "tauri-plugin-shell",
+ "thiserror 2.0.18",
+ "uuid",
+ "winreg 0.52.0",
+]
+
+[[package]]
 name = "crypto-common"
 version = "0.1.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4604,25 +4623,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bfa7760aed19e106de2c7c0b581b509f2f25d3dacaf737cb82ac61bc6d760b0e"
 dependencies = [
  "try-lock",
-]
-
-[[package]]
-name = "warp"
-version = "0.1.0"
-dependencies = [
- "git2",
- "notify",
- "portable-pty",
- "serde",
- "serde_json",
- "tauri",
- "tauri-build",
- "tauri-plugin-dialog",
- "tauri-plugin-global-shortcut",
- "tauri-plugin-shell",
- "thiserror 2.0.18",
- "uuid",
- "winreg 0.52.0",
 ]
 
 [[package]]

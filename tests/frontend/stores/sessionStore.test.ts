@@ -26,6 +26,7 @@ describe("sessionStore", () => {
       label: "",
       status: "starting",
       needsAttention: false,
+      turns: [],
     });
   });
 
